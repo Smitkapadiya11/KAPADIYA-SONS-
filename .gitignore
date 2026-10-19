@@ -147,3 +147,7 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+.vercel
+
+# Local visual QA
+*-preview.png
