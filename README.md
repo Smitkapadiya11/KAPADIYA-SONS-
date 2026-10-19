@@ -20,8 +20,9 @@ Package and service copy lives in `src.js`; editorial sections in `index.html`; 
 
 ## Deployment
 
-Vercel project: `kapadiya-sons`, team: `smit-kapadiyas-projects`. The project is connected to the supplied GitHub repository. Build output is `dist`. Security response headers are configured in `vercel.json`. Fonts load from Google Fonts; no other third-party runtime code is used.
+Vercel project: `kapadiya-sons`, team: `smit-kapadiyas-projects`. The project is connected to the supplied GitHub repository. Build output is `dist`. Security response headers are configured in `vercel.json`. Fonts are self-hosted; no third-party runtime code is used.
 
 ## Verification
 
 Browser checks cover ten detail views, two service filters, seven distinct package enquiry messages, brief message handoff, privacy dialog, 360/390/768/1440px layouts, reduced motion and JavaScript exceptions. These are targeted checks, not a claim of universal device compatibility or a complete security audit.
+
