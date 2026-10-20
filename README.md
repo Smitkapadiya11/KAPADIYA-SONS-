@@ -12,6 +12,7 @@ Requires Node.js 20.19+ or 22.12+.
 - `npm run preview -- --port 4174`
 - `node qa.mjs` (preview running; Microsoft Edge installed)
 - `node qa-glass.mjs` (service artwork and dialog checks; defaults to port 4175)
+- `node qa-identity.mjs` (header, footer, navigation and accessibility at six widths; port 4175)
 - Set `SITE_URL` to test a different preview or production URL.
 
 ## Features
@@ -29,5 +30,9 @@ Vercel project: `kapadiya-sons`, team: `smit-kapadiyas-projects`. The project is
 Browser checks cover ten detail views, two service filters, seven distinct package enquiry messages, brief message handoff, privacy dialog, 360/390/768/950/1440px layouts, gallery scroll transforms and controls, mobile navigation, motion pause, reduced motion, deep links, automated WCAG A/AA checks and JavaScript exceptions. These are targeted checks, not a claim of universal device compatibility or a complete security audit.
 
 `qa-glass.mjs` additionally verifies all ten thumbnail/full images decode, distinct service enquiry messages, preserved image proportions, persistent controls, scroll reset when switching services, no horizontal dialog overflow, and automated accessibility scans inside the mobile and desktop dialogs.
+
+## Identity
+
+The eye-and-K vector identity, colour HEX codes, typography and international contact formatting are documented in `BRAND.md`. `identity.css` defines the brand tokens, refined header/footer, legibility improvements and numeric typography. `qa-identity.mjs` checks the brand layout at six widths, visible footer navigation, hidden floating controls at the footer, working contact links, canonical URL, mobile menu labels, privacy access and back-to-top.
 
 

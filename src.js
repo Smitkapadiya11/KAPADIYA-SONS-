@@ -1,8 +1,10 @@
 import './style.css';
 import './experience.css';
 import './glass.css';
+import './identity.css';
 import './motion.js';
 const wa = message => `https://wa.me/917575807403?text=${encodeURIComponent(message)}`;
+const formatINR = value => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Number(String(value).replaceAll(',', '')));
 const services = [
 ['avatar','content','◉','AI avatar videos','Your approved ideas, ready to post with your own digital avatar.','Consultants, educators, founders and professionals.','Digital-avatar videos, approved scripts, editing and captions aligned with your chosen package.','Your permission, suitable reference footage, topics and preferred language.','Agree the avatar direction and topics, approve scripts, produce and review.','Demo: 4 videos for ₹3,499. Monthly: 30 reels across 30 days, 30–40 seconds each, for ₹15,999, plus 2 realistic UGC-style ad videos.'],
 ['ugc','content','↗','UGC & product ads','Creator-style storytelling that shows what your product does and why it matters.','Apparel brands, product sellers and ecommerce businesses.','AI UGC reels: clothing showcases, product demonstrations, feature explainers and review-style presentations based on verified facts.','Product images, approved claims, audience, offer and brand assets.','Align the hook, demonstration, benefits and call to action, then produce the agreed variations. AI presenters are not real customers.','UGC Ads: 11 reels up to 30 seconds for ₹20,000. Monster: 11 reels of 40–50 seconds plus 25 image posts for ₹33,000. Gemini options from ₹10,000.'],
@@ -23,7 +25,7 @@ function renderServices(filter='all') {
       <span class="service-card-copy"><span class="service-category">${s.category==='content'?'CONTENT & CREATIVE':'TECHNOLOGY & SYSTEMS'}</span><span class="service-title">${s.name}</span><span class="service-description">${s.desc}</span><span class="service-action">Explore the service <span aria-hidden="true">↗</span></span></span>
     </button>`).join('');
 }
-function renderPlans(group='avatar'){document.querySelector('#plan-grid').innerHTML=plans[group].map(([name,price,line,items],i)=>`<article class="plan ${i||group==='film'?'featured':''}"><div class="plan-top"><span>${name}</span><span>✳</span></div><h3>₹${price}</h3><p>${line}</p><ul>${items.map(x=>`<li>✓ <span>${x}</span></li>`).join('')}</ul><a class="button ${i||group==='film'?'dark':'outline'}" href="${wa(`Hi Smit! I’m interested in the ${name} (₹${price}) at KAPADIYA & SONS. My business/product: ___. Audience and preferred language: ___. Please share reference requirements, delivery schedule, revisions, taxes and payment terms.`)}" target="_blank" rel="noopener noreferrer">Let’s discuss this plan <span>↗</span></a></article>`).join('');}
+function renderPlans(group='avatar'){document.querySelector('#plan-grid').innerHTML=plans[group].map(([name,price,line,items],i)=>`<article class="plan ${i||group==='film'?'featured':''}"><div class="plan-top"><span>${name}</span><span aria-hidden="true">✳</span></div><h3>${formatINR(price)}</h3><span class="price-unit">INR · PER PACKAGE</span><p>${line}</p><ul>${items.map(x=>`<li>✓ <span>${x}</span></li>`).join('')}</ul><a class="button ${i||group==='film'?'dark':'outline'}" href="${wa(`Hi Smit! I’m interested in the ${name} (${formatINR(price)}) at KAPADIYA & SONS. My business/product: ___. Audience and preferred language: ___. Please share reference requirements, delivery schedule, revisions, taxes and payment terms.`)}" target="_blank" rel="noopener noreferrer">Let’s discuss this plan <span>↗</span></a></article>`).join('');}
 const dialog=document.querySelector('#service-dialog');let returnFocus;
 function showDialog(content, footer='', pagination='') {
   if(!dialog.open)returnFocus=document.activeElement;
