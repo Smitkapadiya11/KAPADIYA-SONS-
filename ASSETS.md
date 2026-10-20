@@ -1,16 +1,35 @@
-# Visual direction and assets — edition 02
+# Visual direction and assets — edition 03
 
-Four original images generated using the built-in GPT Image tool. Generated concepts are labelled on the website; none is presented as client work, a real customer or a finished video. Smit's portrait is the supplied authentic photograph, encoded for web delivery without generative edits. Original uploads and generation outputs are retained outside the public repository; public WebP files contain the site's final assets.
+Four original showcase images and ten new service-specific images generated using the built-in GPT Image tool. Generated concepts are labelled on the website; none is presented as client work, a real customer or a finished video. Smit's portrait is the supplied authentic photograph, encoded for web delivery without generative edits. Original uploads and generation outputs are retained outside the public repository; public WebP files contain the site's final assets.
 
 ## Placement
 
 | File | Use |
 |---|---|
 | `public/images/hero-sculpture.webp` | Full-screen opening and social preview |
-| `public/images/ugc-creator.webp` | UGC creative world and service detail |
-| `public/images/cinematic-product.webp` | Cinematic creative world and service detail |
-| `public/images/avatar-studio.webp` | Avatar creative world and service detail |
+| `public/images/ugc-creator.webp` | UGC creative world |
+| `public/images/cinematic-product.webp` | Cinematic creative world |
+| `public/images/avatar-studio.webp` | Avatar creative world |
 | `public/images/smit-kapadiya.webp` | Authentic founder portrait |
+
+## Service collection
+
+Ten independently generated landscape images, composed for complete 3:2 display. Each has a 1536×1024 detail asset and a 600×400 responsive preview, in WebP. The full images are approximately 125–262 KB each. Cards load lazily; the dialog requests only the selected service image. CSS preserves the entire composition with natural height and `object-fit: contain`.
+
+| File under `public/images/services/` | Concept |
+|---|---|
+| `avatar.webp` | Expert presenter and digital glass reflection |
+| `ugc.webp` | Creator presenting a skincare product, full face visible |
+| `film.webp` | Emerald fragrance, ocean and sculptural chrome |
+| `reels.webp` | Three editorial frames and a glass play symbol |
+| `images.webp` | Sneaker campaign with glass, satin and amber |
+| `automation.webp` | Glass machine connecting inputs to an output |
+| `whatsapp.webp` | Messaging, appointment and phone composition |
+| `websites.webp` | Glass browser and mobile editorial layouts |
+| `apps.webp` | Exploded glass software layers above a phone |
+| `crm.webp` | Customer hub, profile network and pipeline |
+
+The corresponding `-600.webp` files are previews of the same artwork. Exact prompts and placement metadata are preserved in [service-art-prompts.json](service-art-prompts.json).
 
 ## Generation prompts
 

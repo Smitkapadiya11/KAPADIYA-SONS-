@@ -11,12 +11,14 @@ Requires Node.js 20.19+ or 22.12+.
 - `npm run build`
 - `npm run preview -- --port 4174`
 - `node qa.mjs` (preview running; Microsoft Edge installed)
+- `node qa-glass.mjs` (service artwork and dialog checks; defaults to port 4175)
+- Set `SITE_URL` to test a different preview or production URL.
 
 ## Features
 
-Ten shareable service-detail views at `#service/<id>`, seven content packages, category filters, an accessible native dialog, four original GPT Image concepts, an authentic founder portrait, a GSAP scroll-driven creative gallery, reduced-motion support, and a WhatsApp brief builder. All enquiries use +91 7575807403. No form database, payments, analytics or application secrets.
+Ten shareable service-detail views at `#service/<id>`, seven content packages, category filters, a glass service explorer with persistent navigation and enquiry controls, fourteen original GPT Image concepts, an authentic founder portrait, a GSAP scroll-driven creative gallery, reduced-motion support, and a WhatsApp brief builder. Every service has its own complete 3:2 artwork, with responsive WebP previews and no face-cropping cover treatment. All enquiries use +91 7575807403. No form database, payments, analytics or application secrets.
 
-Package and service copy lives in `src.js`; editorial sections in `index.html`; base styling in `style.css`, the second-edition design in `experience.css`, and choreography in `motion.js`. Asset provenance and exact generation prompts are in `ASSETS.md`. All pricing and proposal terms should be reviewed when the offer changes. The site labels concepts and AI content and makes no fabricated client, testimonial or performance claims.
+Package and service copy lives in `src.js`; editorial sections in `index.html`; base styling in `style.css`, the second-edition design in `experience.css`, the third-edition glass surfaces and service layouts in `glass.css`, and choreography in `motion.js`. Asset provenance is in `ASSETS.md`; the ten new exact image prompts are in `service-art-prompts.json`. All pricing and proposal terms should be reviewed when the offer changes. The site labels concepts and AI content and makes no fabricated client, testimonial or performance claims.
 
 ## Deployment
 
@@ -25,5 +27,7 @@ Vercel project: `kapadiya-sons`, team: `smit-kapadiyas-projects`. The project is
 ## Verification
 
 Browser checks cover ten detail views, two service filters, seven distinct package enquiry messages, brief message handoff, privacy dialog, 360/390/768/950/1440px layouts, gallery scroll transforms and controls, mobile navigation, motion pause, reduced motion, deep links, automated WCAG A/AA checks and JavaScript exceptions. These are targeted checks, not a claim of universal device compatibility or a complete security audit.
+
+`qa-glass.mjs` additionally verifies all ten thumbnail/full images decode, distinct service enquiry messages, preserved image proportions, persistent controls, scroll reset when switching services, no horizontal dialog overflow, and automated accessibility scans inside the mobile and desktop dialogs.
 
 

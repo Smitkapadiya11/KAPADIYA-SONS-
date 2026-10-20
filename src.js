@@ -1,5 +1,6 @@
 import './style.css';
 import './experience.css';
+import './glass.css';
 import './motion.js';
 const wa = message => `https://wa.me/917575807403?text=${encodeURIComponent(message)}`;
 const services = [
@@ -15,11 +16,40 @@ const services = [
 ['crm','systems','⊞','CRM & custom workflows','Bring customer records, next steps and business processes into a clearer system.','Sales teams and professionals working across disconnected tools.','Agreed CRM setup or custom workflow, lead stages, responsibilities and integrations.','Customer process, tools, data sources, team roles and reporting needs.','Map the pipeline, agree fields and access, configure the workflow and test migration where scoped.','Custom quote. Migration, licences, access controls, reporting and administration confirmed in your proposal.']
 ].map(([id,category,icon,name,desc,fit,deliver,needs,process,scope])=>({id,category,icon,name,desc,fit,deliver,needs,process,scope}));
 const plans={avatar:[['Avatar Demo Pack','3,499','Meet your digital on-camera self.',['4 Instagram-ready videos','Your real avatar, built with permission','Start small and assess the response']],['Creator’s Monthly Plan','15,999','Your expertise. A consistent presence.',['30 reels across 30 days','30–40 seconds per reel','2 realistic UGC-style ad videos included']]],ugc:[['UGC Ads Plan','20,000','Show it. Explain it. Make it relevant.',['11 product-led UGC reels','Up to 30 seconds each','Focused creator-style advertising']],['Monster Plan','33,000','More room for your product story.',['11 reels, 40–50 seconds each','25 ultra-realistic Instagram image posts','Space for hook, demo, benefits and CTA']]],gemini:[['Gemini Essentials','10,000','Keep the feed moving.',['10 realistic AI reels','30–40 seconds each','30 matching Instagram image posts']],['Gemini Extended','15,999','Give your message more breathing room.',['10 realistic AI reels','50–60 seconds each','30 matching Instagram image posts']]],film:[['Lion’s Cut','51,999','A cinematic world for a bigger idea.',['7 realistic AI film ads','50 seconds per film','1 next-generation bonus ad included','Bonus scope and duration agreed before production']]]};
-function renderServices(filter='all'){document.querySelector('#service-grid').innerHTML=services.filter(s=>filter==='all'||s.category===filter).map(s=>`<button class="service-card" data-service="${s.id}"><div class="service-card-top"><span class="service-icon">${s.icon}</span><span class="service-arrow">↗</span></div><small>${s.category==='content'?'CONTENT & CREATIVE':'TECHNOLOGY & SYSTEMS'}</small><h3>${s.name}</h3><p>${s.desc}</p><span class="service-more">Explore the possibilities <b>↗</b></span></button>`).join('');}
+function renderServices(filter='all') {
+  document.querySelector('#service-grid').innerHTML=services.filter(s=>filter==='all'||s.category===filter).map(s=>`
+    <button class="service-card" data-service="${s.id}" aria-label="Explore ${s.name}">
+      <span class="service-art"><img src="/images/services/${s.id}-600.webp" srcset="/images/services/${s.id}-600.webp 600w, /images/services/${s.id}.webp 1536w" sizes="(max-width: 600px) 90vw, (max-width: 1200px) 42vw, 28vw" alt="" width="1536" height="1024" loading="lazy" decoding="async"><span class="service-art-label">AI CONCEPT / ${String(services.indexOf(s)+1).padStart(2,'0')}</span></span>
+      <span class="service-card-copy"><span class="service-category">${s.category==='content'?'CONTENT & CREATIVE':'TECHNOLOGY & SYSTEMS'}</span><span class="service-title">${s.name}</span><span class="service-description">${s.desc}</span><span class="service-action">Explore the service <span aria-hidden="true">↗</span></span></span>
+    </button>`).join('');
+}
 function renderPlans(group='avatar'){document.querySelector('#plan-grid').innerHTML=plans[group].map(([name,price,line,items],i)=>`<article class="plan ${i||group==='film'?'featured':''}"><div class="plan-top"><span>${name}</span><span>✳</span></div><h3>₹${price}</h3><p>${line}</p><ul>${items.map(x=>`<li>✓ <span>${x}</span></li>`).join('')}</ul><a class="button ${i||group==='film'?'dark':'outline'}" href="${wa(`Hi Smit! I’m interested in the ${name} (₹${price}) at KAPADIYA & SONS. My business/product: ___. Audience and preferred language: ___. Please share reference requirements, delivery schedule, revisions, taxes and payment terms.`)}" target="_blank" rel="noopener noreferrer">Let’s discuss this plan <span>↗</span></a></article>`).join('');}
 const dialog=document.querySelector('#service-dialog');let returnFocus;
-function showDialog(content){if(!dialog.open)returnFocus=document.activeElement;document.querySelector('#dialog-content').innerHTML=content;const heading=dialog.querySelector('h2');if(heading){heading.id='detail-title';dialog.setAttribute('aria-labelledby','detail-title');}if(!dialog.open)dialog.showModal();document.body.classList.add('modal-open');}
-function openService(id){const s=services.find(x=>x.id===id);if(!s)return;showDialog(`${({avatar:"avatar-studio",ugc:"ugc-creator",film:"cinematic-product",reels:"avatar-studio",images:"cinematic-product"})[s.id] ? `<img class="dialog-visual" src="/images/${({avatar:"avatar-studio",ugc:"ugc-creator",film:"cinematic-product",reels:"avatar-studio",images:"cinematic-product"})[s.id]}.webp" alt="AI-generated illustrative concept for ${s.name}"><span class="concept-note">AI-GENERATED CONCEPT · NOT CLIENT WORK</span>` : ""}<span class="eyebrow">${s.category==='content'?'CONTENT & CREATIVE':'TECHNOLOGY & SYSTEMS'}</span><h2>${s.name}</h2><p class="dialog-lead">${s.desc}</p><div class="detail-grid">${[['WHO IT’S FOR',s.fit],['WHAT WE CAN DELIVER',s.deliver],['WHAT WE NEED FROM YOU',s.needs],['HOW THE WORK HAPPENS',s.process],['SCOPE & PRICING',s.scope]].map(([h,p])=>`<article><h3>${h}</h3><p>${p}</p></article>`).join('')}</div><a class="button dark" href="${wa(`Hi Smit! I’d like to discuss ${s.name} for my business with KAPADIYA & SONS. Business: ___. Main goal: ___. Current challenge: ___. Preferred timeline: ___. Please suggest the right scope, reference requirements and next steps.`)}" target="_blank" rel="noopener noreferrer">Discuss this service on WhatsApp ↗</a><p class="dialog-foot">We confirm scope, timeline, fees and review terms before work begins.</p>`);}
+function showDialog(content, footer='', pagination='') {
+  if(!dialog.open)returnFocus=document.activeElement;
+  const body=document.querySelector('#dialog-content');
+  body.innerHTML=content;
+  document.querySelector('#dialog-footer').innerHTML=footer;
+  document.querySelector('#dialog-pagination').innerHTML=pagination;
+  dialog.classList.toggle('has-service',Boolean(footer));
+  const heading=body.querySelector('h2');
+  if(heading){heading.id='detail-title';dialog.setAttribute('aria-labelledby','detail-title');}
+  if(!dialog.open)dialog.showModal();
+  body.scrollTop=0;
+  document.body.classList.add('modal-open');
+}
+function openService(id) {
+  const s=services.find(x=>x.id===id);if(!s)return;
+  const index=services.indexOf(s);
+  const message=wa(`Hi Smit! I’d like to discuss ${s.name} for my business with KAPADIYA & SONS. Business: ___. Main goal: ___. Current challenge: ___. Preferred timeline: ___. Please suggest the right scope, reference requirements and next steps.`);
+  const info=[['01','WHO IT’S FOR',s.fit],['02','WHAT WE CAN DELIVER',s.deliver],['03','WHAT WE NEED FROM YOU',s.needs],['04','HOW THE WORK HAPPENS',s.process],['05','SCOPE & PRICING',s.scope]];
+  showDialog(`
+    <figure class="dialog-art"><img class="dialog-visual" src="/images/services/${s.id}.webp" alt="AI-generated visual concept illustrating ${s.name}" width="1536" height="1024" decoding="async"><figcaption>AI-GENERATED CONCEPT · NOT CLIENT WORK</figcaption></figure>
+    <div class="dialog-editorial"><div class="dialog-heading"><span class="eyebrow">${s.category==='content'?'CONTENT & CREATIVE':'TECHNOLOGY & SYSTEMS'}</span><h2>${s.name}</h2><p class="dialog-lead">${s.desc}</p></div>
+    <div class="detail-grid">${info.map(([n,h,p])=>`<article><div class="detail-label"><span>${n}</span><h3>${h}</h3></div><p>${p}</p></article>`).join('')}</div><p class="dialog-foot">Every project starts with a conversation. We agree the scope, timeline, fees and review terms before work begins.</p></div>`,
+    `<div class="dialog-footer-copy"><span>YOUR NEXT MOVE</span><strong>Let’s make it happen.</strong></div><a class="button lime" href="${message}" target="_blank" rel="noopener noreferrer">Discuss on WhatsApp <span aria-hidden="true">↗</span></a>`,
+    `<button data-service="${services[(index+9)%10].id}" aria-label="Previous service">←</button><span>${String(index+1).padStart(2,'0')} / 10</span><button data-service="${services[(index+1)%10].id}" aria-label="Next service">→</button>`);
+}
 function syncRoute(){const match=location.hash.match(/^#service\/(.+)$/);if(match)openService(match[1]);}
 document.addEventListener('click',e=>{const card=e.target.closest('[data-service]');if(card){location.hash=`service/${card.dataset.service}`;}const f=e.target.closest('[data-filter]');if(f){document.querySelectorAll('[data-filter]').forEach(b=>{b.classList.toggle('active',b===f);b.setAttribute('aria-pressed',String(b===f));});renderServices(f.dataset.filter);}const p=e.target.closest('[data-plan]');if(p){document.querySelectorAll('[data-plan]').forEach(b=>{b.classList.toggle('active',b===p);b.setAttribute('aria-pressed',String(b===p));});renderPlans(p.dataset.plan);}});
 dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});dialog.addEventListener('close',()=>{document.body.classList.remove('modal-open');if(location.hash.startsWith('#service/'))history.replaceState(null,'',location.pathname+location.search+'#services');returnFocus?.focus();});window.addEventListener('hashchange',()=>{if(!location.hash.startsWith('#service/')&&dialog.open)dialog.close();syncRoute();});

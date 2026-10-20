@@ -1,0 +1,62 @@
+[
+  {
+    "id": "avatar",
+    "file": "public/images/services/avatar.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: ads-marketing. A fictional young adult Indian woman expert in a charcoal blazer sits in a warm futuristic recording studio. Show her complete head and both shoulders and hands within frame, medium wide composition. To her right, a single translucent glass pane contains a softly luminous reflection of the same woman, representing a permission-based digital avatar. Subtle microphone and precise soundwave as physical glowing glass sculpture, balanced real human and digital double, aspirational editorial photography, not robot.",
+    "tool": "built-in GPT Image"
+  },
+  {
+    "id": "ugc",
+    "file": "public/images/services/ugc.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: ads-marketing. A fictional young adult Indian male lifestyle creator in a cream overshirt presents a premium small amber skincare bottle, natural candid expression. Complete head, shoulders and hands clearly inside safe margins, medium wide editorial scene. Minimal travertine studio, warm side light, a large transparent glass arch frames creator and product, subtle chartreuse accent on shelf. Looks like an exceptional creator-led product campaign, human natural skin and anatomically correct hands. No testimonials.",
+    "tool": "built-in GPT Image"
+  },
+  {
+    "id": "film",
+    "file": "public/images/services/film.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: product-mockup. Monumental translucent emerald perfume bottle floating horizontally above a reflective black ocean between surreal curved chrome arches, cinematic golden sun on horizon, carefully suspended droplets, immense scale and editorial luxury campaign direction. Entire bottle and cap fully visible centrally, generous empty framing, dramatic widescreen storytelling within a landscape 3:2 canvas, premium physical materials.",
+    "tool": "built-in GPT Image"
+  },
+  {
+    "id": "reels",
+    "file": "public/images/services/reels.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: stylized-concept. Three beautifully crafted floating portrait-format glass film frames arranged as a dynamic diagonal sculptural composition. Inside the frames are DISTINCT photographic creative moments: close view of a sneaker in motion, a tiny espresso pour, and an orange fabric fashion detail. All three entire frames visible with clear borders and breathing room. One liquid chrome play triangle in foreground, soft charcoal stage, cinematic motion frozen in time, chartreuse edge lighting. This represents social reels and storytelling, not an avatar portrait.",
+    "tool": "built-in GPT Image"
+  },
+  {
+    "id": "images",
+    "file": "public/images/services/images.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: product-mockup. Surreal premium editorial product still life of an ivory sneaker floating in a crystal glass bubble above folded emerald satin, suspended glossy orange sphere, subtle liquid chrome splash, extraordinary tactile detail. Whole sneaker and bubble inside safe margins. Art-directed luxury advertising creative, warm cream background with a soft graphite shadow and a small chartreuse reflection. This represents AI advertising images, distinctly a still-life campaign.",
+    "tool": "built-in GPT Image"
+  },
+  {
+    "id": "automation",
+    "file": "public/images/services/automation.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: stylized-concept. A precise elegant kinetic machine built from translucent glass modules, polished chrome rails and chartreuse light paths on a dark architectural stage. Three separate incoming objects become one neatly arranged output through a central floating clear glass cube; subtle physical gears inside. Entire machine completely visible, wide balanced composition, refined product rendering with real refraction and controlled shadows. A visual metaphor for business automation, no people, no screens filled with text.",
+    "tool": "built-in GPT Image"
+  },
+  {
+    "id": "whatsapp",
+    "file": "public/images/services/whatsapp.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: stylized-concept. Premium glass communication sculpture: one complete clear-glass smartphone at slight perspective, flanked by a translucent speech bubble, a small elegant calendar tile with simple square grid and a chrome checkmark. All devices and objects fully visible, no clipping. Delicate chartreuse filament links message to calendar to checkmark. Soft dark olive architectural backdrop, beautifully controlled light, simple unmistakable lead-to-appointment visual story. No WhatsApp logo, no text, no letters, no numbers.",
+    "tool": "built-in GPT Image"
+  },
+  {
+    "id": "websites",
+    "file": "public/images/services/websites.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: ui-mockup. A gorgeous floating complete desktop browser window crafted from transparent smoked glass, with a smaller complete mobile viewport beside it. Inside: a striking editorial landing page visually composed of a large chrome sculpture photo, abstract horizontal typesetting bars, one chartreuse rectangular CTA block, and neatly arranged content panels. No actual readable text. All window edges visible, no clipped devices, pale stone architectural background, soft shadows, premium web design presentation.",
+    "tool": "built-in GPT Image"
+  },
+  {
+    "id": "apps",
+    "file": "public/images/services/apps.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: stylized-concept. An exploded-view sculptural software product: three beautifully engineered rounded transparent glass application layers floating above one complete premium charcoal smartphone, interlocking components with small geometric symbols and a chartreuse core. Whole phone and every layer visible within generous framing. Dark graphite gradient-free studio backdrop, subtle chrome and emerald details, ultra-refined precision industrial design, visual metaphor for custom apps and software architecture. No readable text.",
+    "tool": "built-in GPT Image"
+  },
+  {
+    "id": "crm",
+    "file": "public/images/services/crm.webp",
+    "prompt": "Create one premium website service artwork, landscape 1536x1024, 3:2 composition. Contemporary editorial AI campaign aesthetic, sculptural liquid glass, polished chrome accents, warm photographic texture, restrained electric chartreuse highlights with graphite and cream. Beautiful controlled studio lighting, refined believable materials, no generic neon sci-fi, no purple gradients, no text, no letters, no watermarks, no logos. Crucial framing: every main subject wholly visible with 12% safe margin on all edges; generous headroom; image will be displayed complete, not cropped. Use case: stylized-concept. A refined customer relationship system represented as a floating clear-glass central hub surrounded by six small frosted glass customer profile cards, each with a simple sculptural circular head and shoulder icon, connected by delicate chrome curves. Three neatly arranged pipeline lanes below the hub, one chartreuse active card. Entire network within frame, balanced spacious architecture, soft cream and stone backdrop, emerald glass and chrome, professional customer management visual without numbers or readable text.",
+    "tool": "built-in GPT Image"
+  }
+]
