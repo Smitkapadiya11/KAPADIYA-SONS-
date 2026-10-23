@@ -40,3 +40,6 @@ The eye-and-K vector identity, colour HEX codes, typography and international co
 ## Indian Diwali edition
 
 The Avatar Demo base plan is a fixed INR 4,000 for four videos. Seasonal styling lives in festival.css; ten new Indian festive service concepts are documented in festive-art-prompts.json. Anime.js animates the mobile and desktop experience; GSAP ScrollTrigger retains desktop pinning/navigation. Run node qa-festival.mjs for mobile scroll, pause and reduced-motion checks (preview port 4175). Private prospect data remains outside this repository.
+## Scroll-controlled Capability Index
+
+capability.js uses a native sticky stage on mobile and desktop. Scroll position selects one service at a time and scrubs Anime.js image motion. A numbered controller supports direct selection and arrow/Home/End keys; each selected card opens its existing detailed view. Category filters rebuild the sequence. Pause and reduced motion restore the complete static grid. Inactive cards are inert and excluded from assistive technology. Run node qa-capability.mjs for phone/desktop scroll selection, all ten controller actions, details, filters and accessibility.

@@ -76,3 +76,5 @@ document.querySelector('.hero-bottom').append(motionButton);
 
 
 document.querySelectorAll('[data-offer-plan]').forEach(a=>a.addEventListener('click',()=>document.querySelector('[data-plan="'+a.dataset.offerPlan+'"]').click()));
+
+import './capability.js';
