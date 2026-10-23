@@ -50,17 +50,23 @@ function setupMotion(){
     gsap.from('.workflow-result',{y:20,opacity:.2,ease:'none',scrollTrigger:{trigger:'.workflow-result',start:'top 90%',end:'top 65%',scrub:.5}});
     gsap.from('.founder-art img',{scale:1.15,ease:'none',scrollTrigger:{trigger:'.founder-art',start:'top bottom',end:'bottom top',scrub:1}});
     gsap.from('.process-grid article',{y:50,opacity:0,stagger:.13,duration:.8,ease:'power3.out',scrollTrigger:{trigger:'.process-grid',start:'top 85%',once:true}});
+    gsap.from('.diwali-picks>a',{y:35,rotateX:7,opacity:0,stagger:.12,duration:.8,ease:'power3.out',scrollTrigger:{trigger:'.diwali-picks',start:'top 88%',once:true}});
     gsap.from('.footer-invitation-action',{y:30,opacity:0,duration:.8,ease:'power3.out',scrollTrigger:{trigger:'.footer-invitation',start:'top 90%',once:true}});
   });
   media=gsap.matchMedia();
   media.add('(min-width: 801px)',()=>{
     const track=document.querySelector('.studio-track');
     const viewport=document.querySelector('.studio-viewport');
-    const distance=()=>track.scrollWidth-track.clientWidth;
-    gsap.to(track,{x:()=>-distance(),ease:'none',scrollTrigger:{id:'creative-worlds',trigger:viewport,start:'top 90px',end:()=>`+=${distance()}`,pin:true,scrub:.8,anticipatePin:1,invalidateOnRefresh:true,onUpdate:self=>{
-      document.querySelector('.studio-meter>span').style.transform=`scaleX(${(1+self.progress*2)/3})`;
-      document.querySelector('.studio-count').textContent=`0${Math.min(3,Math.round(self.progress*2)+1)} / 03`;
+    const worlds=[...track.querySelectorAll('.world')];
+    const sequence=gsap.timeline({scrollTrigger:{id:'creative-worlds',trigger:viewport,start:'top 90px',end:()=>'+='+Math.max(1600,innerHeight*2),pin:true,scrub:.7,anticipatePin:1,invalidateOnRefresh:true,onUpdate:self=>{
+      document.querySelector('.studio-meter>span').style.transform='scaleX('+((1+self.progress*2)/3)+')';
+      document.querySelector('.studio-count').textContent='0'+Math.min(3,Math.round(self.progress*2)+1)+' / 03';
     }}});
+    worlds.slice(1).forEach((world,i)=>{
+      sequence.to(worlds[i],{scale:.94,opacity:.25,duration:1,ease:'none'},i);
+      sequence.fromTo(world,{clipPath:'inset(100% 0% 0% 0% round 24px)'},{clipPath:'inset(0% 0% 0% 0% round 24px)',duration:1,ease:'none'},i);
+    });
+
   });
   media.add('(max-width: 800px)',()=>{
     gsap.utils.toArray('.world-image').forEach(el=>gsap.from(el.querySelector('img'),{scale:1.12,ease:'none',scrollTrigger:{trigger:el,start:'top bottom',end:'bottom top',scrub:.7}}));

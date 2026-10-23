@@ -51,6 +51,6 @@ Use case: photorealistic-natural. Portrait 1024x1536 editorial photo for an AI a
 
 ## Motion design
 
-GSAP orchestrates the opening typography, scroll-linked hero artwork, desktop pinned horizontal creative worlds, manifesto, workflow steps and founder portrait. Mobile uses vertically stacked worlds and restrained parallax. Native browser scrolling is retained. Reduced-motion preferences and the visible pause control replace the pinned sequence with readable stacked content.
+GSAP orchestrates the opening typography, scroll-linked hero artwork, desktop pinned layered creative worlds, manifesto, workflow steps and founder portrait. Mobile uses vertically stacked worlds and restrained parallax. Native browser scrolling is retained. Reduced-motion preferences and the visible pause control replace the pinned sequence with readable stacked content.
 
 Implementation references: [ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) and [responsive motion contexts](https://gsap.com/docs/v3/GSAP/gsap.matchMedia()/).

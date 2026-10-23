@@ -1,0 +1,49 @@
+
+/* Diwali edition: glass, flame and cinematic chapter reveals. */
+.hero {height:max(950px,105svh)}
+.hero h1 {font-size:clamp(70px,8.5vw,130px);letter-spacing:-.065em;max-width:1000px}
+.hero-image {object-position:68% center}
+.hero-shade {background:linear-gradient(90deg,#07130ed9, #07130e55 55%, transparent),linear-gradient(0deg,#07130e,transparent 35%)}
+.hero .lime-type {color:#edcf94}
+.hero-orbit {color:#edcf94}
+.diwali-section {background:#f0eee5;color:#18251c;position:relative;overflow:hidden}
+.diwali-heading {max-width:800px}
+.diwali-heading h2 {margin:25px 0;font-size:clamp(40px,5vw,76px);line-height:1.08}
+.diwali-heading em {font-family:Georgia,serif;font-weight:400;color:#596539}
+.diwali-heading>p {font-size:16px;line-height:1.8;max-width:500px}
+.diwali-picks {display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
+.diwali-picks>a {display:flex;flex-direction:column;padding:32px;border:1px solid #a9b39188;border-radius:22px;background:linear-gradient(145deg,#fff9,#e6e9d9aa);transition:transform .3s,box-shadow .3s;min-width:0}
+.diwali-picks>a:hover {transform:translateY(-6px);box-shadow:0 25px 50px #17201315}
+.diwali-picks>a:nth-child(2) {background:#18281f;color:#f0f5e9}
+.diwali-picks>a>span {font-size:10px;letter-spacing:.1em}
+.diwali-picks h3 {font-size:26px;letter-spacing:-.04em;margin:30px 0 10px}
+.diwali-picks p {font-size:13px;line-height:1.7}
+.diwali-picks strong {font-size:42px;letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin:30px 0 8px}
+.diwali-picks small {font-size:11px}
+.diwali-picks b {font-size:12px;font-weight:500;margin-top:36px}
+.diwali-note {font-size:12px;line-height:1.8;margin-top:26px;max-width:780px}
+.diwali-note a {text-decoration:underline;text-underline-offset:4px}
+.offer-badge {display:inline-block;margin-top:22px;background:#17281e;color:#e4f6c8;border:1px solid #455b35;border-radius:30px;padding:8px 12px;font-size:10px;letter-spacing:.07em}
+.original-price {font-size:12px;color:#46553c;margin-top:24px}
+.original-price s {margin-left:8px;font-variant-numeric:tabular-nums}
+.plan h3 {margin-top:10px;font-size:clamp(38px,4vw,64px)}
+.plan .price-unit {margin-bottom:18px}
+@media(min-width:801px){
+.studio-track {display:grid;gap:0;transform:none!important;will-change:auto}
+.studio-track>.world {grid-area:1/1;position:relative;transform-origin:50% 50%;height:min(620px,76vh)}
+.studio-track>.world:nth-child(2){z-index:2}
+.studio-track>.world:nth-child(3){z-index:3}
+.static-motion .studio-track {gap:28px}
+.static-motion .studio-track>.world {grid-area:auto;transform:none!important;opacity:1!important;clip-path:none!important;height:620px}
+}
+@media(max-width:800px){
+.hero {height:930px}
+.hero h1 {font-size:clamp(58px,10vw,82px)}
+.diwali-picks {grid-template-columns:1fr;margin-top:32px}
+.diwali-picks>a {padding:28px}
+.diwali-picks h3 {margin-top:20px}
+.diwali-picks strong {font-size:40px}
+.plan h3 {font-size:44px}
+.studio-track>.world {clip-path:none!important;opacity:1!important;transform:none!important}
+}
+@media(prefers-reduced-motion:reduce){.diwali-picks>a:hover{transform:none}}

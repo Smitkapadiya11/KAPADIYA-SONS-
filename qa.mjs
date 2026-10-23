@@ -11,9 +11,9 @@ await page.screenshot({path:'v2-hero-preview.png'});
 const pin=page.locator('.studio-viewport');
 const start=await pin.evaluate(el=>el.getBoundingClientRect().top+scrollY-90);
 await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),start+50);await page.waitForTimeout(1100);
-const first=await page.locator('.studio-track').evaluate(el=>getComputedStyle(el).transform);
+const first=await page.locator('.world').first().evaluate(el=>getComputedStyle(el).transform);
 await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),start+1300);await page.waitForTimeout(1100);
-const second=await page.locator('.studio-track').evaluate(el=>getComputedStyle(el).transform);assert.notEqual(first,second);
+const second=await page.locator('.world').first().evaluate(el=>getComputedStyle(el).transform);assert.notEqual(first,second);
 await page.locator('[data-world-dir="1"]').click();await page.waitForTimeout(1500);assert.equal(await page.locator('.studio-count').textContent(),'03 / 03');
 await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await page.waitForTimeout(800);
 await page.locator('.motion-toggle').click();assert.ok(await page.locator('body').evaluate(el=>el.classList.contains('static-motion')));
@@ -48,7 +48,7 @@ await page.goto(base+'#service/ugc',{waitUntil:'domcontentloaded',timeout:60000}
 const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
 console.log('ACCESSIBILITY',JSON.stringify(audit.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),null,2));
 assert.deepEqual(errors,[]);assert.equal(audit.violations.length,0);
-console.log('PASS: scroll-driven gallery, gallery navigation, pause motion, 10 detail views, filters, 7 unique package messages, brief handoff, founder image, 5 viewport widths, mobile menu, deep links, reduced motion, accessibility scan and no JS errors.');
+console.log('PASS: scroll-driven chapter reveal, gallery navigation, pause motion, 10 detail views, filters, 7 unique package messages, brief handoff, founder image, 5 viewport widths, mobile menu, deep links, reduced motion, accessibility scan and no JS errors.');
 await browser.close();
 
 
