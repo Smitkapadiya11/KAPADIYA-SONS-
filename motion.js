@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const preference=matchMedia('(prefers-reduced-motion: reduce)');
-let context, media, manualPause=false;
+let media, manualPause=false;
 const header=document.querySelector('.site-header');
 const contact=document.querySelector('.floating-contact');
 const progress=document.querySelector('.reading-progress');
@@ -33,7 +33,7 @@ matchMedia('(min-width: 801px)').addEventListener('change',e=>{if(e.matches)clos
 let animations=[], reveals, scrollScenes=[];
 function track(target,params){const a=animate(target,params);animations.push(a);return a;}
 function setupMotion(){
-  media?.revert();context?.revert();reveals?.disconnect();
+  media?.revert();reveals?.disconnect();
   animations.forEach(a=>a.revert());animations=[];scrollScenes=[];
   const disabled=manualPause||preference.matches;
   document.body.classList.toggle('motion-paused',disabled);
@@ -68,6 +68,13 @@ function setupMotion(){
       document.querySelector('.studio-meter>span').style.transform='scaleX('+((1+self.progress*2)/3)+')';
       document.querySelector('.studio-count').textContent='0'+Math.min(3,Math.round(self.progress*2)+1)+' / 03';
     }});
+    // Anime instances are not owned by GSAP's responsive context.
+    // Revert them explicitly when the desktop breakpoint is left.
+    return ()=>{
+      const scoped=[...incoming,...outgoing];
+      scoped.forEach(a=>a.revert());
+      animations=animations.filter(a=>!scoped.includes(a));
+    };
   });
   ScrollTrigger.refresh();updateScenes();
 }
@@ -82,6 +89,7 @@ function updateScenes(){
   });
 }
 addEventListener('scroll',()=>{if(!sceneFrame){sceneFrame=true;requestAnimationFrame(updateScenes);}},{passive:true});
+addEventListener('resize',()=>{if(!sceneFrame){sceneFrame=true;requestAnimationFrame(updateScenes);}});
 
 requestAnimationFrame(()=>{
   const button=document.querySelector('.motion-toggle');

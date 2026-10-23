@@ -6,6 +6,11 @@ await page.goto(process.env.SITE_URL||'http://127.0.0.1:4175/');await page.waitF
 const visual=page.locator('.world-image img').first();await visual.scrollIntoViewIfNeeded();await page.waitForTimeout(300);
 const before=await visual.evaluate(el=>getComputedStyle(el).transform);await page.evaluate(()=>scrollBy({top:210,behavior:'instant'}));await page.waitForTimeout(300);const after=await visual.evaluate(el=>getComputedStyle(el).transform);assert.notEqual(before,after,'Mobile imagery must respond to scroll');
 await page.screenshot({path:'festival-mobile-gallery-preview.png'});
+await page.setViewportSize({width:1440,height:1000});await page.waitForTimeout(400);
+await page.locator('.studio-viewport').scrollIntoViewIfNeeded();await page.evaluate(()=>scrollBy({top:700,behavior:'instant'}));await page.waitForTimeout(200);
+await page.setViewportSize({width:390,height:844});await page.waitForTimeout(400);
+assert.equal(await page.locator('.world').nth(1).evaluate(el=>el.style.clipPath),'','Desktop Anime styles must be removed on mobile');
+assert.equal(await page.locator('.pin-spacer').count(),0,'Desktop pin must be removed on mobile');
 await page.locator('.motion-toggle').click();assert.ok(await page.locator('body').evaluate(el=>el.classList.contains('static-motion')));
 await page.emulateMedia({reducedMotion:'reduce'});await page.reload();await page.waitForTimeout(300);assert.ok(await page.locator('body').evaluate(el=>el.classList.contains('static-motion')));
 assert.equal(errors.length,0,errors.join('\n'));await browser.close();console.log('PASS mobile scroll motion, pause and reduced motion.');
