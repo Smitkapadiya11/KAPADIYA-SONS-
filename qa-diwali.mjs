@@ -8,7 +8,7 @@ page.on('pageerror',e=>errors.push(e.message));
 await page.goto(process.env.SITE_URL||'http://127.0.0.1:4175/',{waitUntil:'domcontentloaded'});
 await page.locator('.hero-image').evaluate(el=>el.decode());await page.waitForTimeout(1600);
 await page.screenshot({path:'diwali-desktop-preview.png'});
-const expected={avatar:['₹2,099.40','₹9,599.40'],ugc:['₹14,999','₹19,800'],gemini:['₹5,999','₹9,599.40'],film:['₹31,199.40']};
+const expected={avatar:['₹4,000','₹9,599.40'],ugc:['₹14,999','₹19,800'],gemini:['₹5,999','₹9,599.40'],film:['₹31,199.40']};
 for(const [group,prices] of Object.entries(expected)){
 await page.locator('[data-plan="'+group+'"]').click();
 const actual=await page.locator('.plan h3').allTextContents();

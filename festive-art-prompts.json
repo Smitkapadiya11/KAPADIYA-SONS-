@@ -1,0 +1,52 @@
+[
+  {
+    "id": "avatar",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. A confident fictional Indian male business educator in an elegant ivory Nehru jacket, full head and shoulders and hands visible, seated in a professional Indian recording studio with a brass lamp and subtle carved teak jaali backdrop. Microphone at side.",
+    "asset": "public/images/services/avatar.webp"
+  },
+  {
+    "id": "ugc",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. A fictional Indian female creator in a refined rust silk kurta holding a premium unbranded Indian festive gift box, full face and hands visible, candid demonstration at a contemporary Mumbai home, brass diya on table.",
+    "asset": "public/images/services/ugc.webp"
+  },
+  {
+    "id": "film",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. Luxury Indian attar fragrance bottle on a dark sandstone plinth in a magnificent Rajasthan courtyard at twilight, cinematic distant arches and warm diya lights, sculptural product advertising.",
+    "asset": "public/images/services/film.webp"
+  },
+  {
+    "id": "reels",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. Indian female content creator in an elegant indigo kurta filming a festive business reel with a smartphone on tripod in a modern Indian studio, full face visible, warm practical lighting and tasteful marigold accents.",
+    "asset": "public/images/services/reels.webp"
+  },
+  {
+    "id": "images",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. Editorial still life of Indian festive gifting: handwoven silk, a sculptural brass diya, unbranded ivory gift packaging and saffron marigolds arranged with precise luxury product photography on burgundy stone.",
+    "asset": "public/images/services/images.webp"
+  },
+  {
+    "id": "automation",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. Two Indian business professionals reviewing an automation workflow on a large glass desktop display in a contemporary Ahmedabad office, tasteful teak jaali and brass diya, abstract clean workflow nodes on screen without readable words.",
+    "asset": "public/images/services/automation.webp"
+  },
+  {
+    "id": "whatsapp",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. An Indian woman business owner in a professional silk kurta using a smartphone at her festive boutique counter, abstract green chat interface visible, appointment diary and elegant boxed gifts, full face visible.",
+    "asset": "public/images/services/whatsapp.webp"
+  },
+  {
+    "id": "websites",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. Premium responsive website shown on laptop and phone on a carved walnut desk in a contemporary Indian design studio, abstract festive ecommerce layout with generous ivory space and burgundy product cards, no readable text.",
+    "asset": "public/images/services/websites.webp"
+  },
+  {
+    "id": "apps",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. Indian software designer in a modern Bengaluru office reviewing a tablet application with modular abstract dashboard panels, warm sandstone and carved screen background, premium traditional professional wardrobe, full head visible.",
+    "asset": "public/images/services/apps.webp"
+  },
+  {
+    "id": "crm",
+    "prompt": "Create a premium photoreal editorial website service illustration, landscape 1536x1024. Indian Diwali heritage meets contemporary luxury professionalism. Deep oxblood, warm ivory, antique brass, saffron highlights. Physically realistic materials and believable natural people. No text, logos, watermark or numbers. Sophisticated magazine art direction, not clip art. Keep ALL faces, hands and essential objects inside central 75% with generous safe margins. Wide complete scene, suitable for uncropped 3:2 display. Indian business team of two reviewing an abstract customer pipeline on a wide monitor at a premium Surat office desk, festive brass lamp and restrained marigold detail, contemporary professional Indian styling.",
+    "asset": "public/images/services/crm.webp"
+  }
+]

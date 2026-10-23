@@ -36,3 +36,7 @@ Browser checks cover ten detail views, two service filters, seven distinct packa
 The eye-and-K vector identity, colour HEX codes, typography and international contact formatting are documented in `BRAND.md`. `identity.css` defines the brand tokens, refined header/footer, legibility improvements and numeric typography. `qa-identity.mjs` checks the brand layout at six widths, visible footer navigation, hidden floating controls at the footer, working contact links, canonical URL, mobile menu labels, privacy access and back-to-top.
 
 
+
+## Indian Diwali edition
+
+The Avatar Demo base plan is a fixed INR 4,000 for four videos. Seasonal styling lives in festival.css; ten new Indian festive service concepts are documented in festive-art-prompts.json. Anime.js animates the mobile and desktop experience; GSAP ScrollTrigger retains desktop pinning/navigation. Run node qa-festival.mjs for mobile scroll, pause and reduced-motion checks (preview port 4175). Private prospect data remains outside this repository.

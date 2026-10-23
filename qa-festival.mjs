@@ -1,0 +1,11 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+const page=await browser.newPage({viewport:{width:390,height:844}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto(process.env.SITE_URL||'http://127.0.0.1:4175/');await page.waitForTimeout(1800);
+const visual=page.locator('.world-image img').first();await visual.scrollIntoViewIfNeeded();await page.waitForTimeout(300);
+const before=await visual.evaluate(el=>getComputedStyle(el).transform);await page.evaluate(()=>scrollBy({top:210,behavior:'instant'}));await page.waitForTimeout(300);const after=await visual.evaluate(el=>getComputedStyle(el).transform);assert.notEqual(before,after,'Mobile imagery must respond to scroll');
+await page.screenshot({path:'festival-mobile-gallery-preview.png'});
+await page.locator('.motion-toggle').click();assert.ok(await page.locator('body').evaluate(el=>el.classList.contains('static-motion')));
+await page.emulateMedia({reducedMotion:'reduce'});await page.reload();await page.waitForTimeout(300);assert.ok(await page.locator('body').evaluate(el=>el.classList.contains('static-motion')));
+assert.equal(errors.length,0,errors.join('\n'));await browser.close();console.log('PASS mobile scroll motion, pause and reduced motion.');

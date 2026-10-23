@@ -1,3 +1,4 @@
+import { animate, stagger } from 'animejs';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
@@ -29,50 +30,58 @@ menu.addEventListener('click',e=>{if(e.target.closest('a'))closeMenu();});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&menu.classList.contains('open')){closeMenu();menuButton.focus();}if(e.key==='Tab'&&menu.classList.contains('open')){const last=menu.querySelector('a:last-child');if(!e.shiftKey&&document.activeElement===last){e.preventDefault();menuButton.focus();}else if(e.shiftKey&&document.activeElement===menuButton){e.preventDefault();last.focus();}}});
 matchMedia('(min-width: 801px)').addEventListener('change',e=>{if(e.matches)closeMenu();});
 
+let animations=[], reveals, scrollScenes=[];
+function track(target,params){const a=animate(target,params);animations.push(a);return a;}
 function setupMotion(){
-  media?.revert();context?.revert();
+  media?.revert();context?.revert();reveals?.disconnect();
+  animations.forEach(a=>a.revert());animations=[];scrollScenes=[];
   const disabled=manualPause||preference.matches;
   document.body.classList.toggle('motion-paused',disabled);
+  document.body.classList.toggle('static-motion',disabled);
   document.querySelector('.studio-count').textContent='01 / 03';
-  document.querySelector('.studio-meter>span').style.transform='scaleX(.3333)';
-  if(disabled){document.body.classList.add('static-motion');return;}
-  document.body.classList.remove('static-motion');
-  context=gsap.context(()=>{
-    gsap.from('.hero-line>span',{yPercent:115,rotate:3,duration:1.35,stagger:.12,ease:'power4.out',clearProps:'transform'});
-    gsap.from('.hero-description,.hero-top,.hero-orbit',{y:20,opacity:0,duration:1,delay:.55,stagger:.1,ease:'power2.out',clearProps:'opacity,transform'});
-    gsap.to('.hero-image',{scale:1.15,yPercent:10,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
-    gsap.to('.hero-content',{y:100,opacity:.15,ease:'none',scrollTrigger:{trigger:'.hero',start:'25% top',end:'bottom top',scrub:1}});
-    gsap.from('.manifesto-copy',{y:65,opacity:.2,ease:'none',scrollTrigger:{trigger:'.manifesto',start:'top 85%',end:'top 25%',scrub:1}});
-    gsap.to('.manifesto-star',{rotate:180,ease:'none',scrollTrigger:{trigger:'.manifesto',start:'top bottom',end:'bottom top',scrub:1}});
-    gsap.utils.toArray('.section-heading,.systems-section>div:first-child,.founder-section>div:last-child,.process>h2,.brief-section>div:first-child').forEach(el=>gsap.from(el,{y:45,opacity:0,duration:.85,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 90%',once:true}}));
-    gsap.from('.workflow-step',{x:35,opacity:.25,stagger:.3,ease:'none',scrollTrigger:{trigger:'.workflow',start:'top 80%',end:'bottom 80%',scrub:.5}});
-    gsap.from('.workflow-connector',{scaleY:0,ease:'none',scrollTrigger:{trigger:'.workflow',start:'top 75%',end:'bottom 65%',scrub:.5}});
-    gsap.from('.workflow-result',{y:20,opacity:.2,ease:'none',scrollTrigger:{trigger:'.workflow-result',start:'top 90%',end:'top 65%',scrub:.5}});
-    gsap.from('.founder-art img',{scale:1.15,ease:'none',scrollTrigger:{trigger:'.founder-art',start:'top bottom',end:'bottom top',scrub:1}});
-    gsap.from('.process-grid article',{y:50,opacity:0,stagger:.13,duration:.8,ease:'power3.out',scrollTrigger:{trigger:'.process-grid',start:'top 85%',once:true}});
-    gsap.from('.diwali-picks>a',{y:35,rotateX:7,opacity:0,stagger:.12,duration:.8,ease:'power3.out',scrollTrigger:{trigger:'.diwali-picks',start:'top 88%',once:true}});
-    gsap.from('.footer-invitation-action',{y:30,opacity:0,duration:.8,ease:'power3.out',scrollTrigger:{trigger:'.footer-invitation',start:'top 90%',once:true}});
+  if(disabled)return;
+  track('.hero-line>span',{y:['110%',0],rotate:[4,0],opacity:[0,1],duration:1300,delay:stagger(140),ease:'outExpo'});
+  track('.hero-description,.hero-top',{y:[24,0],opacity:[0,1],duration:1000,delay:500,ease:'outExpo'});
+  const hero=track('.hero-image',{scale:[1,1.16],y:[0,60],duration:1000,autoplay:false,ease:'linear'});
+  scrollScenes.push({element:document.querySelector('.hero'),animation:hero,hero:true});
+  reveals=new IntersectionObserver(entries=>entries.forEach(({target,isIntersecting})=>{
+    if(!isIntersecting)return;
+    track(target,{y:[32,0],opacity:[.25,1],scale:[.97,1],duration:1000,ease:'outExpo'});
+    reveals.unobserve(target);
+  }),{threshold:.12});
+  document.querySelectorAll('.section-heading,.diwali-heading,.diwali-picks>a,.process-grid article,.workflow-step,.founder-section>div:last-child,.footer-invitation').forEach(el=>reveals.observe(el));
+  document.querySelectorAll('.world-image img,.founder-art img').forEach(el=>{
+    const a=track(el,{scale:[1.07,1],y:[-18,18],duration:1000,autoplay:false,ease:'linear'});
+    scrollScenes.push({element:el.parentElement,animation:a});
+  });
+  document.querySelectorAll('.world-info h3,.manifesto-copy').forEach(el=>{
+    const a=track(el,{y:[38,-15],opacity:[.35,1],duration:1000,autoplay:false,ease:'linear'});
+    scrollScenes.push({element:el,animation:a});
   });
   media=gsap.matchMedia();
   media.add('(min-width: 801px)',()=>{
-    const track=document.querySelector('.studio-track');
-    const viewport=document.querySelector('.studio-viewport');
-    const worlds=[...track.querySelectorAll('.world')];
-    const sequence=gsap.timeline({scrollTrigger:{id:'creative-worlds',trigger:viewport,start:'top 90px',end:()=>'+='+Math.max(1600,innerHeight*2),pin:true,scrub:.7,anticipatePin:1,invalidateOnRefresh:true,onUpdate:self=>{
+    const worlds=[...document.querySelectorAll('.world')];
+    const incoming=worlds.slice(1).map(el=>track(el,{clipPath:['inset(100% 0% 0% 0% round 36px)','inset(0% 0% 0% 0% round 36px)'],duration:1000,autoplay:false,ease:'linear'}));
+    const outgoing=worlds.slice(0,2).map(el=>track(el,{scale:[1,.88],rotate:[0,-3],opacity:[1,.2],duration:1000,autoplay:false,ease:'linear'}));
+    ScrollTrigger.create({id:'creative-worlds',trigger:'.studio-viewport',start:'top 90px',end:()=>'+='+Math.max(1800,innerHeight*2.5),pin:true,invalidateOnRefresh:true,onUpdate:self=>{
+      incoming.forEach((a,i)=>{const phase=Math.max(0,Math.min(1,self.progress*2-i));a.seek(phase*1000);outgoing[i].seek(phase*1000);});
       document.querySelector('.studio-meter>span').style.transform='scaleX('+((1+self.progress*2)/3)+')';
       document.querySelector('.studio-count').textContent='0'+Math.min(3,Math.round(self.progress*2)+1)+' / 03';
-    }}});
-    worlds.slice(1).forEach((world,i)=>{
-      sequence.to(worlds[i],{scale:.94,opacity:.25,duration:1,ease:'none'},i);
-      sequence.fromTo(world,{clipPath:'inset(100% 0% 0% 0% round 24px)'},{clipPath:'inset(0% 0% 0% 0% round 24px)',duration:1,ease:'none'},i);
-    });
-
+    }});
   });
-  media.add('(max-width: 800px)',()=>{
-    gsap.utils.toArray('.world-image').forEach(el=>gsap.from(el.querySelector('img'),{scale:1.12,ease:'none',scrollTrigger:{trigger:el,start:'top bottom',end:'bottom top',scrub:.7}}));
-  });
-  ScrollTrigger.refresh();
+  ScrollTrigger.refresh();updateScenes();
 }
+let sceneFrame=false;
+function updateScenes(){
+  sceneFrame=false;
+  if(manualPause||preference.matches)return;
+  scrollScenes.forEach(({element,animation,hero})=>{
+    const r=element.getBoundingClientRect();
+    const progress=hero?Math.max(0,Math.min(1,-r.top/r.height)):Math.max(0,Math.min(1,(innerHeight-r.top)/(innerHeight+r.height)));
+    animation.seek(progress*1000);
+  });
+}
+addEventListener('scroll',()=>{if(!sceneFrame){sceneFrame=true;requestAnimationFrame(updateScenes);}},{passive:true});
 
 requestAnimationFrame(()=>{
   const button=document.querySelector('.motion-toggle');

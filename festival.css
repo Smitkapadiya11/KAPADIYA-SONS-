@@ -1,0 +1,32 @@
+/* Indian Diwali atelier: oxblood, sandstone and antique brass. */
+:root{--brand-forest:#291511;--brand-lime:#edc787;--brand-gold:#edc787;--brand-ivory:#fff4e4;--brand-sage:#d9c6ae;--brand-ink:#321d17;--paper:#f6ebd9;--ink:#321d17;--lime:#edc787;--muted:#715b4d;--line:#d2bda2;--glass-muted:#e0cbb8}
+body{background:#f6ebd9;color:#321d17}
+.site-header,.site-header.is-scrolled{background:linear-gradient(115deg,#321711f5,#401d18ed);border-color:#cfa26770;box-shadow:0 12px 48px #18080635}
+.site-header .button,.button.lime,.floating-contact{background:#edc787;color:#321d17;border-color:#f6deb3}
+.hero{min-height:950px;background:#291511}
+.hero-image{object-position:70% center;filter:sepia(.18)}
+.hero-shade{background:linear-gradient(90deg,#200b0aed,#200b0a88 55%,#200b0a22),linear-gradient(0deg,#291511,transparent 60%)}
+.hero h1{font-size:clamp(65px,8vw,126px);letter-spacing:-.065em;line-height:1.01}
+.hero h1 .lime-type{font-family:Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.055em;color:#f0cb8e}
+.hero-top,.hero-orbit,.hero-bottom{color:#f0cb8e}
+.section{padding-top:110px;padding-bottom:110px}
+.diwali-section{background:#f6ebd9;color:#321d17;border-top:1px solid #c3a173}
+.diwali-heading{max-width:950px;display:grid;grid-template-columns:1.5fr 1fr;column-gap:70px;align-items:end}
+.diwali-heading>.eyebrow{grid-column:1/-1}.diwali-heading h2{font-family:Georgia,serif;font-size:clamp(46px,5.8vw,84px);letter-spacing:-.05em;font-weight:400}.diwali-heading em{color:#863c27}.diwali-heading>p{padding-bottom:20px}
+.diwali-picks{gap:0;border-top:1px solid #bca17e;border-bottom:1px solid #bca17e}
+.diwali-picks>a{border:0;border-right:1px solid #bca17e;border-radius:0;background:transparent;padding:36px;box-shadow:none}
+.diwali-picks>a:nth-child(2){background:#54241e;color:#fff4e4}.diwali-picks>a:last-child{border-right:0}.diwali-picks strong{font-family:Georgia,serif;font-weight:400;font-size:52px}.diwali-picks h3{font-size:29px}
+.studio-section,#services,.plans-section{background:#291511;color:#fff4e4}
+.studio-intro h2,.section-heading h2,.manifesto h2{letter-spacing:-.045em}
+.world{border-color:#c39a6255!important;background:#4c251f!important;color:#fff4e4;border-radius:36px!important;overflow:hidden}
+.world-image{border-radius:150px 150px 0 0;overflow:hidden;background:#2e1611}.world-image img{object-fit:contain!important;width:100%;height:100%}.world-info{background:#4c251f}.world-info p,.world-meta{color:#e7d2b9}.world h3 em{color:#edc787}.world-tags span{border-color:#a8805e;color:#e7d2b9}
+.service-card{background:linear-gradient(145deg,#63372c88,#321914)!important;border-color:#b1896455!important;border-radius:20px!important}.service-art{border-radius:14px 14px 0 0}.service-title{color:#fff4e4}.service-description{color:#e4cebb}.service-category,.service-action{color:#edc787}.service-tabs button{color:#f2dfc7;border-color:#986d4f}.service-tabs button.active{background:#edc787;color:#321d17}
+.manifesto{background:#edc787;color:#321d17}.manifesto-copy>span{color:#783c2a}.systems-section{background:#f6ebd9}.workflow{background:#fff6e9;border-color:#bc9671;box-shadow:15px 15px 0 #d9bd9a}.workflow-step{border-color:#c2a986}.workflow-result{background:#ecd5af}.workflow-step>span:first-child{background:#54241e;color:#fff4e4}
+.plan{background:#fff2df;color:#321d17;border-color:#ba9363;border-radius:24px}.plan.featured{background:#edc787;color:#321d17}.plan .original-price{color:#60442e}.offer-badge{background:#54241e;border-color:#54241e;color:#fff4e4}.plans-section .terms-note{color:#e0cbb8}.plan-tabs button{color:#f5e6d2;border-color:#936b50}.plan-tabs button.active{color:#321d17;background:#edc787}
+.founder-section{background:#f6ebd9}.founder-art{border-radius:150px 150px 24px 24px}.process{background:#ecd9bc}.brief-section{background:#54241e;color:#fff4e4}.brief-section p,.brief-section .availability{color:#edd6bc}.brief-section form{background:#fff2df;color:#321d17}.faq-section{background:#f6ebd9}.brand-footer{background:#291511;color:#fff4e4}.footer-invitation{background:linear-gradient(120deg,#4c251f,#291511);border-color:#c49a6155}.footer-invitation-action{color:#edc787}.brand-footer p,.footer-bottom,.footer-location{color:#dfc8ac}.footer-signature{color:#fff4e4}
+#service-dialog{background:#301b16;color:#fff4e4;border-color:#bb9161}.dialog-chrome,.dialog-footer,#dialog-footer{background:#301b16;border-color:#9b765244}.dialog-editorial,.dialog-heading,.detail-grid p,.dialog-lead{color:#f0dfcb}.detail-label{color:#edc787}.dialog-art{background:#41221b}
+:focus-visible{outline-color:#9e542f}#services :focus-visible,.plans-section :focus-visible,.site-header :focus-visible{outline-color:#edc787}
+@media(min-width:801px){.world{grid-template-columns:1.12fr 1fr}.world-image{margin:22px}.studio-track>.world{height:min(680px,78vh)}}
+@media(max-width:800px){.section{padding-top:72px;padding-bottom:72px}.hero{min-height:850px;height:100svh;max-height:1100px}.hero h1{font-size:clamp(57px,10.5vw,85px)}.hero-image{object-position:68% center}.diwali-heading{display:block}.diwali-picks{grid-template-columns:1fr}.diwali-picks>a{border-right:0;border-bottom:1px solid #bca17e}.diwali-picks>a:last-child{border-bottom:0}.world-image{height:auto!important;aspect-ratio:3/2;margin:16px 16px 0;border-radius:70px 70px 0 0}.world-info{padding:30px}.studio-track{gap:40px}.founder-art{border-radius:100px 100px 20px 20px}.service-card{transform:none}.hero-description{max-width:340px}.diwali-picks strong{font-size:48px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.world-image img,.world-info h3{transform:none!important;opacity:1!important}}
+.world-meta span:last-child{color:#e7d2b9}.workflow-header,.workflow-step b,.workflow-step small,.workflow-note{color:#60442e}.plans-section .section-heading p{color:#e0cbb8}.plan.featured p{color:#513323}.founder-section>div:last-child h2,.founder-section>div:last-child .eyebrow,.founder-section>div:last-child p,.founder-section .signature{color:#513323}.brief-section form>p{color:#60442e}
