@@ -15,7 +15,9 @@ function updateChrome(){
   header.classList.toggle('is-scrolled',scrollY>90);
   const brief=document.querySelector('#brief').getBoundingClientRect();
   const footer=document.querySelector('footer').getBoundingClientRect();
-  const showContact=scrollY>650&&!(brief.top<innerHeight&&brief.bottom>0)&&footer.top>=innerHeight;
+  const cinema=document.querySelector('.cinema-rail')?.getBoundingClientRect();
+  const inCinema=cinema&&cinema.top<innerHeight&&cinema.bottom>100;
+  const showContact=!inCinema&&scrollY>650&&!(brief.top<innerHeight&&brief.bottom>0)&&footer.top>=innerHeight;
   contact.classList.toggle('visible',showContact);
   contact.inert=!showContact;
   const length=document.documentElement.scrollHeight-innerHeight;

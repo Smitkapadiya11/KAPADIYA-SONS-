@@ -80,3 +80,5 @@ document.querySelectorAll('[data-offer-plan]').forEach(a=>a.addEventListener('cl
 import './capability.js';
 
 import './atelier.js';
+
+import './cinema.js';

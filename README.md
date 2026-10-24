@@ -49,3 +49,11 @@ capability.js uses a native sticky stage on mobile and desktop. Scroll position 
 atelier.css and atelier.js provide the editorial opening, goal selector and illustrative workflow. The visitor chooses creative content, websites or automation; imagery, explanatory copy and the service link update together. Keyboard arrow/Home/End navigation follows the tab pattern. The workflow preview demonstrates capture, organisation and a response prepared for review; it sends no messages and uses no customer data. Existing generated artwork is reused with concept labels, and the founder portrait is unchanged.
 
 The presentation uses responsive typography, an image frame with restrained pointer depth, Anime.js reveals and the existing scroll-controlled service index. Pause and reduced-motion settings retain access to all information and controls. qa-atelier.mjs verifies goal choices, keyboard navigation, service links, workflow replay and automated mobile/desktop accessibility.
+
+## Scroll cinema — 24 October 2026
+
+The opening is a five-chapter, native-scroll presentation: oversized title and a suspended photographic fan; content coming forward; websites taking the foreground; automation taking the foreground; and a three-panel assembly with the next-step link. One paused Anime.js timeline is sought from native scroll position. The numbered controller seeks the same timeline; reversing scroll reverses the scene. Transform, opacity and perspective changes avoid per-frame layout resizing. No autonomous render loop runs while the page is idle.
+
+The Capability Index now scrubs adjacent cards through depth instead of hard-switching a single static panel. Inactive cards remain inert; only the selected service opens details. Both sequences rebuild for screen-width changes, honour motion pause/reduced motion, and retain a static fallback. The cinema includes a visible skip link and hides the floating enquiry control while it would cover chapter navigation.
+
+qa-cinema.mjs tests chapter selection, changing transforms, hidden future captions, reverse navigation, pause/resume, reduced motion and automated accessibility at mobile and desktop sizes. Full-site and pricing tests remain applicable. Smoothness depends on the device/browser; no universal frame-rate guarantee is asserted.
