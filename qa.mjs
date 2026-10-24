@@ -42,7 +42,7 @@ for(const width of [360,390,768,950,1440]){
   if(width===390){await page.locator('.menu-toggle').click();assert.equal(await page.locator('#mobile-menu').getAttribute('inert'),null);await page.locator('#mobile-menu a[href="#services"]').click();assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'),'false');await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await page.waitForTimeout(400);await page.screenshot({path:'v2-mobile-preview.png'});}
 }
 await page.emulateMedia({reducedMotion:'reduce'});await page.waitForTimeout(300);
-assert.equal(await page.locator('.hero-orbit svg').evaluate(el=>getComputedStyle(el).animationName),'none');
+assert.equal(await page.locator('.direction-mount').evaluate(el=>getComputedStyle(el).transform),'none');
 assert.equal(await page.locator('.studio-track').evaluate(el=>getComputedStyle(el).display),'grid');
 await page.goto(base+'#service/ugc',{waitUntil:'domcontentloaded',timeout:60000});await page.locator('dialog').waitFor({state:'visible'});await page.keyboard.press('Escape');
 const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
@@ -50,6 +50,3 @@ console.log('ACCESSIBILITY',JSON.stringify(audit.violations.map(v=>({id:v.id,imp
 assert.deepEqual(errors,[]);assert.equal(audit.violations.length,0);
 console.log('PASS: scroll-driven chapter reveal, gallery navigation, pause motion, 10 detail views, filters, 7 unique package messages, brief handoff, founder image, 5 viewport widths, mobile menu, deep links, reduced motion, accessibility scan and no JS errors.');
 await browser.close();
-
-
-

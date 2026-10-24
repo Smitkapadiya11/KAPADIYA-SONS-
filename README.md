@@ -43,3 +43,9 @@ The Avatar Demo base plan is a fixed INR 4,000 for four videos. Seasonal styling
 ## Scroll-controlled Capability Index
 
 capability.js uses a native sticky stage on mobile and desktop. Scroll position selects one service at a time and scrubs Anime.js image motion. A numbered controller supports direct selection and arrow/Home/End keys; each selected card opens its existing detailed view. Category filters rebuild the sequence. Pause and reduced motion restore the complete static grid. Inactive cards are inert and excluded from assistive technology. Run node qa-capability.mjs for phone/desktop scroll selection, all ten controller actions, details, filters and accessibility.
+
+## Interactive studio presentation — 24 October 2026
+
+atelier.css and atelier.js provide the editorial opening, goal selector and illustrative workflow. The visitor chooses creative content, websites or automation; imagery, explanatory copy and the service link update together. Keyboard arrow/Home/End navigation follows the tab pattern. The workflow preview demonstrates capture, organisation and a response prepared for review; it sends no messages and uses no customer data. Existing generated artwork is reused with concept labels, and the founder portrait is unchanged.
+
+The presentation uses responsive typography, an image frame with restrained pointer depth, Anime.js reveals and the existing scroll-controlled service index. Pause and reduced-motion settings retain access to all information and controls. qa-atelier.mjs verifies goal choices, keyboard navigation, service links, workflow replay and automated mobile/desktop accessibility.
