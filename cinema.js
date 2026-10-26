@@ -1,54 +1,34 @@
-import {createTimeline} from 'animejs';
-import './cinema.css';
+import {gsap} from 'gsap';
+import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import {SplitText} from 'gsap/SplitText';
+import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
+gsap.registerPlugin(ScrollTrigger,SplitText);
+const reduced=matchMedia('(prefers-reduced-motion: reduce)'),fine=matchMedia('(pointer:fine)');
+const rail=document.querySelector('.light-hero'),art=document.querySelector('.light-art'),intro=document.querySelector('.ignition');
+let context,smooth,ticker,split,disabled=false,resizeTimer;
+const splitStatement=()=>{const text=document.querySelector('.manifesto-copy');if(text.dataset.split)return;text.dataset.split='true';text.setAttribute('aria-label',text.textContent);text.innerHTML=text.innerHTML.replaceAll('<br>',' ').replace(/<[^>]*>/g,'').split(/\s+/).filter(Boolean).map((w,i)=>`<span aria-hidden="true" class="statement-word ${i>8?'lamp-word':''}" data-word="${w}">${w}</span>`).join(' ')};
+function setup(){
+ context?.revert();split?.revert();smooth?.destroy();if(ticker)gsap.ticker.remove(ticker);
+ disabled=reduced.matches||document.body.classList.contains('static-motion');rail.classList.toggle('is-scrubbed',!disabled);splitStatement();
+ if(disabled){gsap.set('.statement-word',{'--lit':1});return;}
+ if(fine.matches){smooth=new Lenis({lerp:.1,smoothWheel:true,syncTouch:false,anchors:{offset:-180},prevent:el=>Boolean(el.closest('dialog,.mobile-menu'))});smooth.on('scroll',ScrollTrigger.update);ticker=t=>smooth.raf(t*1000);gsap.ticker.add(ticker);}
+ context=gsap.context(()=>{
+  split=SplitText.create('.light-hero h1',{type:'words',mask:'words',autoSplit:true,onSplit:self=>gsap.from(self.words,{yPercent:105,rotate:2,duration:1,stagger:.065,ease:'expo.out',delay:.12})});
+  const tl=gsap.timeline({scrollTrigger:{trigger:rail,start:'top top',end:'bottom bottom',scrub:.65}});
+  tl.to(art,{scale:innerWidth<768?1.8:2.8,xPercent:innerWidth<768?-5:-18,ease:'none'},0).to('.light-hero-copy',{y:-90,opacity:0,ease:'none'},0).to('.light-halo',{opacity:1,scale:1.8,ease:'none'},0).to(art,{opacity:.08,duration:.22},.78);
+  gsap.to('.statement-word',{'--lit':1,stagger:.08,ease:'none',scrollTrigger:{trigger:'.manifesto-copy',start:'top 80%',end:'bottom 35%',scrub:true}});
+  const ribbon=document.querySelector('.ticker>div');
+  ScrollTrigger.create({trigger:'.ticker',start:'top bottom',end:'bottom top',onUpdate:self=>{gsap.to(ribbon,{x:-self.progress*300,skewX:gsap.utils.clamp(-3,3,self.getVelocity()/700),duration:.4,overwrite:true});gsap.to(ribbon,{skewX:0,duration:.8,delay:.15,overwrite:'auto'})}});
+ });ScrollTrigger.refresh();
+}
 requestAnimationFrame(()=>{
- const rail=document.querySelector('.cinema-rail'),stage=rail.querySelector('.cinema-stage');
- const cards=[...rail.querySelectorAll('.cinema-card')],outro=rail.querySelector('.cinema-outro'),buttons=[...rail.querySelectorAll('[data-cinema-step]')];
- const reduced=matchMedia('(prefers-reduced-motion: reduce)');
- const stops=[0,.23,.48,.72,1];
- const copy=[['01 / CREATE ATTENTION','Give your story<br>a bigger stage.','Creator-style content, AI films and campaign visuals.'],['02 / BUILD CONNECTION','Make every<br>interaction count.','Websites and landing pages with a clear next step.'],['03 / CREATE CAPACITY','Let the routine<br>take care of itself.','Scoped automation, customer workflows and useful software.']];
- let timeline,enabled=false,queued=false,last=-1,width=innerWidth,selected=-1;
- const clamp=v=>Math.max(0,Math.min(1,v));
- function build(){
-  timeline?.revert();enabled=!reduced.matches&&!document.body.classList.contains('static-motion');rail.classList.toggle('cinema-enabled',enabled);last=-1;
-  rail.querySelector('#cinema-pause').textContent=enabled?'Pause motion':'Resume motion';rail.querySelector('#cinema-pause').setAttribute('aria-pressed',String(!enabled));
-  outro.inert=false;if(!enabled)return;
-  const w=stage.clientWidth,h=stage.clientHeight,mobile=w<=800;
-  const side=w*(mobile?.85:.72),fan=w*(mobile?.23:.29),base=h*(mobile?0:.1);
-  timeline=createTimeline({autoplay:false,defaults:{ease:'inOutCubic'}});
-  timeline.add('.cinema-intro',{y:[0,-h*.22],scale:[1,1.13],opacity:[1,0],duration:700},100);
-  cards.forEach((card,i)=>{
-   const positions=[-w*.22,0,w*.22],rotations=[-18,8,20];
-   timeline.add(card,{x:[positions[i],i===0?0:side*(i===1?1:1.5)],y:[h*.26,base],scale:[mobile?.58:.5,i===0?1.08:.65],rotate:[rotations[i],i===0?0:12],rotateY:[i===0?25:-20,i===0?0:-38],opacity:[.42,i===0?1:.35],duration:1000},0);
-  });
-  timeline.add(cards[0],{x:-side,scale:.62,rotate:-12,rotateY:35,opacity:.3,duration:950},1250);
-  timeline.add(cards[1],{x:0,y:base,scale:1.08,rotate:0,rotateY:0,opacity:1,duration:950},1250);
-  timeline.add(cards[2],{x:side,y:base,scale:.65,rotate:12,rotateY:-38,opacity:.35,duration:950},1250);
-  timeline.add(cards[0],{x:-side*1.5,opacity:0,duration:950},2450);
-  timeline.add(cards[1],{x:-side,scale:.62,rotate:-12,rotateY:35,opacity:.3,duration:950},2450);
-  timeline.add(cards[2],{x:0,y:base,scale:1.08,rotate:0,rotateY:0,opacity:1,duration:950},2450);
-  cards.forEach((card,i)=>timeline.add(card,{x:(i-1)*fan,y:-h*.12,scale:mobile?.43:.45,rotate:(i-1)*8,rotateY:0,opacity:1,duration:1000},3650));
-  timeline.add('.cinema-caption',{opacity:[0,1],y:[40,0],duration:500},600);
-  timeline.add('.cinema-caption',{opacity:0,y:30,duration:400},3650);
-  timeline.add('.cinema-outro',{y:[70,0],opacity:[0,1],duration:700},3950);
-  timeline.add('.cinema-grid',{rotate:[-15,10],scale:[1,1.25],opacity:[.25,.5],duration:4650,ease:'linear'},0);
-  update();
- }
- function update(){
-  queued=false;if(!enabled)return;
-  const r=rail.getBoundingClientRect();const p=clamp(-r.top/Math.max(1,rail.offsetHeight-stage.offsetHeight));if(Math.abs(p-last)<.00001)return;last=p;
-  timeline.seek(p*4650);
-  const chapter=p<.36?0:p<.62?1:2;
-  if(selected!==chapter){selected=chapter;document.querySelector('#cinema-chapter').textContent=copy[chapter][0];document.querySelector('#cinema-caption-title').innerHTML=copy[chapter][1];document.querySelector('#cinema-caption-copy').textContent=copy[chapter][2];}
-  const step=p<.12?0:p<.36?1:p<.62?2:p<.85?3:4;
-  buttons.forEach((b,i)=>b.setAttribute('aria-current',step===i?'step':'false'));
-  rail.querySelector('.cinema-percent').textContent=String(Math.round(p*100)).padStart(3,'0')+'%';
-  rail.style.setProperty('--cinema-progress',String(p));outro.inert=p<.85;
- }
- function queue(){if(!queued){queued=true;requestAnimationFrame(update)}}
- buttons.forEach((b,i)=>b.addEventListener('click',()=>{const start=rail.getBoundingClientRect().top+scrollY;scrollTo({top:start+(rail.offsetHeight-stage.offsetHeight)*stops[i],behavior:'instant'});update()}));
- rail.querySelector('#cinema-pause').addEventListener('click',()=>document.querySelector('.motion-toggle').click());
- addEventListener('scroll',queue,{passive:true});
- addEventListener('resize',()=>{if(Math.abs(width-innerWidth)>2){width=innerWidth;build()}else queue()});
- let previous=document.body.classList.contains('static-motion');new MutationObserver(()=>{const next=document.body.classList.contains('static-motion');if(next!==previous){previous=next;build()}}).observe(document.body,{attributes:true,attributeFilter:['class']});
- reduced.addEventListener('change',build);build();
+ const proxy=document.querySelector('#cinema-pause');proxy.addEventListener('click',()=>{document.querySelector('.motion-toggle').click();proxy.setAttribute('aria-pressed',document.querySelector('.motion-toggle').getAttribute('aria-pressed'));proxy.textContent=document.querySelector('.motion-toggle').textContent});
+ setup();let seen=true;try{seen=sessionStorage.getItem('light-intro')==='seen';sessionStorage.setItem('light-intro','seen')}catch{}
+ if(!seen&&!disabled&&scrollY<20){gsap.set(intro,{display:'grid'});const flash=gsap.timeline({onComplete:()=>intro.remove()}).from(intro.querySelector('i'),{scale:0,opacity:0,duration:.25}).to(intro,{opacity:0,duration:.65,delay:.1});const skip=()=>{flash.progress(1);removeEventListener('pointerdown',skip);removeEventListener('wheel',skip);removeEventListener('touchstart',skip);removeEventListener('scroll',skip)};addEventListener('pointerdown',skip,{once:true});addEventListener('wheel',skip,{once:true,passive:true});addEventListener('touchstart',skip,{once:true,passive:true});addEventListener('scroll',skip,{once:true,passive:true});}
 });
+addEventListener('motion-preference',setup);reduced.addEventListener('change',setup);
+let previousWidth=innerWidth;addEventListener('resize',()=>{if(Math.abs(previousWidth-innerWidth)>2){previousWidth=innerWidth;clearTimeout(resizeTimer);resizeTimer=setTimeout(setup,180)}});
+rail.addEventListener('pointermove',e=>{if(disabled||!fine.matches)return;gsap.to('.light-art img',{x:(e.clientX/innerWidth-.5)*16,y:(e.clientY/innerHeight-.5)*10,duration:1.2,overwrite:true})});rail.addEventListener('pointerleave',()=>gsap.to('.light-art img',{x:0,y:0,duration:1}));
+addEventListener('deviceorientation',e=>{if(disabled||fine.matches||!Number.isFinite(e.gamma)||!Number.isFinite(e.beta))return;if(rail.getBoundingClientRect().bottom<0)return;gsap.to('.light-art img',{x:gsap.utils.clamp(-8,8,e.gamma/3),y:gsap.utils.clamp(-6,6,(e.beta-45)/5),duration:.8,overwrite:true})},{passive:true});
+new MutationObserver(()=>{if(document.body.classList.contains('modal-open')||document.body.classList.contains('menu-open'))smooth?.stop();else smooth?.start()}).observe(document.body,{attributes:true,attributeFilter:['class']});

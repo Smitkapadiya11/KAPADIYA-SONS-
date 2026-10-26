@@ -11,13 +11,13 @@ let imageAnimation,captionAnimation,current='notice';
 function choose(key){
  if(current===key)return;current=key;const d=directions[key];
  imageAnimation?.revert();captionAnimation?.revert();
- const image=document.querySelector('#direction-image');image.src='/images/services/'+d.image+'.webp';image.alt=d.alt;
+ const image=document.querySelector('#direction-image');image.src='/images/services/'+d.image+'.webp';image.srcset='/images/services/'+d.image+'-600.webp 600w, /images/services/'+d.image+'.webp 1536w';image.alt=d.alt;
  document.querySelector('#direction-panel').setAttribute('aria-labelledby','direction-'+key);
  document.querySelector('#direction-counter').textContent=d.label;document.querySelector('#direction-small').textContent=d.small;document.querySelector('#direction-title').innerHTML=d.title;document.querySelector('#direction-note').textContent=d.note;
  const cta=document.querySelector('#direction-cta');cta.href='#service/'+d.service;cta.innerHTML=d.cta+' <span>↗</span>';
  buttons.forEach(b=>{const selected=b.dataset.direction===key;b.setAttribute('aria-selected',String(selected));b.tabIndex=selected?0:-1});
  if(!reduced.matches&&!document.body.classList.contains('static-motion')){
-  imageAnimation=animate('.direction-image-window',{clipPath:['inset(0% 0% 100% 0%)','inset(0% 0% 0% 0%)'],duration:800,ease:'outExpo'});
+  imageAnimation=animate('.direction-image-window',{opacity:[.35,1],scale:[1.04,1],duration:800,ease:'outExpo'});
   captionAnimation=animate('.direction-caption strong',{y:[20,0],opacity:[0,1],duration:700,ease:'outExpo'});
  }
 }

@@ -1,5 +1,14 @@
 node_modules
-.git
-.vercel
+*.py
+qa*.mjs
 *-preview.png
-qa.mjs
+audit-*.json
+lighthouse-*.json
+*.md
+*-fragment.html
+new-hero.html
+workflow-demo.html
+campaign-graphics.mjs
+build-share.mjs
+inspect-sections.mjs
+preview-smoke.mjs

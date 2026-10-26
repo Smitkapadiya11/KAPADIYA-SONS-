@@ -1,0 +1,26 @@
+{
+  "auditedAt": "2026-10-26T10:34:06.503Z",
+  "url": "http://127.0.0.1:4175/",
+  "mode": "Lighthouse mobile simulation on local production build",
+  "scores": {
+    "performance": 97,
+    "accessibility": 100
+  },
+  "metrics": {
+    "lcpMs": 2476.796125,
+    "cls": 0.001608747644875423,
+    "totalBlockingMs": 55
+  },
+  "jsGzipKB": 87.87,
+  "viewports": [
+    360,
+    390,
+    768,
+    1440
+  ],
+  "axeViolations": 0,
+  "limitations": [
+    "Not a physical Android device or field measurement",
+    "Audit report completed; browser temporary-folder cleanup returned a Windows permission error after the report was saved"
+  ]
+}

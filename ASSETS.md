@@ -54,3 +54,10 @@ Use case: photorealistic-natural. Portrait 1024x1536 editorial photo for an AI a
 GSAP orchestrates the opening typography, scroll-linked hero artwork, desktop pinned layered creative worlds, manifesto, workflow steps and founder portrait. Mobile uses vertically stacked worlds and restrained parallax. Native browser scrolling is retained. Reduced-motion preferences and the visible pause control replace the pinned sequence with readable stacked content.
 
 Implementation references: [ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) and [responsive motion contexts](https://gsap.com/docs/v3/GSAP/gsap.matchMedia()/).
+
+
+## Chrome and lime preview
+
+Six scene assets are in `public/images/light`, with AVIF and WebP exports and smaller portrait variants. The share scene uses the same flame sculpture as the hero. Image descriptions and source prompts are in `light-art-prompts.json`. The final share card is composed by `build-share.mjs` using the live offer data. Generated originals were resampled to the requested 2K export dimensions where needed. All people in campaign images are fictional; the founder photograph remains the supplied authentic photograph.
+
+Local fonts now have Latin, punctuation and currency WOFF2 subsets, retaining the original font licences.

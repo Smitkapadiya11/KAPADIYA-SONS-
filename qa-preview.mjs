@@ -1,0 +1,21 @@
+import {chromium} from '@playwright/test';import assert from 'node:assert/strict';import AxeBuilder from '@axe-core/playwright';import fs from 'node:fs';
+const expected=[['avatar-demo','₹4,000','₹5,999',2],['creator-monthly','₹11,999','₹21,999',3],['ugc-demo','₹4,999','₹6,999',1],['ugc-monthly','₹14,999','₹20,999',1],['monster','₹19,800','₹33,999',2],['content-essentials','₹5,999','₹10,999',1],['content-extended','₹9,599.40','₹15,999',1],['lions-cut','₹35,000','₹51,999',2]];
+const browser=await chromium.launch({channel:'msedge',headless:true});const context=await browser.newContext();const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+for(const width of [360,390,768,1440]){
+ await page.setViewportSize({width,height:950});await page.goto(process.env.SITE_URL||'http://127.0.0.1:4175/');await page.waitForTimeout(1300);
+ assert.equal(await page.locator('h1').count(),1);assert.equal(await page.locator('.offer-card').count(),8);
+ for(const [id,price,was,items] of expected){const card=page.locator('#offer-'+id);assert.equal(await card.locator('.offer-price').textContent(),price);assert.equal(await card.locator('s').textContent(),was);assert.equal(await card.locator('li').count(),items);const href=new URL(await card.locator('a').getAttribute('href'));assert.equal(href.pathname,'/917575807403');assert.ok(href.searchParams.get('text').includes(price));assert.ok(href.searchParams.get('text').endsWith('My business: ___'));}
+ const data=JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());assert.deepEqual(data['@graph'].map(p=>Number(p.price)),[4000,11999,4999,14999,19800,5999,9599.4,35000]);
+ assert.ok(!/Gemini|ChatGPT|Hugging Face|OpenAI|Midjourney|HeyGen/i.test(await page.locator('body').innerText()));
+ const original=await page.locator('.light-art').evaluate(el=>getComputedStyle(el).transform);await page.evaluate(()=>scrollTo(0,450));await page.waitForTimeout(900);assert.notEqual(await page.locator('.light-art').evaluate(el=>getComputedStyle(el).transform),original);
+ if(width<768)assert.equal(await page.locator('.capability-rail.controlled').count(),0);
+ for(const category of ['avatar','ugc','routine','film']){await page.locator('[data-category='+category+']').click();await page.waitForTimeout(700);assert.equal(await page.locator('[data-category='+category+']').getAttribute('aria-selected'),'true');}
+ await page.locator('[data-category=film]').press('Home');await page.waitForTimeout(500);assert.equal(await page.locator('[data-category=avatar]').getAttribute('aria-selected'),'true');
+ await page.evaluate(()=>scrollTo(0,0));await page.waitForTimeout(500);await page.locator('#cinema-pause').click();await page.waitForTimeout(500);assert.equal(await page.locator('.pin-spacer').count(),0);assert.equal(await page.locator('.is-scrubbed').count(),0);
+ await page.screenshot({path:`checked-hero-${width}-preview.png`});await page.locator('#category-ugc').scrollIntoViewIfNeeded();await page.screenshot({path:`checked-ugc-${width}-preview.png`});
+ const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();fs.writeFileSync(`audit-${width}.json`,JSON.stringify(audit.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})),null,2));assert.equal(audit.violations.length,0,'Accessibility violations');console.log({width,violations:audit.violations.length,overflow:await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('.pin-spacer').count(),0);await page.emulateMedia({reducedMotion:'no-preference'});
+}
+for(const id of ['avatar','ugc','film','reels','images','automation','whatsapp','websites','apps','crm']){await page.evaluate(id=>location.hash='service/'+id,id);await page.locator('dialog[open]').waitFor();assert.ok(await page.locator('.dialog-visual').evaluate(i=>i.complete&&i.naturalWidth>0));await page.locator('.dialog-close').click();}
+assert.deepEqual(errors,[]);await browser.close();console.log('PASS exact offer data, schema, WhatsApp messages, category controls, responsive layouts, scroll motion, pause, reduced motion and all ten service routes.');

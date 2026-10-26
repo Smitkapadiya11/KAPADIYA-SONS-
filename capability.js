@@ -37,7 +37,7 @@ requestAnimationFrame(()=>{
  function queue(){if(!scheduled){scheduled=true;requestAnimationFrame(update)}}
  function rebuild(){
   animations.forEach(pair=>{pair.frame.revert();pair.image.revert()});animations=[];cards=[...grid.querySelectorAll('.service-card')];active=-1;
-  enabled=!reduced.matches&&!document.body.classList.contains('static-motion');
+  enabled=innerWidth>=768&&!reduced.matches&&!document.body.classList.contains('static-motion');
   rail.classList.toggle('controlled',enabled);controls.hidden=!enabled;
   rail.style.setProperty('--cap-distance',Math.max(0,cards.length-1)*65+'svh');
   controls.innerHTML='<div class="capability-status"><span>SCROLL TO EXPLORE</span><strong class="capability-count">01 / '+String(cards.length).padStart(2,'0')+'</strong></div><div class="capability-steps">'+cards.map((c,i)=>'<button type="button" data-cap-step="'+i+'" aria-label="Show '+c.querySelector('.service-title').textContent+'"><span>'+String(i+1).padStart(2,'0')+'</span></button>').join('')+'</div><a class="capability-skip" href="#plans">Skip to plans ↘</a>';

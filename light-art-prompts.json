@@ -1,0 +1,65 @@
+{
+  "directory": "public/images/light",
+  "note": "Generated concept art, not client work. Portraits are fictional. Exported at 2K, resampled from generated originals where necessary. The share background was refined using the hero sculpture as reference; share typography is rendered separately from offers.js.",
+  "assets": [
+    {
+      "name": "hero",
+      "prompt": "Photoreal 2K 2048x1152 16:9 hero image, enhance off look. Straight-on medium-wide shot of a polished liquid-chrome abstract sculpture shaped like a stylised diya flame, with an open glowing centre, standing on matte black stone plinth in a dark studio. Lime-green edge light, warm flame-gold rim from right at 2700K, soft cool key above5600K. Fine floating sparks, gentle haze, volumetric light shafts. Micro scratches chrome, dust plinth edge, faint fingerprint, reflections tiny lamps. 50mm f5.6 fine film grain subtle chromatic aberration. Quiet expensive festive. Black #11130F #1A1D16 lime #C4E45A chrome #E6E9EE gold #F2B441 flame #FF8A1F. Full sculpture centered with breathing room. No text logos watermark.",
+      "exports": [
+        "hero.avif",
+        "hero.webp",
+        "hero-1000.avif"
+      ]
+    },
+    {
+      "name": "avatar",
+      "prompt": "Photoreal 2K portrait 3:4 1536x2048, natural unenhanced. Medium close-up fictional Indian female presenter early30s, warm wheatish skin, natural makeup, sleek low bun, deep green silk kurta fine gold zari border, speaking to camera warm recording studio. Small brass diya out of focus, acoustic panels, soft key4500K left gold practical2700K behind. Modern smartphone sharp microcontrast shallowdepth. Full head comfortable headroom shoulders visible. Credible expert festive professional. Dark ink #11130F green #2E4A2A lime #C4E45A gold #F2B441. No text logo watermark.",
+      "exports": [
+        "avatar.avif",
+        "avatar.webp",
+        "avatar-600.avif",
+        "avatar-600.webp"
+      ]
+    },
+    {
+      "name": "ugc",
+      "prompt": "Photoreal 2K portrait 3:4 1536x2048 natural unenhanced. Handheld selfie medium shot fictional Indian male creator mid20s holding premium skincare bottle thin gold Diwali ribbon toward camera, smiling midsentence, warm apartment fairy lights marigold garland softbackground. Slight phonecamera tilt natural window5000K warm fairy2700K. Reflective unbranded bottle, stray hairs creased cotton shirt. Full head and product fully inside frame headroom. Relatable real desirable. Inkblack gold warmcream small lime accents. No readable text brand logos watermark.",
+      "exports": [
+        "ugc.avif",
+        "ugc.webp",
+        "ugc-600.avif",
+        "ugc-600.webp"
+      ]
+    },
+    {
+      "name": "routine",
+      "prompt": "Photoreal 2K portrait 3:4 1536x2048 natural unenhanced. Overhead flat lay dark slate desk: phone showing grid vibrant short vertical video thumbnails with no words or logos, small brass diya, few marigold petals, matteblack notebook limegreen tabs, chrome pen. Soft top5600K warm diya2700K. Petal bruising slight dust fingerprint phoneglass. Organised consistent festive expensive editorial stilllife. Ink #11130F #1A1D16 lime #C4E45A chrome #E6E9EE gold #F2B441. Generous composition no cut off phone. No text logos watermark.",
+      "exports": [
+        "routine.avif",
+        "routine.webp",
+        "routine-600.avif",
+        "routine-600.webp"
+      ]
+    },
+    {
+      "name": "film",
+      "prompt": "Photoreal 2K portrait 3:4 1536x2048 natural unenhanced. Cinematic wide shot Rajasthan haveli courtyard bluehour hundreds tiny diyas liningsteps lonefigure ivory sherwani walking toward carvedarchway holdingcrystal attarbottle catchinglight. Wideenvironment portraitframing. Anamorphiclook35mm f2.8 light haze warm2700K lamps cool7000K sky. Chipped sandstone waxdrips dust lightbeams. Epic regal launchday. Inkblack bluegray gold ivory subtlelime. No textlogoswatermark.",
+      "exports": [
+        "film.avif",
+        "film.webp",
+        "film-600.avif",
+        "film-600.webp"
+      ]
+    },
+    {
+      "name": "share",
+      "prompt": "Photoreal 2K 1.91:1 wide socialshare image 2048x1072. Liquidchrome abstract sculptural diya flame on matteblack plinth RIGHT THIRD ONLY. Left two thirds entirely dark #11130F negative space for type to be added later. Lime edge #C4E45A warmgold rim #F2B441 right, soft cool overhead, micro scratches dust haze few tiny sparks. Quiet expensive festive editorial photograph50mm. No text lettering logos watermark.",
+      "exports": [
+        "share.avif",
+        "share.webp",
+        "share-card.avif",
+        "share-card.webp"
+      ]
+    }
+  ]
+}

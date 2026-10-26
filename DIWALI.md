@@ -1,19 +1,22 @@
-# Diwali edition — 23 October 2026
+# Diwali offer data
 
-Source: Smit-Kapadiya-Revised-Service-Quotation (1).pdf, all four pages, with the owner's explicit correction to 40%, overriding the PDF's 50%. Four packages use 60% of their brochure price, preserving paise; Avatar Demo is the fixed INR 4,000 base/demo plan (four videos); UGC Ads at INR 14,999 and Gemini Essentials at INR 5,999 remain fixed offers. Custom technology quotes are separate. No expiry date or stock scarcity is asserted.
+The current preview uses `offers.js` as the single source of truth for all eight plans. It generates the static price cards, highlights, metadata, structured offers and service-detail pricing. WhatsApp messages use the same objects.
 
-The seasonal design lives in diwali.css. Desktop creative worlds use pinned, layered clip reveals with depth. Native scrolling remains; mobile and reduced-motion layouts stack the chapters. The private prospect workspace is outside this public repository.
+The October 26 brief replaces every earlier quotation and discount rule. There is no blanket discount and no additional reduction on the listed offers. Do not restore historic package counts or bonuses.
 
-## Generated artwork
+The two content-routine plans are named Content Essentials and Content Extended in the customer experience to meet the instruction not to name a generation vendor. Their supplied prices, savings, unit figures and deliverables are unchanged. The explicit decimal savings and per-reel figures in the brief are retained rather than rounded away.
 
-public/images/diwali-light.webp was generated with GPT Image at 1536 × 1024 and optimised as WebP. It is illustrative campaign artwork, not client work. Exact prompt:
+No end date, countdown, scarcity counter or conversion guarantee is supplied or displayed. Availability, taxes, payment terms, revisions and dates are confirmed before booking. Custom technology work is quoted separately.
 
-Use case: ads-marketing. Create a premium landscape 1536x1024 Diwali campaign artwork for KAPADIYA & SONS creative technology studio. No text or logos. A monumental sculptural clear smoked-glass diya oil lamp, refined brushed gold rim, bright elegant single flame, floating above a dark forest-green reflective surface. Two thin orbital gold ribbons around lamp suggesting creative energy, tiny warm sparks, tasteful cinematic glow, luxurious photoreal product campaign lighting, beautiful refracted amber and subtle chartreuse caustics. Main lamp in right 60%, left 40% dark clean negative space for live website typography. Contemporary Indian festival luxury meets futuristic glass design, restrained, not crowded, no traditional clip art, no fireworks clutter. Full lamp safely framed with generous margins. Extremely polished physical materials and precise flame.
+# Preview release
 
-## Verification
+Branch: `preview/chrome-lime-diwali`.
+Production approval is required by the latest user brief. Do not merge or promote this preview without it.
 
-Run node qa-diwali.mjs for seven exact prices, enquiry messages, offer routing, responsive layouts, automated accessibility and JavaScript errors. Existing qa.mjs, qa-glass.mjs and qa-identity.mjs cover the remaining site interactions.
+# Validation
 
-## Indian festive revision — 24 October 2026
+`npm run build`
+`node qa-preview.mjs`
+`node qa-preview-flows.mjs`
 
-festival.css sets the oxblood, ivory and antique-brass visual system. Ten replacement Indian professional/Diwali concepts and exact prompts are in festive-art-prompts.json. The founder portrait remains authentic. Anime.js drives headline, section, image and gallery animation; ScrollTrigger manages the desktop pin and controls. Mobile uses scroll-linked image and text animation without pinning. Reduced motion and the pause button retain readable static content.
+The older QA scripts describe prior versions; use the preview scripts for the changed offer and motion experience. Tests intercept the brief URL and never send messages.
