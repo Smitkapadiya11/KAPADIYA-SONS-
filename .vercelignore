@@ -12,3 +12,8 @@ campaign-graphics.mjs
 build-share.mjs
 inspect-sections.mjs
 preview-smoke.mjs
+.git
+.vercel
+hosted-preview.html
+check-hosted.mjs
+verify-preview.mjs
