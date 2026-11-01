@@ -32,19 +32,31 @@ const stars=new THREE.BufferGeometry(),positions=[];
 for(let i=0;i<180;i++){positions.push(Math.sin(i*13.1)*12,Math.cos(i*7.3)*8,-4-(i%25)*.45);}
 stars.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));scene.add(new THREE.Points(stars,new THREE.PointsMaterial({color:0xa9e27d,size:.025,transparent:true,opacity:.5})));
 const chapters=[...document.querySelectorAll('.signal-hero,#selected-work,#studio,#pinyoursite,#avatar,.manifesto,#services,#plans,#about,#brief,footer')];
-let anchors=[],p=0,target=0,px=0,py=0,tx=0,ty=0,frame=0,last=0;
+let anchors=[],p=0,target=0,px=0,py=0,tx=0,ty=0,frame=0,last=0,flow=0;
 const reduced=matchMedia('(prefers-reduced-motion:reduce)');
 function measure(){anchors=chapters.map(e=>e.getBoundingClientRect().top+scrollY);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);update();}
 function update(){let n=0;for(let i=0;i<anchors.length;i++)if(scrollY>=anchors[i]-innerHeight*.35)n=i;const a=anchors[n]-innerHeight*.35,b=(anchors[n+1]||document.documentElement.scrollHeight)-innerHeight*.35;target=n+Math.max(0,Math.min(1,(scrollY-a)/Math.max(1,b-a)));}
-function render(now=0){frame=0;const off=reduced.matches||document.body.classList.contains('motion-paused');const dt=Math.min(40,now-last||16);last=now;p+=(target-p)*(off?1:1-Math.exp(-dt/160));px+=(tx-px)*.06;py+=(ty-py)*.06;
+function render(now=0){frame=0;const off=reduced.matches||document.body.classList.contains('motion-paused');const dt=Math.min(40,now-last||16);last=now;if(!off&&!document.hidden)flow+=dt*.00025;p+=(target-p)*(off?1:1-Math.exp(-dt/160));px+=(tx-px)*.06;py+=(ty-py)*.06;
  const mobile=innerWidth<801;
  const turn=p*Math.PI*.38;
  // The same assembly travels, opens, and reforms across the entire document.
- machine.rotation.set(.35+Math.sin(p*.7)*.5+py*.12,turn+px*.2,-.25+Math.sin(p*.6)*.25);
+ machine.rotation.set(.35+Math.sin(p*.7)*.5+py*.12+Math.sin(flow)*.06,turn+px*.2,-.25+Math.sin(p*.6)*.25);
  machine.position.set(Math.cos(p*Math.PI)* (mobile?.65:2.1),Math.sin(p*.8)*.35,0);
  const expansion=.16+Math.pow(Math.sin(p*Math.PI*.5),2)*.62;
- layers.forEach((layer,i)=>{layer.position.z=(i-5)*expansion;layer.rotation.z=(i%2?1:-1)*p*.18;});
- cage.rotation.set(p*.7,p*.4,0);
+ // Continuous morph weights: assembled portal → helix → petal fan → portal.
+ // Transform the shared layers instead of rebuilding geometry each frame.
+ const helix=Math.pow(.5-.5*Math.cos(p*Math.PI*.66),2);
+ const petals=Math.pow(.5-.5*Math.cos(p*Math.PI*.43),4);
+ layers.forEach((layer,i)=>{
+   const phase=i/11*Math.PI*2+flow;
+   const wave=Math.sin(flow*1.5+i*.48);
+   layer.position.set(Math.cos(phase)*helix*.85,Math.sin(phase)*helix*.85,(i-5)*expansion+wave*.06);
+   layer.rotation.set(Math.cos(phase)*petals*.8,Math.sin(phase)*petals*.8,(i%2?1:-1)*(p*.18+flow*.12));
+   const breath=1+wave*.025;
+   layer.scale.set(breath*(1+petals*.22),breath*(1-petals*.3),1);
+ });
+ cage.rotation.set(p*.7+flow*.25,p*.4+flow*.18,0);
+ cage.scale.setScalar(1+Math.sin(flow*1.4)*.045);
  camera.position.set(Math.sin(p*.45)*.5,Math.cos(p*.6)*.4,mobile?12:8.4+Math.sin(p*Math.PI)*1.1);camera.lookAt(0,0,0);
  renderer.render(scene,camera);
  if(!document.hidden&&!off)frame=requestAnimationFrame(render);

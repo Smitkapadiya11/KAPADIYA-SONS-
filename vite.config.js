@@ -7,6 +7,11 @@ import {
   terms,
 } from "./offers.js";
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: { manualChunks: { spatial: ['three'] } },
+    },
+  },
   plugins: [
     {
       name: "content-data",
