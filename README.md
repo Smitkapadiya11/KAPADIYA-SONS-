@@ -44,3 +44,9 @@ Forms prepare WhatsApp messages for visitors to review and send; there is no hid
 The content script checks the eight exact package prices, seven structured offers, destination links, seasonal-copy removal, media files, unique plot data, gallery and PDF assets. Geometry tests verify all 63 polygons, reference dimensions and desktop/mobile camera positioning. Browser checks cover responsive layouts, service filters/dialogs, video playback, motion pause/resume, map search/selection, gallery and satellite view. See `pinyoursite/CLONE_REPORT.md` for reconstruction scope.
 
 A smooth 60 fps experience is a design target, not a guarantee across every device. Offscreen footage is paused, heavy satellite code is loaded on demand, and animation primarily uses transforms and opacity.
+
+### Responsive image refinement — 1 November 2026
+
+Image frames now constrain their contents independently of source dimensions. The founder portrait is capped at 320px on desktop and 250px on smaller screens, with automatic image height. Service grids use three desktop columns, two tablet columns and one phone column; a final unpaired card spans only when the current filter leaves an incomplete row. Phone descriptions are 14px and service titles are 24px.
+
+Browser verification at 1440, 768, 390 and 360px found no horizontal page overflow or clipped heading, service-description or price text. Both service filters were checked for consistent image heights and correct final-card placement. All 14 PinYourSite gallery images loaded. Content/asset and plot geometry checks passed.

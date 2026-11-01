@@ -72,6 +72,9 @@ svg {
   max-width: 100%;
   display: block;
 }
+img {
+  height: auto;
+}
 h1,
 h2,
 h3,

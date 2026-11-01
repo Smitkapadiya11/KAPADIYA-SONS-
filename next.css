@@ -263,6 +263,8 @@ h2 {
   background: linear-gradient(#0005, transparent 30%, transparent 80%, #0003);
 }
 .work-media img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 112%;
   object-fit: cover;
@@ -557,6 +559,7 @@ h2 {
 }
 .service-visual {
   aspect-ratio: 1.55;
+  width: 100%;
   position: relative;
   overflow: hidden;
   background: #244a33;
@@ -568,6 +571,9 @@ h2 {
   background: linear-gradient(#0003, transparent 40%);
 }
 .service-visual img {
+  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -605,7 +611,7 @@ h2 {
   min-height: 235px;
 }
 .service-info small {
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.15em;
   color: #6e836b;
 }
@@ -620,7 +626,7 @@ h2 {
 }
 .service-description {
   display: block;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.65;
   max-width: none;
   color: #688164;
@@ -631,7 +637,7 @@ h2 {
   align-items: center;
   margin-top: auto;
   padding-top: 23px;
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0.12em;
 }
 .service-explore b {
@@ -671,13 +677,18 @@ h2 {
 .founder-section {
   background: #e5e9dc;
   color: #173c28;
-  gap: 7vw;
+  grid-template-columns: minmax(220px, 320px) minmax(0, 650px);
+  justify-content: center;
+  gap: clamp(40px, 6vw, 90px);
 }
 .founder-photo {
+  width: 100%;
+  max-width: 320px;
   border-radius: 6px;
   overflow: hidden;
 }
 .founder-photo img {
+  height: auto;
   filter: grayscale(0.2);
 }
 .founder-section h2 {
@@ -1201,16 +1212,16 @@ h2 {
   .service-explore b {
     font-size: 13px;
   }
-  .service-row:last-child {
+  .service-row:last-child:nth-child(odd) {
     grid-column: 1/-1;
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
-  .service-row:last-child .service-visual {
+  .service-row:last-child:nth-child(odd) .service-visual {
     height: 100%;
     aspect-ratio: auto;
   }
-  .service-row:last-child .service-info {
+  .service-row:last-child:nth-child(odd) .service-info {
     min-height: 230px;
   }
   .plans-section .plan-grid {
@@ -1378,5 +1389,114 @@ body {
 @media (max-width: 800px) {
   .dialog-service-image {
     height: 180px;
+  }
+}
+
+/* Keep image crops independent of their source dimensions and filtered count. */
+@media (min-width: 801px) {
+  .service-row:last-child:nth-child(3n + 1) {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+  .service-row:last-child:nth-child(3n + 1) .service-visual {
+    height: 100%;
+    min-height: 250px;
+    aspect-ratio: auto;
+  }
+  .service-row:last-child:nth-child(3n + 1) .service-info {
+    justify-content: center;
+    padding: 32px;
+  }
+  .service-row:last-child:nth-child(3n + 1) .service-description {
+    max-width: 520px;
+  }
+}
+@media (max-width: 800px) {
+  .service-info {
+    padding: 22px 18px;
+    min-height: 260px;
+  }
+  .service-info small,
+  .service-explore {
+    font-size: 9px;
+  }
+  .service-description {
+    font-size: 13px;
+  }
+  .founder-photo {
+    max-width: 250px;
+    align-self: flex-start;
+  }
+  .founder-section h2 {
+    font-size: clamp(30px, 5vw, 40px);
+  }
+}
+@media (max-width: 540px) {
+  #service-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .service-row,
+  .service-row:last-child:nth-child(odd) {
+    display: block;
+    grid-column: auto;
+  }
+  .service-visual,
+  .service-row:last-child:nth-child(odd) .service-visual {
+    aspect-ratio: 1.4;
+    height: auto;
+  }
+  .service-info,
+  .service-row:last-child:nth-child(odd) .service-info {
+    min-height: 0;
+    padding: 24px;
+  }
+  .service-row strong {
+    font-size: 24px;
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+  }
+  .service-info small,
+  .service-explore {
+    font-size: 10px;
+  }
+  .service-description {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .service-number {
+    font-size: 10px;
+  }
+  .service-arrow {
+    width: 36px;
+    height: 36px;
+    font-size: 22px;
+  }
+  .film-editorial {
+    display: block;
+  }
+  .film-editorial > p {
+    font-size: 14px;
+    max-width: 34ch;
+  }
+  .featured-price {
+    margin: 24px 0;
+    padding: 20px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .featured-price p {
+    font-size: 13px;
+  }
+  .film-editorial .button {
+    font-size: 12px;
+    padding: 16px 22px;
+  }
+  .work-type {
+    font-size: 8px;
+    letter-spacing: 0.04em;
+    max-width: calc(100% - 24px);
+    line-height: 1.6;
   }
 }
