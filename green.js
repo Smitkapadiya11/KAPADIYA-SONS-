@@ -93,6 +93,27 @@ function renderServices(filter = "all") {
     .join("");
 }
 renderServices();
+const reel = select('#service-grid');
+let reelFrame = 0;
+function reelPosition() {
+  const cards = [...reel.children];
+  const index = cards.reduce((best, card, i) => Math.abs(card.offsetLeft - reel.scrollLeft) < Math.abs(cards[best].offsetLeft - reel.scrollLeft) ? i : best, 0);
+  select('#reel-count').textContent = String(index + 1).padStart(2, '0') + ' / ' + String(cards.length).padStart(2, '0');
+  select('#reel-prev').disabled = index === 0;
+  select('#reel-next').disabled = index === cards.length - 1;
+  return index;
+}
+function moveReel(step) {
+  const cards = [...reel.children];
+  const index = Math.max(0, Math.min(cards.length - 1, reelPosition() + step));
+  reel.scrollTo({left: cards[index].offsetLeft, behavior: document.body.classList.contains('motion-paused') ? 'instant' : 'smooth'});
+}
+select('#reel-prev').addEventListener('click', () => moveReel(-1));
+select('#reel-next').addEventListener('click', () => moveReel(1));
+reel.addEventListener('scroll', () => { cancelAnimationFrame(reelFrame); reelFrame = requestAnimationFrame(reelPosition); }, {passive:true});
+reel.addEventListener('keydown', e => { if(e.key === 'ArrowRight' || e.key === 'ArrowLeft') {e.preventDefault();moveReel(e.key === 'ArrowRight' ? 1 : -1);} });
+new MutationObserver(() => {reel.scrollTo({left:0,behavior:'instant'});reelPosition();}).observe(reel,{childList:true});
+reelPosition();
 const dialog = select("#service-dialog");
 let returnFocus;
 function showDialog(content) {
