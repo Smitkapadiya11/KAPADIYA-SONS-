@@ -1,6 +1,6 @@
 import "./green.css";
-import "./motion/kapadiya-motion.js";
 import "./next.css";
+import "./signal.css";
 import { services as originalServices } from "./services.js";
 import { offers, terms, servicePricing } from "./offers.js";
 const select = (s) => document.querySelector(s),
@@ -281,106 +281,5 @@ new IntersectionObserver(
   },
   { threshold: 0 },
 ).observe(video);
-const ns = "http://www.w3.org/2000/svg";
-for (let i = 0; i < 12; i++) {
-  const p = document.createElementNS(ns, "path");
-  p.setAttribute(
-    "d",
-    "M300 300 C210 210 208 70 300 30 C392 70 390 210 300 300Z",
-  );
-  p.setAttribute("transform", "rotate(" + i * 30 + " 300 300)");
-  select(".flower-petals").append(p);
-}
 
-for (let band = 0; band < 34; band++) {
-  const p = document.createElementNS(ns, "path");
-  let d = "";
-  for (let j = 0; j <= 280; j++) {
-    const t = (j / 280) * Math.PI * 2,
-      r = 150 + band * 2.15,
-      z = Math.sin(t * 3 + 0.5) * (30 + band * 0.7);
-    const x = 300 + Math.cos(t) * r + Math.sin(t * 2) * 45,
-      y = 300 + Math.sin(t) * r * 0.67 + z;
-    d += (j ? "L" : "M") + x.toFixed(2) + " " + y.toFixed(2);
-  }
-  p.setAttribute("d", d + "Z");
-  p.setAttribute("fill", "none");
-  p.setAttribute("stroke", "url(#contour-ink)");
-  p.setAttribute("stroke-width", band % 6 === 0 ? "1.6" : ".7");
-  p.setAttribute("opacity", 0.4 + band / 60);
-  select(".contour-lines").append(p);
-}
-
-const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-let paused = reduced.matches,
-  frame = 0;
-const flower = select(".vector-flower"),
-  hero = select(".hero"),
-  star = select(".manifesto-vector"),
-  manifesto = select(".manifesto"),
-  progress = select(".scroll-progress");
-function paint() {
-  frame = 0;
-  const scroll = window.scrollY;
-  progress.style.transform =
-    "scaleX(" +
-    scroll / Math.max(1, document.documentElement.scrollHeight - innerHeight) +
-    ")";
-  if (paused || reduced.matches) return;
-  const r = hero.getBoundingClientRect();
-  if (r.bottom > 0 && r.top < innerHeight) {
-    const p = Math.min(1, Math.max(0, -r.top / r.height));
-    flower.style.transform =
-      "rotate(" + (p * 105 - 12) + "deg) scale(" + (1 - p * 0.08) + ")";
-  }
-  const mr = manifesto.getBoundingClientRect();
-  if (mr.bottom > 0 && mr.top < innerHeight)
-    star.style.transform =
-      "rotate(" +
-      ((innerHeight - mr.top) / (innerHeight + mr.height)) * 100 +
-      "deg)";
-}
-function schedule() {
-  if (!frame) frame = requestAnimationFrame(paint);
-}
-window.addEventListener("scroll", schedule, { passive: true });
-window.addEventListener("resize", schedule, { passive: true });
-function motionState() {
-  document.body.classList.toggle("motion-paused", paused || reduced.matches);
-  select(".motion-toggle").setAttribute(
-    "aria-pressed",
-    String(paused || reduced.matches),
-  );
-  select(".motion-toggle").innerHTML =
-    paused || reduced.matches
-      ? "Resume motion <span>▶</span>"
-      : "Pause motion <span>Ⅱ</span>";
-  schedule();
-}
-select(".motion-toggle").addEventListener("click", () => {
-  paused = !paused;
-  if (reduced.matches) paused = true;
-  motionState();
-});
-reduced.addEventListener("change", () => {
-  paused = reduced.matches;
-  motionState();
-});
-if (!reduced.matches) {
-  document.body.classList.add("motion-ready");
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add("is-visible");
-          observer.unobserve(e.target);
-        }
-      });
-    },
-    { threshold: 0.07 },
-  );
-  all(".reveal").forEach((el) => observer.observe(el));
-}
-motionState();
-
-import "./next-motion.js";
+import "./signal-motion.js";

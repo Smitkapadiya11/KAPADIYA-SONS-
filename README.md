@@ -50,3 +50,7 @@ A smooth 60 fps experience is a design target, not a guarantee across every devi
 Image frames now constrain their contents independently of source dimensions. The founder portrait is capped at 320px on desktop and 250px on smaller screens, with automatic image height. Service grids use three desktop columns, two tablet columns and one phone column; a final unpaired card spans only when the current filter leaves an incomplete row. Phone descriptions are 14px and service titles are 24px.
 
 Browser verification at 1440, 768, 390 and 360px found no horizontal page overflow or clipped heading, service-description or price text. Both service filters were checked for consistent image heights and correct final-card placement. All 14 PinYourSite gallery images loaded. Content/asset and plot geometry checks passed.
+
+## Signal edition
+
+The current entry uses `signal.css` and `signal-motion.js`: a live projected vector field, pinned hero transformation, horizontal portfolio sequence, seven scroll-driven portal backgrounds, masked typography, perspective property reveal and cinematic service/pricing entrances. The original motion package remains archived but is no longer imported. Motion pause and reduced-motion restore static layouts. The vector canvas stops rendering offscreen and in hidden tabs; pixel density is capped at 1.5.
