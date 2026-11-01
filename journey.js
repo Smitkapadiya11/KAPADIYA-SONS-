@@ -48,6 +48,18 @@ for(let i=0;i<25;i++){
  tower.position.set((i%5-2)*.72,height/2-1.2,(Math.floor(i/5)-2)*.72);city.add(tower);
 }
 const foundation=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(4,.08,4)),architectural);foundation.position.y=-1.25;city.add(foundation);
+// Window bands, a street grid and corner pylons complete the architectural model.
+for(let k=0;k<5;k++){
+ const points=[new THREE.Vector3(-2,-1.19,(k-2)*.8),new THREE.Vector3(2,-1.19,(k-2)*.8),new THREE.Vector3((k-2)*.8,-1.19,-2),new THREE.Vector3((k-2)*.8,-1.19,2)];
+ city.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(points),architectural));
+}
+const connections=[];
+for(let i=0;i<2;i++){
+ const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(65*3),3));
+ const line=new THREE.Line(geometry,new THREE.LineBasicMaterial({color:0xbaff64,transparent:true,opacity:.48}));scene.add(line);
+ const pulse=new THREE.Mesh(new THREE.SphereGeometry(.045,8,6),bright);scene.add(pulse);connections.push({line,pulse});
+}
+const path=new THREE.CubicBezierCurve3(new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3());
 const nucleus=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.1,1)),architectural);orbit.add(nucleus);
 const satellites=[];
 for(let i=0;i<5;i++){
@@ -90,14 +102,27 @@ function render(now=0){frame=0;const off=reduced.matches||document.body.classLis
  const cityWeight=smooth(1.7,2.8,p)*(1-smooth(4,4.8,p));
  const orbitWeight=smooth(4.1,5.2,p)*(1-smooth(7.5,8.4,p));
  const portalWeight=1-Math.max(cityWeight,orbitWeight);
- machine.scale.setScalar(Math.max(.001,portalWeight));machine.visible=portalWeight>.005;
+ machine.scale.setScalar(.16+portalWeight*.68);machine.visible=true;
  for(const [world,weight] of [[city,cityWeight],[orbit,orbitWeight]]){
-  world.visible=weight>.005;world.position.copy(machine.position);world.rotation.copy(machine.rotation);world.scale.setScalar(Math.max(.001,weight));
+  world.visible=true;world.position.copy(machine.position);world.rotation.copy(machine.rotation);world.scale.setScalar(.16+weight*.68);
  }
+ // Inactive worlds remain complete satellites, joined by flowing vector conduits.
+ machine.position.x=machine.position.x*portalWeight-2.55*(1-portalWeight);
+ machine.position.y+=1.5*(1-portalWeight);
+ city.position.x=city.position.x*cityWeight+2.6*(1-cityWeight);city.position.y-=1.45*(1-cityWeight);
+ orbit.position.x=orbit.position.x*orbitWeight+2.5*(1-orbitWeight);orbit.position.y+=1.65*(1-orbitWeight);
+ if(mobile){machine.position.x*=.55;city.position.x*=.55;orbit.position.x*=.55;}
+ connections.forEach(({line,pulse},i)=>{
+  const from=i===0?machine.position:city.position,to=i===0?city.position:orbit.position;
+  path.v0.copy(from);path.v3.copy(to);path.v1.set(from.x+1,from.y-1.3,-1);path.v2.set(to.x-1,to.y+1.3,-1);
+  const attribute=line.geometry.attributes.position;
+  for(let j=0;j<=64;j++){const v=path.getPoint(j/64);attribute.setXYZ(j,v.x,v.y,v.z);}
+  attribute.needsUpdate=true;line.geometry.computeBoundingSphere();pulse.position.copy(path.getPoint((flow*.23+i*.5)%1));
+ });
  city.rotation.x=.35+py*.4;city.rotation.y=p*.65+px*.65+flow*.08;
  nucleus.rotation.set(flow*.3,flow*.2,0);
  satellites.forEach((node,i)=>{const a=flow*(.6+i*.12)+i,r=1.8+i*.12;node.position.set(Math.cos(a)*r,Math.sin(a)*r,0);});
- camera.position.set(Math.sin(p*.45)*.5,Math.cos(p*.6)*.4,mobile?12:8.4+Math.sin(p*Math.PI)*1.1);camera.lookAt(0,0,0);
+ camera.position.set(Math.sin(p*.45)*.5,Math.cos(p*.6)*.4,mobile?14.5:8.4+Math.sin(p*Math.PI)*1.1);camera.lookAt(0,0,0);
  renderer.render(scene,camera);
  if(!document.hidden&&!off)frame=requestAnimationFrame(render);
 }

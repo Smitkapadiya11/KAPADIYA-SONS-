@@ -270,6 +270,7 @@ document.addEventListener("click",event=>{
   if(hash.startsWith("#service/"))return;
   const target=hash==="#"?document.body:document.getElementById(hash.slice(1));
   if(!target)return;
+  if(target.matches('details'))target.open=true;
   event.preventDefault();
   const offset=innerWidth>800?84:70;
   const y=hash==="#"?0:target.getBoundingClientRect().top+scrollY-offset;

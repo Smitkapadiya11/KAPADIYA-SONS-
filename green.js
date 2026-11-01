@@ -303,5 +303,16 @@ new IntersectionObserver(
   { threshold: 0 },
 ).observe(video);
 
+// Keep the two flagship offers open; the remaining cuts disclose their full scope.
+document.querySelectorAll('.plan:not(.featured)').forEach(plan=>{
+  const details=document.createElement('details');
+  details.className='plan compact-cut';details.id=plan.id;
+  const summary=document.createElement('summary');
+  const title=plan.querySelector('h3'),price=plan.querySelector('.plan-price');
+  summary.append(title,price);
+  const body=document.createElement('div');body.className='cut-details';
+  while(plan.firstChild)body.append(plan.firstChild);
+  details.append(summary,body);plan.replaceWith(details);
+});
 import "./signal-motion.js";
 import './journey.js';
