@@ -54,3 +54,9 @@ Browser verification at 1440, 768, 390 and 360px found no horizontal page overfl
 ## Signal edition
 
 The current entry uses `signal.css` and `signal-motion.js`: a live projected vector field, pinned hero transformation, horizontal portfolio sequence, seven scroll-driven portal backgrounds, masked typography, perspective property reveal and cinematic service/pricing entrances. The original motion package remains archived but is no longer imported. Motion pause and reduced-motion restore static layouts. The vector canvas stops rendering offscreen and in hidden tabs; pixel density is capped at 1.5.
+
+## Spatial edition
+
+The current persistent scene is in journey.js (Three.js). Eleven instanced mechanical layers rotate, separate and regroup along measured document chapters, with pointer parallax and a camera path. GSAP controls foreground transitions and the horizontal portfolio. Native touch scrolling is retained. Pixel ratio is capped at 1.5; pause, reduced-motion and hidden-tab handling stop continuous rendering. The old canvas is a static fallback if WebGL is unavailable.
+
+Portfolio and service images now use contain sizing to preserve the full artwork. Service slides occupy the complete reel width, with adjacent text on desktop and stacked text on phones. The earlier grid and overlay descriptions above are historical. Both sites retain their existing content and offers.

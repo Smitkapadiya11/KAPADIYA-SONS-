@@ -130,7 +130,8 @@ function animateServices() {
 function start() {
   if (context || paused || reduce.matches) return;
   document.body.classList.add("signal-motion");
-  field.setRunning(true);
+  // Static canvas fallback; the persistent WebGL scene owns animated rendering.
+  field.setRunning(false);
   context = gsap.context(() => {
     if (fine.matches) {
       lenis = new Lenis({ duration: 1.05, smoothWheel: true, prevent: node => !!node.closest("dialog,[data-lenis-prevent]") });
