@@ -28,7 +28,33 @@ for(let i=0;i<11;i++){
  group.position.z=(i-5)*.16;
 }
 const cage=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.15,1)),new THREE.LineBasicMaterial({color:0xbaff45,transparent:true,opacity:.8}));machine.add(cage);
+const ribbons=new THREE.Group();machine.add(ribbons);
+for(let k=0;k<7;k++){
+ const points=[];
+ for(let j=0;j<=180;j++){
+  const a=j/180*Math.PI*2,r=2.45+.18*Math.sin(a*3+k*.45);
+  points.push(new THREE.Vector3(Math.cos(a)*r,Math.sin(a)*r,Math.sin(a*2+k*.5)*.55));
+ }
+ const ribbon=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:k%2?0xdfffad:0x91dc45,transparent:true,opacity:.22+k*.035}));
+ ribbon.rotation.set(k*.16,k*.21,0);ribbons.add(ribbon);
+}
 const stars=new THREE.BufferGeometry(),positions=[];
+// Three authored worlds share one camera and hand off through scroll position.
+const city=new THREE.Group(),orbit=new THREE.Group();scene.add(city,orbit);
+const architectural=new THREE.LineBasicMaterial({color:0xc1ff79,transparent:true,opacity:.8});
+for(let i=0;i<25;i++){
+ const height=.6+((i*7)%11)*.22;
+ const tower=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(.48,height,.48)),architectural);
+ tower.position.set((i%5-2)*.72,height/2-1.2,(Math.floor(i/5)-2)*.72);city.add(tower);
+}
+const foundation=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(4,.08,4)),architectural);foundation.position.y=-1.25;city.add(foundation);
+const nucleus=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.1,1)),architectural);orbit.add(nucleus);
+const satellites=[];
+for(let i=0;i<5;i++){
+ const lane=new THREE.Group();lane.rotation.set(i*.55,i*.7,i*.3);orbit.add(lane);
+ lane.add(new THREE.Mesh(new THREE.TorusGeometry(1.8+i*.12,.015,4,96),bright));
+ const node=new THREE.Mesh(new THREE.IcosahedronGeometry(.11,0),bright);lane.add(node);satellites.push(node);
+}
 for(let i=0;i<180;i++){positions.push(Math.sin(i*13.1)*12,Math.cos(i*7.3)*8,-4-(i%25)*.45);}
 stars.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));scene.add(new THREE.Points(stars,new THREE.PointsMaterial({color:0xa9e27d,size:.025,transparent:true,opacity:.5})));
 const chapters=[...document.querySelectorAll('.signal-hero,#selected-work,#studio,#pinyoursite,#avatar,.manifesto,#services,#plans,#about,#brief,footer')];
@@ -36,11 +62,11 @@ let anchors=[],p=0,target=0,px=0,py=0,tx=0,ty=0,frame=0,last=0,flow=0;
 const reduced=matchMedia('(prefers-reduced-motion:reduce)');
 function measure(){anchors=chapters.map(e=>e.getBoundingClientRect().top+scrollY);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);update();}
 function update(){let n=0;for(let i=0;i<anchors.length;i++)if(scrollY>=anchors[i]-innerHeight*.35)n=i;const a=anchors[n]-innerHeight*.35,b=(anchors[n+1]||document.documentElement.scrollHeight)-innerHeight*.35;target=n+Math.max(0,Math.min(1,(scrollY-a)/Math.max(1,b-a)));}
-function render(now=0){frame=0;const off=reduced.matches||document.body.classList.contains('motion-paused');const dt=Math.min(40,now-last||16);last=now;if(!off&&!document.hidden)flow+=dt*.00025;p+=(target-p)*(off?1:1-Math.exp(-dt/160));px+=(tx-px)*.06;py+=(ty-py)*.06;
+function render(now=0){frame=0;const off=reduced.matches||document.body.classList.contains('motion-paused');const dt=Math.min(40,now-last||16);last=now;if(!off&&!document.hidden)flow+=dt*.0004;p+=(target-p)*(off?1:1-Math.exp(-dt/65));px+=(tx-px)*.18;py+=(ty-py)*.18;
  const mobile=innerWidth<801;
  const turn=p*Math.PI*.38;
  // The same assembly travels, opens, and reforms across the entire document.
- machine.rotation.set(.35+Math.sin(p*.7)*.5+py*.12+Math.sin(flow)*.06,turn+px*.2,-.25+Math.sin(p*.6)*.25);
+ machine.rotation.set(.35+Math.sin(p*.7)*.5+py*.48+Math.sin(flow)*.06,turn+px*.65,-.25+Math.sin(p*.6)*.25);
  machine.position.set(Math.cos(p*Math.PI)* (mobile?.65:2.1),Math.sin(p*.8)*.35,0);
  const expansion=.16+Math.pow(Math.sin(p*Math.PI*.5),2)*.62;
  // Continuous morph weights: assembled portal → helix → petal fan → portal.
@@ -57,6 +83,20 @@ function render(now=0){frame=0;const off=reduced.matches||document.body.classLis
  });
  cage.rotation.set(p*.7+flow*.25,p*.4+flow*.18,0);
  cage.scale.setScalar(1+Math.sin(flow*1.4)*.045);
+ ribbons.rotation.set(flow*.12,p*.35,-flow*.16);
+ ribbons.scale.setScalar(1+helix*.1);
+ rim.position.set(-4+px*5,1-py*4,4);
+ const smooth=(a,b,v)=>{const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return t*t*(3-2*t);};
+ const cityWeight=smooth(1.7,2.8,p)*(1-smooth(4,4.8,p));
+ const orbitWeight=smooth(4.1,5.2,p)*(1-smooth(7.5,8.4,p));
+ const portalWeight=1-Math.max(cityWeight,orbitWeight);
+ machine.scale.setScalar(Math.max(.001,portalWeight));machine.visible=portalWeight>.005;
+ for(const [world,weight] of [[city,cityWeight],[orbit,orbitWeight]]){
+  world.visible=weight>.005;world.position.copy(machine.position);world.rotation.copy(machine.rotation);world.scale.setScalar(Math.max(.001,weight));
+ }
+ city.rotation.x=.35+py*.4;city.rotation.y=p*.65+px*.65+flow*.08;
+ nucleus.rotation.set(flow*.3,flow*.2,0);
+ satellites.forEach((node,i)=>{const a=flow*(.6+i*.12)+i,r=1.8+i*.12;node.position.set(Math.cos(a)*r,Math.sin(a)*r,0);});
  camera.position.set(Math.sin(p*.45)*.5,Math.cos(p*.6)*.4,mobile?12:8.4+Math.sin(p*Math.PI)*1.1);camera.lookAt(0,0,0);
  renderer.render(scene,camera);
  if(!document.hidden&&!off)frame=requestAnimationFrame(render);

@@ -117,13 +117,32 @@ chapters.forEach((section,index)=>{
 
 function animateServices() {
   serviceContext?.revert();
+  const reel = $('.service-reel'), cards = $$('.service-row');
+  reel.classList.remove('scroll-sequence');
+  cards.forEach(card => { card.inert = false; });
+  if (innerHeight < 620 || paused || reduce.matches) return;
   serviceContext = gsap.context(() => {
-    ScrollTrigger.batch($$(".service-row"), {
-      start: "top 94%", once: true,
-      onEnter: (batch) => gsap.fromTo(batch,
-        { y: 70, opacity: 0 },
-        { y: 0, opacity: 1, duration: .85, stagger: .09, ease: "power3.out", clearProps: "transform,opacity" }),
+    reel.classList.add('scroll-sequence');
+    gsap.set(cards, {autoAlpha:0, y:60, scale:.94, rotationX:5});
+    gsap.set(cards[0], {autoAlpha:1,y:0,scale:1,rotationX:0});
+    const timeline = gsap.timeline({scrollTrigger:{
+      trigger:reel, start:()=>`top top+=${innerWidth>800?100:82}`,
+      end:()=>`+=${(cards.length-1)*innerHeight*.58}`, pin:true,
+      scrub:.18, anticipatePin:1, invalidateOnRefresh:true,
+      onUpdate:self=>{
+        const active=Math.min(cards.length-1,Math.round(self.progress*(cards.length-1)));
+        cards.forEach((card,i)=>{card.inert=i!==active;});
+        $('#reel-count').textContent=String(active+1).padStart(2,'0')+' / '+String(cards.length).padStart(2,'0');
+        reel.style.setProperty('--sequence-progress',self.progress);
+      }
+    }});
+    cards.slice(1).forEach((card,i)=>{
+      const at=i+.38;
+      timeline.to(cards[i],{autoAlpha:0,y:-55,scale:.95,rotationX:-5,duration:.18,ease:'power1.in'},at)
+        .to(card,{autoAlpha:1,y:0,scale:1,rotationX:0,duration:.28,ease:'power2.out'},at+.18);
     });
+    timeline.to({}, {duration:.2});
+    return ()=>{reel.classList.remove('scroll-sequence');cards.forEach(card=>{card.inert=false;});};
   });
 }
 
@@ -134,7 +153,7 @@ function start() {
   field.setRunning(false);
   context = gsap.context(() => {
     if (fine.matches) {
-      lenis = new Lenis({ duration: 1.05, smoothWheel: true, prevent: node => !!node.closest("dialog,[data-lenis-prevent]") });
+      lenis = new Lenis({ duration: .65, smoothWheel: true, prevent: node => !!node.closest("dialog,[data-lenis-prevent]") });
       const raf = time => lenis?.raf(time * 1000);
       gsap.ticker.add(raf);
       lenis.on("scroll", ScrollTrigger.update);
