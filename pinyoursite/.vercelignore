@@ -1,0 +1,10 @@
+node_modules
+dist
+.vercel
+gallery-contact.png
+reference-search.txt
+plots-geometry.json
+gallery-sources.json
+README.md
+RECON
+*.md

@@ -1,59 +1,46 @@
-# KAPADIYA & SONS
+# Kapadiya & Sons — Motion Edition
 
-Production website for KAPADIYA & SONS, founded by Smit Kapadiya. Content packages are transcribed from the supplied AI Content Services brochure; technology services follow the founder’s brief.
+Two Vite projects share this repository:
 
-## Develop
+- `/`: Kapadiya.tech, the studio website.
+- `/pinyoursite`: PinYourSite by Kapadiya & Sons, the independent interactive property demonstration.
 
-Requires Node.js 20.19+ or 22.12+.
+## Run and build
 
-- `npm ci`
-- `npm run dev`
-- `npm run build`
-- `npm run preview -- --port 4174`
-- `node qa.mjs` (preview running; Microsoft Edge installed)
-- `node qa-glass.mjs` (service artwork and dialog checks; defaults to port 4175)
-- `node qa-identity.mjs` (header, footer, navigation and accessibility at six widths; port 4175)
-- Set `SITE_URL` to test a different preview or production URL.
+```sh
+npm ci
+npm run dev -- --port 4175
+npm run build
+node scripts/verify-content.mjs
+node scripts/verify-geometry.mjs
 
-## Features
+cd pinyoursite
+npm ci
+npm run dev -- --port 4176
+npm run build
+```
 
-Ten shareable service-detail views at `#service/<id>`, seven content packages, category filters, a glass service explorer with persistent navigation and enquiry controls, fourteen original GPT Image concepts, an authentic founder portrait, a GSAP scroll-driven creative gallery, reduced-motion support, and a WhatsApp brief builder. Every service has its own complete 3:2 artwork, with responsive WebP previews and no face-cropping cover treatment. All enquiries use +91 7575807403. No form database, payments, analytics or application secrets.
+## Content and design
 
-Package and service copy lives in `src.js`; editorial sections in `index.html`; base styling in `style.css`, the second-edition design in `experience.css`, the third-edition glass surfaces and service layouts in `glass.css`, and choreography in `motion.js`. Asset provenance is in `ASSETS.md`; the ten new exact image prompts are in `service-art-prompts.json`. All pricing and proposal terms should be reviewed when the offer changes. The site labels concepts and AI content and makes no fabricated client, testimonial or performance claims.
+`offers.js` is the source of truth for all eight packages, prices, booking links and structured offers. Diamond’s Cut is enquiry-only because no demo price was supplied. `services.js` preserves the original ten capabilities; `green.js` adds PinYourSite, music videos and short films.
+
+The homepage uses original service imagery, a hand-built SVG contour drawing, and the user-supplied Motion Next system adapted to this layout. GSAP drives line drawing, masked text and image reveals, property routes, the film viewfinder, pricing and the final contact scene. Lenis smooths wheel input without replacing native touch scrolling. Mobile uses shorter scenes without the desktop manifesto pin. Pause motion and OS reduced-motion settings restore the static page.
+
+The three supplied videos are full-length 720p H.264/AAC exports with fast-start metadata and poster images. They total about 45 MB. Video is loaded on demand, has native controls and plays inline. It pauses offscreen and when the tab is hidden. `ugc-latest.mp4` is the default selection.
+
+PinYourSite is linked from the homepage at https://pinyoursite-kapadiya.vercel.app. The preview screenshot is `public/images/pinyoursite-demo.png`.
 
 ## Deployment
 
-Vercel project: `kapadiya-sons`, team: `smit-kapadiyas-projects`. The project is connected to the supplied GitHub repository. Build output is `dist`. Security response headers are configured in `vercel.json`. Images, fonts and the bundled animation library are served locally; there are no third-party runtime network requests.
+Main Vercel project: `kapadiya-sons` (root directory).
+PinYourSite Vercel project: `pinyoursite-kapadiya` (directory `pinyoursite`).
+
+Run `vercel deploy --prod --yes` from each linked project directory. Local `.vercel` account metadata is excluded from Git. No API secrets are required. The property viewer loads public satellite tiles only when GPS is opened.
+
+Forms prepare WhatsApp messages for visitors to review and send; there is no hidden lead submission, booking system or payment collection.
 
 ## Verification
 
-Browser checks cover ten detail views, two service filters, seven distinct package enquiry messages, brief message handoff, privacy dialog, 360/390/768/950/1440px layouts, gallery scroll transforms and controls, mobile navigation, motion pause, reduced motion, deep links, automated WCAG A/AA checks and JavaScript exceptions. These are targeted checks, not a claim of universal device compatibility or a complete security audit.
+The content script checks the eight exact package prices, seven structured offers, destination links, seasonal-copy removal, media files, unique plot data, gallery and PDF assets. Geometry tests verify all 63 polygons, reference dimensions and desktop/mobile camera positioning. Browser checks cover responsive layouts, service filters/dialogs, video playback, motion pause/resume, map search/selection, gallery and satellite view. See `pinyoursite/CLONE_REPORT.md` for reconstruction scope.
 
-`qa-glass.mjs` additionally verifies all ten thumbnail/full images decode, distinct service enquiry messages, preserved image proportions, persistent controls, scroll reset when switching services, no horizontal dialog overflow, and automated accessibility scans inside the mobile and desktop dialogs.
-
-## Identity
-
-The eye-and-K vector identity, colour HEX codes, typography and international contact formatting are documented in `BRAND.md`. `identity.css` defines the brand tokens, refined header/footer, legibility improvements and numeric typography. `qa-identity.mjs` checks the brand layout at six widths, visible footer navigation, hidden floating controls at the footer, working contact links, canonical URL, mobile menu labels, privacy access and back-to-top.
-
-
-
-## Indian Diwali edition
-
-The Avatar Demo base plan is a fixed INR 4,000 for four videos. Seasonal styling lives in festival.css; ten new Indian festive service concepts are documented in festive-art-prompts.json. Anime.js animates the mobile and desktop experience; GSAP ScrollTrigger retains desktop pinning/navigation. Run node qa-festival.mjs for mobile scroll, pause and reduced-motion checks (preview port 4175). Private prospect data remains outside this repository.
-## Scroll-controlled Capability Index
-
-capability.js uses a native sticky stage on mobile and desktop. Scroll position selects one service at a time and scrubs Anime.js image motion. A numbered controller supports direct selection and arrow/Home/End keys; each selected card opens its existing detailed view. Category filters rebuild the sequence. Pause and reduced motion restore the complete static grid. Inactive cards are inert and excluded from assistive technology. Run node qa-capability.mjs for phone/desktop scroll selection, all ten controller actions, details, filters and accessibility.
-
-## Interactive studio presentation — 24 October 2026
-
-atelier.css and atelier.js provide the editorial opening, goal selector and illustrative workflow. The visitor chooses creative content, websites or automation; imagery, explanatory copy and the service link update together. Keyboard arrow/Home/End navigation follows the tab pattern. The workflow preview demonstrates capture, organisation and a response prepared for review; it sends no messages and uses no customer data. Existing generated artwork is reused with concept labels, and the founder portrait is unchanged.
-
-The presentation uses responsive typography, an image frame with restrained pointer depth, Anime.js reveals and the existing scroll-controlled service index. Pause and reduced-motion settings retain access to all information and controls. qa-atelier.mjs verifies goal choices, keyboard navigation, service links, workflow replay and automated mobile/desktop accessibility.
-
-## Scroll cinema — 24 October 2026
-
-The opening is a five-chapter, native-scroll presentation: oversized title and a suspended photographic fan; content coming forward; websites taking the foreground; automation taking the foreground; and a three-panel assembly with the next-step link. One paused Anime.js timeline is sought from native scroll position. The numbered controller seeks the same timeline; reversing scroll reverses the scene. Transform, opacity and perspective changes avoid per-frame layout resizing. No autonomous render loop runs while the page is idle.
-
-The Capability Index now scrubs adjacent cards through depth instead of hard-switching a single static panel. Inactive cards remain inert; only the selected service opens details. Both sequences rebuild for screen-width changes, honour motion pause/reduced motion, and retain a static fallback. The cinema includes a visible skip link and hides the floating enquiry control while it would cover chapter navigation.
-
-qa-cinema.mjs tests chapter selection, changing transforms, hidden future captions, reverse navigation, pause/resume, reduced motion and automated accessibility at mobile and desktop sizes. Full-site and pricing tests remain applicable. Smoothness depends on the device/browser; no universal frame-rate guarantee is asserted.
+A smooth 60 fps experience is a design target, not a guarantee across every device. Offscreen footage is paused, heavy satellite code is loaded on demand, and animation primarily uses transforms and opacity.

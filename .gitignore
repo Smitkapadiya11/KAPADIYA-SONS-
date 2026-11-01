@@ -151,3 +151,15 @@ vite.config.ts.timestamp-*
 
 # Local visual QA
 *-preview.png
+qa-output/
+pinyoursite/gallery-contact.png
+pinyoursite/reference-search.txt
+pinyoursite/plots-geometry.json
+pinyoursite/RECON/
+# One-off local migration/recon helpers
+scripts/rework-next.py
+scripts/extract-services.py
+scripts/recon-reference.py
+scripts/prepare-property.py
+scripts/resize-plan.py
+scripts/update-demo-preview.py

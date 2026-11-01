@@ -1,0 +1,386 @@
+import "./green.css";
+import "./motion/kapadiya-motion.js";
+import "./next.css";
+import { services as originalServices } from "./services.js";
+import { offers, terms, servicePricing } from "./offers.js";
+const select = (s) => document.querySelector(s),
+  all = (s) => [...document.querySelectorAll(s)];
+const wa = (message) =>
+  "https://wa.me/917575807403?text=" + encodeURIComponent(message);
+const services = [
+  ...originalServices,
+  {
+    id: "pinyoursite",
+    category: "systems",
+    name: "PinYourSite property experiences",
+    desc: "An interactive world for every property. Search plots, explore details and start a conversation.",
+    fit: "Developers, architects and real estate teams.",
+    deliver:
+      "A complete 3D informational web view and all required project information.",
+    needs:
+      "Approved masterplan, plot dimensions, project details, location and gallery assets.",
+    process:
+      "Map your project, build the interactive view, review details and launch.",
+    scope: servicePricing("property"),
+  },
+  {
+    id: "music",
+    category: "content",
+    name: "AI music videos",
+    desc: "Ultra-realistic visual worlds for your sound, from first beat to final frame.",
+    fit: "Artists, labels and creators.",
+    deliver: "3 full music videos, 2 minutes each.",
+    needs:
+      "Music you have permission to use, visual references and an approved concept.",
+    process: "Align the story, develop visual direction, produce and review.",
+    scope: servicePricing("music"),
+  },
+  {
+    id: "short-film",
+    category: "content",
+    name: "AI short films",
+    desc: "Ambitious worlds and human stories, crafted into cinematic short films.",
+    fit: "Storytellers, brands and independent filmmakers.",
+    deliver: "2 ultra-realistic short films, 5 minutes each.",
+    needs: "An approved story, character direction, language and references.",
+    process: "Develop the script, plan the scenes, produce and review.",
+    scope: servicePricing("film"),
+  },
+];
+services.find((s) => s.id === "film").scope = servicePricing("ugc");
+services.find((s) => s.id === "images").deliver =
+  "AI image concepts and agreed ad formats. Lion’s Cut includes 20 campaign images. Standalone image work is scoped to your brief.";
+services.find((s) => s.id === "reels").scope =
+  "Cat’s Cut: ₹25,999 for 30 videos in 30 days, up to 30 seconds each. Other social content, publishing and account management are scoped separately.";
+const serviceArt = {
+  avatar: "avatar-studio",
+  ugc: "ugc-creator",
+  film: "cinematic-product",
+  reels: "services/reels-600",
+  images: "services/images-600",
+  automation: "services/automation-600",
+  whatsapp: "services/whatsapp-600",
+  websites: "services/websites-600",
+  apps: "services/apps-600",
+  crm: "services/crm-600",
+  pinyoursite: "property-aerial",
+  music: "cinematic-product",
+  "short-film": "light/film-600",
+};
+function renderServices(filter = "all") {
+  select("#service-grid").innerHTML = services
+    .filter((s) => filter === "all" || s.category === filter)
+    .map(
+      (s) =>
+        '<button class="service-row" data-service="' +
+        s.id +
+        '"><div class="service-visual"><img src="/images/' +
+        (serviceArt[s.id] || "ugc-creator") +
+        '.webp" alt="' +
+        s.name +
+        ' — illustrative creative concept" loading="lazy"><span class="service-number">' +
+        String(services.indexOf(s) + 1).padStart(2, "0") +
+        '</span><span class="service-arrow" aria-hidden="true">↗</span></div><div class="service-info"><small>' +
+        (s.category === "content"
+          ? "CONTENT & CREATIVE"
+          : "TECHNOLOGY & SYSTEMS") +
+        "</small><strong>" +
+        s.name +
+        '</strong><span class="service-description">' +
+        s.desc +
+        '</span><span class="service-explore">EXPLORE CAPABILITY <b>↗</b></span></div></button>',
+    )
+    .join("");
+}
+renderServices();
+const dialog = select("#service-dialog");
+let returnFocus;
+function showDialog(content) {
+  returnFocus = document.activeElement;
+  select("#dialog-content").innerHTML = content;
+  dialog.setAttribute("aria-labelledby", "detail-title");
+  if (!dialog.open) dialog.showModal();
+  dialog.scrollTop = 0;
+  document.body.classList.add("modal-open");
+}
+function openService(id) {
+  const s = services.find((s) => s.id === id);
+  if (!s) return;
+  const fields = [
+    ["Who it’s for", s.fit],
+    ["What we can deliver", s.deliver],
+    ["What we need from you", s.needs],
+    ["How the work happens", s.process],
+    ["Scope & pricing", s.scope],
+  ];
+  showDialog(
+    '<img class="dialog-service-image" src="/images/' +
+      (serviceArt[id] || "ugc-creator") +
+      '.webp" alt="' +
+      s.name +
+      ' creative concept"><span class="eyebrow">KAPADIYA & SONS / SERVICE EXPLORER</span><h2 id="detail-title">' +
+      s.name +
+      "</h2><p>" +
+      s.desc +
+      "</p>" +
+      fields
+        .map(([title, text]) => "<h3>" + title + "</h3><p>" + text + "</p>")
+        .join("") +
+      '<a class="button dark" href="' +
+      wa(
+        "Hi Smit! I’d like to discuss " +
+          s.name +
+          ". My business: ___. My goal: ___.",
+      ) +
+      '" target="_blank" rel="noopener noreferrer">Discuss this project ↗</a>' +
+      (id === "pinyoursite"
+        ? '<a class="button lime" href="https://pinyoursite-kapadiya.vercel.app" target="_blank" rel="noopener noreferrer">Explore the live demo ↗</a>'
+        : "") +
+      '<p class="dialog-foot">Scope, timeline and review terms are agreed before production. AI realism depends on the concept and references.</p>',
+  );
+}
+function route() {
+  const m = location.hash.match(/^#service\/(.+)$/);
+  if (m) openService(m[1]);
+}
+document.addEventListener("click", (e) => {
+  const service = e.target.closest("[data-service]");
+  if (service) {
+    if (location.hash === "#service/" + service.dataset.service)
+      openService(service.dataset.service);
+    else location.hash = "service/" + service.dataset.service;
+  }
+  const f = e.target.closest("[data-filter]");
+  if (f) {
+    all("[data-filter]").forEach((b) => {
+      b.classList.toggle("active", b === f);
+      b.setAttribute("aria-pressed", String(b === f));
+    });
+    renderServices(f.dataset.filter);
+  }
+});
+window.addEventListener("hashchange", route);
+route();
+select(".dialog-close").addEventListener("click", () => dialog.close());
+dialog.addEventListener("click", (e) => {
+  if (e.target === dialog) {
+    const r = dialog.getBoundingClientRect();
+    if (
+      e.clientX < r.left ||
+      e.clientX > r.right ||
+      e.clientY < r.top ||
+      e.clientY > r.bottom
+    )
+      dialog.close();
+  }
+});
+dialog.addEventListener("close", () => {
+  document.body.classList.remove("modal-open");
+  if (location.hash.startsWith("#service/"))
+    history.replaceState(null, "", "#services");
+  returnFocus?.focus();
+});
+select("#privacy-open").addEventListener("click", () =>
+  showDialog(
+    '<span class="eyebrow">CLEAR FROM THE START</span><h2 id="detail-title">Privacy & project terms</h2><h3>Your information</h3><p>This website does not store form submissions, collect payments or use analytics cookies. The brief builder prepares a WhatsApp message for you to review and send. WhatsApp and our hosting provider process information under their own policies; hosting may retain technical access logs.</p><h3>When you contact us</h3><p>Information you send by WhatsApp or email is used to discuss your enquiry and deliver agreed work. Contact smitkapadiya.work@gmail.com for privacy questions.</p><h3>Project scope</h3><p>' +
+      terms +
+      "</p><h3>Creative permissions</h3><p>Human clones require the depicted person’s permission. Supply only assets you have rights to use. AI presenters are not real customer endorsements. Product claims need approval. Results, reach and sales are not guaranteed.</p>",
+  ),
+);
+const menu = select(".menu-button"),
+  nav = select("#navigation");
+function closeMenu() {
+  nav.classList.remove("open");
+  menu.setAttribute("aria-expanded", "false");
+  menu.setAttribute("aria-label", "Open menu");
+  menu.textContent = "☰";
+}
+menu.addEventListener("click", () => {
+  const open = menu.getAttribute("aria-expanded") !== "true";
+  nav.classList.toggle("open", open);
+  menu.setAttribute("aria-expanded", String(open));
+  menu.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  menu.textContent = open ? "✕" : "☰";
+});
+nav.addEventListener("click", (e) => {
+  if (e.target.closest("a")) closeMenu();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeMenu();
+});
+offers.forEach((o) =>
+  select("#brief-service").add(new Option(o.name + " — " + o.label, o.name)),
+);
+services.forEach((s) =>
+  select("#brief-service").add(new Option(s.name, s.name)),
+);
+select("#brief-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const d = new FormData(e.currentTarget);
+  location.assign(
+    wa(
+      "Hi Smit! I’m " +
+        d.get("name") +
+        ", from " +
+        d.get("business") +
+        ".\n\nI’m interested in: " +
+        d.get("service") +
+        ".\n\nMy brief: " +
+        d.get("context") +
+        "\n\nPlease share the next steps with Kapadiya & Sons.",
+    ),
+  );
+});
+select("#year").textContent = new Date().getFullYear();
+const video = select("#ugc-player");
+const videos = {
+  latest: { title: "The latest cut", label: "01 / LATEST RELEASE" },
+  captioned: { title: "Words that move", label: "02 / CREATOR STORIES" },
+  story: { title: "A little more story", label: "03 / LONGER STORIES" },
+};
+all("[data-video]").forEach((button) =>
+  button.addEventListener("click", () => {
+    const id = button.dataset.video;
+    video.pause();
+    video.src = "/media/ugc-" + id + ".mp4";
+    video.poster = "/media/ugc-" + id + ".webp";
+    video.setAttribute("aria-label", videos[id].title + " — UGC AI ad film");
+    select("#video-title").textContent = videos[id].title;
+    select("#video-label").textContent = videos[id].label;
+    all("[data-video]").forEach((b) => {
+      b.classList.toggle("active", b === button);
+      b.setAttribute("aria-pressed", String(b === button));
+    });
+    select(".media-note").textContent =
+      "Tap play for sound · AI-generated creative showcase";
+    video.load();
+    video.play().catch(() => {});
+  }),
+);
+video.addEventListener("error", () => {
+  select(".media-note").textContent =
+    "Could not load this film. Please try another film or refresh.";
+});
+all("[data-video]").forEach((button) =>
+  button.addEventListener("click", () => {
+    if (innerWidth < 801)
+      video.scrollIntoView({
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "center",
+      });
+  }),
+);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) video.pause();
+});
+new IntersectionObserver(
+  (entries) => {
+    if (!entries[0].isIntersecting) video.pause();
+  },
+  { threshold: 0 },
+).observe(video);
+const ns = "http://www.w3.org/2000/svg";
+for (let i = 0; i < 12; i++) {
+  const p = document.createElementNS(ns, "path");
+  p.setAttribute(
+    "d",
+    "M300 300 C210 210 208 70 300 30 C392 70 390 210 300 300Z",
+  );
+  p.setAttribute("transform", "rotate(" + i * 30 + " 300 300)");
+  select(".flower-petals").append(p);
+}
+
+for (let band = 0; band < 34; band++) {
+  const p = document.createElementNS(ns, "path");
+  let d = "";
+  for (let j = 0; j <= 280; j++) {
+    const t = (j / 280) * Math.PI * 2,
+      r = 150 + band * 2.15,
+      z = Math.sin(t * 3 + 0.5) * (30 + band * 0.7);
+    const x = 300 + Math.cos(t) * r + Math.sin(t * 2) * 45,
+      y = 300 + Math.sin(t) * r * 0.67 + z;
+    d += (j ? "L" : "M") + x.toFixed(2) + " " + y.toFixed(2);
+  }
+  p.setAttribute("d", d + "Z");
+  p.setAttribute("fill", "none");
+  p.setAttribute("stroke", "url(#contour-ink)");
+  p.setAttribute("stroke-width", band % 6 === 0 ? "1.6" : ".7");
+  p.setAttribute("opacity", 0.4 + band / 60);
+  select(".contour-lines").append(p);
+}
+
+const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+let paused = reduced.matches,
+  frame = 0;
+const flower = select(".vector-flower"),
+  hero = select(".hero"),
+  star = select(".manifesto-vector"),
+  manifesto = select(".manifesto"),
+  progress = select(".scroll-progress");
+function paint() {
+  frame = 0;
+  const scroll = window.scrollY;
+  progress.style.transform =
+    "scaleX(" +
+    scroll / Math.max(1, document.documentElement.scrollHeight - innerHeight) +
+    ")";
+  if (paused || reduced.matches) return;
+  const r = hero.getBoundingClientRect();
+  if (r.bottom > 0 && r.top < innerHeight) {
+    const p = Math.min(1, Math.max(0, -r.top / r.height));
+    flower.style.transform =
+      "rotate(" + (p * 105 - 12) + "deg) scale(" + (1 - p * 0.08) + ")";
+  }
+  const mr = manifesto.getBoundingClientRect();
+  if (mr.bottom > 0 && mr.top < innerHeight)
+    star.style.transform =
+      "rotate(" +
+      ((innerHeight - mr.top) / (innerHeight + mr.height)) * 100 +
+      "deg)";
+}
+function schedule() {
+  if (!frame) frame = requestAnimationFrame(paint);
+}
+window.addEventListener("scroll", schedule, { passive: true });
+window.addEventListener("resize", schedule, { passive: true });
+function motionState() {
+  document.body.classList.toggle("motion-paused", paused || reduced.matches);
+  select(".motion-toggle").setAttribute(
+    "aria-pressed",
+    String(paused || reduced.matches),
+  );
+  select(".motion-toggle").innerHTML =
+    paused || reduced.matches
+      ? "Resume motion <span>▶</span>"
+      : "Pause motion <span>Ⅱ</span>";
+  schedule();
+}
+select(".motion-toggle").addEventListener("click", () => {
+  paused = !paused;
+  if (reduced.matches) paused = true;
+  motionState();
+});
+reduced.addEventListener("change", () => {
+  paused = reduced.matches;
+  motionState();
+});
+if (!reduced.matches) {
+  document.body.classList.add("motion-ready");
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add("is-visible");
+          observer.unobserve(e.target);
+        }
+      });
+    },
+    { threshold: 0.07 },
+  );
+  all(".reveal").forEach((el) => observer.observe(el));
+}
+motionState();
+
+import "./next-motion.js";

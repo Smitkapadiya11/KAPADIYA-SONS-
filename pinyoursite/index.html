@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101113" />
+    <title>PinYourSite by Kapadiya & Sons | Interactive Project Demo</title>
+    <meta
+      name="description"
+      content="Every plot, every dimension, every perspective. An interactive property demonstration by Kapadiya & Sons."
+    />
+    <link rel="icon" href="/favicon.svg" />
+    <meta
+      property="og:image"
+      content="https://pinyoursite-kapadiya.vercel.app/gallery/01.webp"
+    />
+  </head>
+  <body>
+    <a class="skip" href="#toolbar">Skip to project tools</a>
+    <header class="brand">
+      <a href="https://www.kapadiya.tech/#pinyoursite"
+        ><svg viewBox="0 0 36 42" aria-hidden="true">
+          <path
+            d="M18 2C-1 2-1 25 18 40C37 25 37 2 18 2Z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          />
+          <path
+            d="M11 22V13h14v9M18 13v16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          /></svg
+        ><span>PinYourSite<small>BY KAPADIYA & SONS</small></span></a
+      ><span class="demo-label">DEMONSTRATION</span>
+    </header>
+    <button id="compass" aria-label="Reset map view">
+      <span class="north">N</span><span class="east">E</span
+      ><span class="south">S</span><span class="west">W</span><b>➤</b>
+    </button>
+    <main
+      id="map-viewport"
+      tabindex="0"
+      aria-label="Interactive masterplan. Drag to pan, scroll to zoom, select a plot for details."
+    >
+      <div id="map-transform">
+        <svg
+          id="plot-map"
+          width="1920"
+          height="1080"
+          viewBox="0 0 1920 1080"
+          aria-label="63 demonstration plots"
+        >
+          <image
+            id="map-image"
+            href="/masterplan.webp"
+            width="1920"
+            height="1080"
+          />
+          <g id="plots"></g>
+          <g id="dimensions" pointer-events="none"></g>
+        </svg>
+      </div>
+    </main>
+    <div id="hover-tip" hidden></div>
+    <div class="legend" id="legend" hidden>
+      <button data-status="available" aria-pressed="true">
+        <i></i>AVAILABLE<span>✓</span></button
+      ><button data-status="hold" aria-pressed="true">
+        <i></i>BUILDER<span>✓</span></button
+      ><button data-status="sold" aria-pressed="true">
+        <i></i>SOLD<span>✓</span>
+      </button>
+    </div>
+    <div class="dock">
+      <div class="dock-top">
+        <button id="legend-toggle" aria-pressed="false">
+          STATUS LEGEND <span class="switch"></span></button
+        ><button
+          id="home"
+          class="round"
+          aria-label="Home view"
+          data-icon="house"
+        ></button
+        ><button
+          id="share"
+          class="round"
+          aria-label="Share project"
+          data-icon="share"
+        ></button>
+      </div>
+      <nav id="toolbar" aria-label="Project tools">
+        <button data-panel="search"><i data-icon="search"></i>Search</button
+        ><button data-panel="details"><i data-icon="info"></i>Details</button
+        ><button data-panel="gallery"><i data-icon="image"></i>Gallery</button
+        ><button data-panel="nearby"><i data-icon="pin"></i>Nearby</button
+        ><button data-panel="gps"><i data-icon="navigation"></i>GPS</button
+        ><button data-panel="brochure"><i data-icon="file"></i>Brochure</button>
+      </nav>
+    </div>
+    <a
+      class="powered"
+      href="https://www.kapadiya.tech"
+      target="_blank"
+      rel="noopener"
+      >POWERED BY KAPADIYA & SONS</a
+    >
+    <dialog id="panel" aria-labelledby="panel-title">
+      <header>
+        <h2 id="panel-title"></h2>
+        <button
+          id="close-panel"
+          class="round"
+          aria-label="Close panel"
+          data-icon="x"
+        ></button>
+      </header>
+      <div id="panel-body"></div>
+    </dialog>
+    <aside id="plot-detail" aria-label="Selected plot details" hidden></aside>
+    <dialog id="lightbox" aria-label="Project gallery image">
+      <header>
+        <span id="image-count"></span>
+        <div>
+          <button
+            id="image-zoom"
+            class="round"
+            aria-label="Zoom image"
+            data-icon="search"
+          ></button
+          ><a
+            id="image-download"
+            class="round"
+            download
+            aria-label="Download image"
+            data-icon="download"
+          ></a
+          ><button
+            id="image-full"
+            class="round"
+            aria-label="Full screen"
+            data-icon="expand"
+          ></button
+          ><button
+            id="image-close"
+            class="round"
+            aria-label="Close image"
+            data-icon="x"
+          ></button>
+        </div>
+      </header>
+      <div class="lightbox-stage">
+        <img id="lightbox-image" alt="Project visualisation" />
+      </div>
+      <button id="image-prev" class="round" aria-label="Previous image">
+        ‹</button
+      ><button id="image-next" class="round" aria-label="Next image">›</button>
+      <div id="image-thumbs"></div>
+    </dialog>
+    <section id="gps-view" aria-label="Satellite project location" hidden>
+      <div id="satellite-map"></div>
+      <div class="gps-head">
+        <span>PinYourSite <small>DEMONSTRATION LOCATION</small></span
+        ><button
+          id="gps-close"
+          class="round"
+          aria-label="Close satellite map"
+          data-icon="x"
+        ></button>
+      </div>
+      <div class="gps-tools">
+        <button
+          id="gps-home"
+          class="round"
+          aria-label="Recenter project"
+          data-icon="house"
+        ></button
+        ><button id="gps-plus" class="round" aria-label="Zoom map in">+</button
+        ><button id="gps-minus" class="round" aria-label="Zoom map out">
+          −</button
+        ><button
+          id="gps-overlay"
+          class="round"
+          aria-label="Toggle project overlay"
+          aria-pressed="true"
+          data-icon="layers"
+        ></button
+        ><a
+          class="round"
+          href="https://www.google.com/maps/dir/?api=1&destination=21.25548,72.76072"
+          target="_blank"
+          rel="noopener"
+          aria-label="Get directions"
+          data-icon="navigation"
+        ></a>
+      </div>
+      <button id="gps-explore">Explore the project ↗</button>
+      <p id="map-error" hidden>
+        Satellite tiles could not load.
+        <a
+          href="https://www.google.com/maps/search/?api=1&query=21.25548,72.76072"
+          target="_blank"
+          rel="noopener"
+          >Open Google Maps ↗</a
+        >
+      </p>
+    </section>
+    <div id="toast" role="status"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

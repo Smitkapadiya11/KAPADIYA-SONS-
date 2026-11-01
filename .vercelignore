@@ -17,3 +17,7 @@ preview-smoke.mjs
 hosted-preview.html
 check-hosted.mjs
 verify-preview.mjs
+pinyoursite
+qa-output
+scripts
+dist

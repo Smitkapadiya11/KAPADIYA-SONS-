@@ -1,28 +1,170 @@
-export const categories = [
- {id:'avatar',name:'Show up as yourself',intro:'Your face. Your voice. On screen every week, without a shoot.',image:'avatar',alt:'Fictional Indian presenter in a green silk kurta in a recording studio'},
- {id:'ugc',name:'Showcase a product',intro:'Creator-style ads that show it, explain it, and make people want it.',image:'ugc',alt:'Fictional Indian creator presenting an unbranded skincare bottle'},
- {id:'routine',name:'Build a content routine',intro:'Realistic AI reels that keep your feed moving.',image:'routine',alt:'A thoughtfully arranged content desk with a phone, notebook and lamp'},
- {id:'film',name:'Go cinematic',intro:'Film-grade ads for launches that deserve a bigger stage.',image:'film',alt:'A cinematic concept in a lamp-lit Rajasthan courtyard'}
-];
 export const offers = [
- {id:'avatar-demo',category:'avatar',name:'Avatar Demo',was:5999,price:4000,save:1999,off:33,badge:'Start here',items:['2 avatar reels, 30 seconds each','Your real avatar, created with your permission']},
- {id:'creator-monthly',category:'avatar',name:"Creator’s Monthly Plan",was:21999,price:11999,save:10000,off:45,monthly:true,badge:'Lowest price per avatar reel',unit:'₹800 per reel',items:['15 avatar reels','Ready to post: edited, with music','2 UGC-style videos FREE']},
- {id:'ugc-demo',category:'ugc',name:'UGC Demo',was:6999,price:4999,save:2000,off:29,badge:'Start here',items:['1 UGC demo video, up to 30 seconds']},
- {id:'ugc-monthly',category:'ugc',name:'UGC Ads Plan',was:20999,price:14999,save:6000,off:29,monthly:true,unit:'₹2,500 per video',items:['6 UGC videos per month, up to 30 seconds each']},
- {id:'monster',category:'ugc',name:'Monster Plan',was:33999,price:19800,save:14199,off:42,badge:'Lowest price per UGC video',unit:'₹2,200 per video + 25 image posts',items:['9 UGC videos, up to 30 seconds each','25 ultra-realistic Instagram image posts']},
- {id:'content-essentials',category:'routine',name:'Content Essentials',was:10999,price:5999,save:5000,off:45,unit:'₹1,200 per reel',items:['5 realistic AI reels']},
- {id:'content-extended',category:'routine',name:'Content Extended',was:15999,price:9599.40,save:6399.60,off:40,badge:'Lowest price per reel',unit:'₹872.67 per reel',items:['11 realistic AI reels, 40–50 seconds each']},
- {id:'lions-cut',category:'film',name:'Lion’s Cut',was:51999,price:35000,save:16999,off:33,unit:'₹5,833 per film',items:['6 cinematic, realistic AI film ads','30–50 seconds each']}
+  {
+    id: "lions-cut",
+    category: "ugc",
+    name: "Lion’s Cut",
+    price: 19999,
+    featured: true,
+    label: "UGC AI AD FILMS",
+    items: ["4 high-level UGC ad films", "20 campaign images"],
+    note: "For brands ready to make an entrance.",
+  },
+  {
+    id: "architect",
+    category: "property",
+    name: "Architect’s Cut",
+    price: 25999,
+    featured: true,
+    label: "PINYOURSITE",
+    items: [
+      "Complete 3D informational web view",
+      "All your client’s required project information",
+    ],
+    note: "Turn a property into an experience.",
+  },
+  {
+    id: "avatar-demo",
+    category: "avatar",
+    name: "Diamond’s Cut",
+    price: null,
+    label: "UGC AVATAR DEMO",
+    items: [
+      "Explore an AI avatar demo",
+      "Discuss your face, voice and content direction",
+    ],
+    note: "Demo pricing confirmed on enquiry.",
+  },
+  {
+    id: "cats-cut",
+    category: "avatar",
+    name: "Cat’s Cut",
+    price: 25999,
+    label: "REAL HUMAN CLONE",
+    items: [
+      "30 videos in 30 days",
+      "Up to 30 seconds per video",
+      "Your approved human clone",
+    ],
+    note: "Your face. Your voice. A month of content.",
+  },
+  {
+    id: "monster",
+    category: "ugc",
+    name: "Monster Cut",
+    price: 49999,
+    label: "UGC AI AD FILMS",
+    items: ["16 ultra-realistic videos", "Up to 40 seconds per video"],
+    note: "Lifelike creative, built for a bigger campaign.",
+  },
+  {
+    id: "fox",
+    category: "systems",
+    name: "Fox’s Cut",
+    price: 29999,
+    label: "AI SOFTWARE · APPS · WEBSITES",
+    items: [
+      "Complete working product in 20 days",
+      "Lifetime hosting included for websites",
+    ],
+    note: "A clear scope. A working launch.",
+  },
+  {
+    id: "arijit",
+    category: "music",
+    name: "Arijit’s Cut",
+    price: 50999,
+    label: "AI MUSIC VIDEOS",
+    items: [
+      "3 complete music videos",
+      "2 minutes each · ultra-realistic direction",
+    ],
+    note: "Give your sound a world of its own.",
+  },
+  {
+    id: "director",
+    category: "film",
+    name: "Director’s Cut",
+    price: 251999,
+    label: "AI SHORT FILMS",
+    items: ["2 ultra-realistic short films", "5 minutes each"],
+    note: "Bigger stories. Beautifully imagined.",
+  },
 ];
-export const money = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',minimumFractionDigits:Number.isInteger(n)?0:2,maximumFractionDigits:2}).format(n);
-export const terms = 'Diwali prices shown are fixed offers. Confirm availability, taxes, payment terms, revisions and delivery dates before booking. Custom technology projects are quoted separately. Reach, leads and sales are not guaranteed.';
-export const pageTitle = 'Diwali Offers | KAPADIYA & SONS — AI Avatar Videos, UGC Ads & Cinematic AI Films';
-export const description = `Explore eight Diwali offers from ${money(offers[0].price)}. AI avatar videos, UGC ads and cinematic AI films by KAPADIYA & SONS, Surat, India. Discuss your plan on WhatsApp.`;
-export const booking = p => 'https://wa.me/917575807403?text='+encodeURIComponent(`Hi Smit! I'd like the ${p.name} Diwali offer at ${money(p.price)}${p.monthly?' / month':''}. My business: ___`);
-const safe = text => String(text).replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll('<','&lt;');
-export function picture(c,cls='') {return `<picture class="${cls}"><source type="image/avif" srcset="/images/light/${c.image}-600.avif 600w, /images/light/${c.image}.avif 1536w" sizes="(max-width:767px) 90vw, 28vw"><img src="/images/light/${c.image}.webp" srcset="/images/light/${c.image}-600.webp 600w, /images/light/${c.image}.webp 1536w" sizes="(max-width:767px) 90vw, 28vw" width="1536" height="2048" alt="${safe(c.alt)}" loading="lazy" decoding="async"></picture>`;}
-export function offerCard(p,c){return `<article class="offer-card" id="offer-${p.id}" data-offer="${p.id}"><div class="card-sheen" aria-hidden="true"></div><span class="eyebrow">${c.name}</span><h4>${p.name}</h4><div class="was-price"><span>Was </span><s aria-label="Regular price ${money(p.was)}">${money(p.was)}<i aria-hidden="true"></i></s></div><div class="price-seal"><span class="seal-label">Diwali price</span><strong class="offer-price">${money(p.price)}</strong>${p.monthly?'<span class="price-period">/ month</span>':''}</div><span class="savings-chip">Save ${money(p.save)} <span>(${p.off}% off)</span></span>${p.unit?`<p class="unit-price">${p.unit}</p>`:'<p class="unit-price">A first step, made for you.</p>'}${p.badge?`<p class="offer-fact">${p.badge}</p>`:''}<ul>${p.items.map(s=>`<li><span aria-hidden="true">✓</span>${s}</li>`).join('')}</ul><a class="button lime" href="${booking(p)}" target="_blank" rel="noopener noreferrer">Book on WhatsApp <span aria-hidden="true">↗</span></a></article>`;}
-export function renderOffers(){return `<div class="section-heading offer-heading"><div><span class="eyebrow">04 / THE DIWALI EDIT</span><h2>This Diwali,<br>the right price for<br><em>every next move.</em></h2></div><p>Four ways to show up brighter. Pick the one that fits where your brand is going.</p></div><div class="offer-nav-wrap"><div class="offer-tabs" role="tablist" aria-label="Diwali offer categories">${categories.map((c,i)=>`<button type="button" id="tab-${c.id}" role="tab" aria-selected="${i===0}" aria-controls="category-${c.id}" tabindex="${i===0?0:-1}" data-category="${c.id}"><span class="tab-num">0${i+1}</span><span>${c.name}</span>${i===0?'<span class="offer-indicator" aria-hidden="true"></span>':''}</button>`).join('')}</div></div><div id="plan-grid">${categories.map((c,i)=>`<section class="offer-category" id="category-${c.id}" role="tabpanel" aria-labelledby="tab-${c.id}" tabindex="0"><div class="category-stage"><div class="category-story"><figure>${picture(c)}<figcaption>AI-generated concept</figcaption></figure><div class="category-copy"><span class="category-number" aria-hidden="true">0${i+1}</span><h3>${c.name}</h3><p>${c.intro}</p></div><svg class="rangoli" viewBox="0 0 300 300" aria-hidden="true"><path pathLength="1" d="M150 10 290 150 150 290 10 150Z M150 40 260 150 150 260 40 150Z M50 50H250V250H50Z M150 10V290 M10 150H290 M50 50 250 250 M250 50 50 250"/></svg></div><div class="offer-deck" data-count="${offers.filter(p=>p.category===c.id).length}">${offers.filter(p=>p.category===c.id).map(p=>offerCard(p,c)).join('')}</div></div></section>`).join('')}</div><p class="terms-note">${terms}</p>`;}
-export function renderHighlights(){return [offers[0],offers[1],offers[3]].map((p,i)=>`<a href="#category-${p.category}" data-offer-plan="${p.category}"><span>0${i+1} / ${categories.find(c=>c.id===p.category).name.toUpperCase()}</span><h3>${p.name}</h3><p>${p.items[0]}</p><strong>${money(p.price)}${p.monthly?'<span class="highlight-period"> / month</span>':''}</strong><small>Diwali price · was ${money(p.was)}</small><b>Explore the plan ↗</b></a>`).join('');}
-export function offerSchema(){return {'@context':'https://schema.org','@graph':offers.map(p=>({'@type':'Offer','@id':`https://www.kapadiya.tech/#offer-${p.id}`,name:p.name,price:p.price.toFixed(2),priceCurrency:'INR',url:`https://www.kapadiya.tech/#offer-${p.id}`,description:p.items.join('. ')+(p.monthly?'. Price per month.':''),seller:{'@type':'Organization',name:'KAPADIYA & SONS'},itemOffered:{'@type':'Service',name:p.name,description:p.items.join('. ')}}))};}
-export function servicePricing(category){return offers.filter(p=>p.category===category).map(p=>`${p.name}: ${money(p.price)}${p.monthly?' / month':''} (was ${money(p.was)}). ${p.items.join('. ')}.`).join(' ');}
+export const money = (n) =>
+  n === null
+    ? "Let’s talk"
+    : new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+      }).format(n);
+export const terms =
+  "Prices are in INR. Confirm taxes, revisions, payment terms and delivery scope before booking. The 20-day build schedule begins after scope and required inputs are agreed. Lifetime hosting applies to websites; domain and third-party charges are confirmed separately. No payment is collected here.";
+export const pageTitle =
+  "KAPADIYA & SONS — Creative intelligence. Real momentum.";
+export const description =
+  "UGC AI ad films, human-clone avatar videos, PinYourSite property experiences, AI websites, apps, music videos and short films. Built by Kapadiya & Sons.";
+export const booking = (p) =>
+  "https://wa.me/917575807403?text=" +
+  encodeURIComponent(
+    "Hi Smit! I’m interested in " +
+      p.name +
+      (p.price === null ? " (avatar demo)" : " at " + money(p.price)) +
+      ". " +
+      p.items.join(". ") +
+      ". My business: ___. Please share the next steps.",
+  );
+export const servicePricing = (category) =>
+  offers
+    .filter((p) => p.category === category)
+    .map(
+      (p) => p.name + ": " + money(p.price) + ". " + p.items.join(". ") + ".",
+    )
+    .join(" ");
+export const offerSchema = () => ({
+  "@context": "https://schema.org",
+  "@graph": offers
+    .filter((p) => p.price !== null)
+    .map((p) => ({
+      "@type": "Offer",
+      name: p.name,
+      price: p.price,
+      priceCurrency: "INR",
+      url: "https://www.kapadiya.tech/#offer-" + p.id,
+      description: p.items.join(". "),
+      seller: { "@type": "Organization", name: "KAPADIYA & SONS" },
+    })),
+});
+export const renderOffers = () =>
+  offers
+    .map(
+      (p) =>
+        '<article class="plan ' +
+        (p.featured ? "featured" : "") +
+        '" id="offer-' +
+        p.id +
+        '" data-category="' +
+        p.category +
+        '"><div class="plan-top"><span class="eyebrow">' +
+        p.label +
+        '</span><span aria-hidden="true">' +
+        (p.featured ? "✳" : "↗") +
+        "</span></div><h3>" +
+        p.name +
+        "</h3><p>" +
+        p.note +
+        '</p><div class="plan-price">' +
+        money(p.price) +
+        "<small>" +
+        (p.price === null ? "DEMO ENQUIRY" : "INR / PACKAGE") +
+        "</small></div><ul>" +
+        p.items.map((i) => "<li>" + i + "</li>").join("") +
+        '</ul><a class="button ' +
+        (p.featured ? "lime" : "outline") +
+        '" href="' +
+        booking(p) +
+        '" target="_blank" rel="noopener noreferrer">' +
+        (p.price === null ? "Request a demo" : "Discuss this cut") +
+        ' <span aria-hidden="true">↗</span></a></article>',
+    )
+    .join("");

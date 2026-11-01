@@ -1,0 +1,1058 @@
+/*!
+ * KAPADIYA & SONS — Motion Edition (Next) · styles
+ * Load AFTER green.css. Everything is scoped under html.km-on (added by kapadiya-motion.js),
+ * so if the script is paused, reduced-motion is on, or the JS fails, the site looks exactly as before.
+ */
+
+/* ---------- 0. Hand-over from the old reveal system ---------- */
+html.km-on body.motion-ready .reveal,
+html.km-on body.motion-ready .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* ---------- 1. Lenis smooth scroll ---------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+html.km-on {
+  scroll-behavior: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ---------- 2. Preloader (first visit per session) ---------- */
+html.km-preload body {
+  overflow: hidden;
+}
+html.km-preload .hero {
+  visibility: hidden;
+}
+.km-pre {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--deep, #091b13);
+  color: var(--cream, #edf1e5);
+  display: grid;
+  place-items: center;
+  clip-path: inset(0 0 0 0);
+  overflow: hidden;
+}
+.km-pre__wipe {
+  position: absolute;
+  inset: 0;
+  background: var(--lime, #c6f986);
+  transform: translateY(100%);
+}
+.km-pre__inner {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 26px;
+}
+.km-pre__flower {
+  width: min(34vmin, 300px);
+  height: auto;
+  overflow: visible;
+}
+.km-pre__word {
+  font-family: Manrope, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.32em;
+  font-size: 14px;
+  overflow: hidden;
+  padding: 4px 0;
+}
+.km-pre__word b {
+  color: var(--lime, #c6f986);
+  font-weight: 800;
+}
+.km-pre__count {
+  position: absolute;
+  left: 5vw;
+  bottom: 5vh;
+  font-family: Manrope, sans-serif;
+  font-weight: 800;
+  font-size: clamp(48px, 9vw, 120px);
+  letter-spacing: -0.06em;
+  color: var(--lime, #c6f986);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.km-pre__meta {
+  position: absolute;
+  right: 5vw;
+  bottom: 6vh;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--sage, #a8baa9);
+}
+
+/* ---------- 3. Header: sticky, hides on scroll down, glass when scrolled ---------- */
+html.km-on .km-header {
+  position: sticky;
+  top: 0;
+  transition:
+    background-color 0.45s,
+    backdrop-filter 0.45s,
+    border-color 0.45s;
+  will-change: transform;
+}
+html.km-on .km-header.km-scrolled {
+  background: rgba(16, 41, 30, 0.78);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-bottom-color: rgba(198, 249, 134, 0.18);
+}
+html.km-on .header nav a {
+  position: relative;
+}
+html.km-on .header nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  height: 1px;
+  background: var(--lime, #c6f986);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html.km-on .header nav a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---------- 4. Section rail (desktop vector navigator) ---------- */
+.km-rail {
+  position: fixed;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 90;
+  color: var(--cream, #edf1e5);
+  --km-accent: var(--lime, #c6f986);
+  pointer-events: none;
+  transition: color 0.5s;
+}
+.km-rail.is-light {
+  color: var(--forest, #10291e);
+  --km-accent: var(--forest, #10291e);
+}
+.km-rail__track {
+  position: absolute;
+  right: 4px;
+  width: 1px;
+  top: 6px;
+  bottom: 6px;
+}
+.km-rail__track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0.25;
+}
+.km-rail__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--km-accent);
+  transform-origin: top;
+}
+.km-rail ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 26px;
+  position: relative;
+}
+.km-rail li {
+  position: relative;
+  display: block;
+  height: 9px;
+  width: 9px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.km-rail li i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  background: transparent;
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s,
+    border-color 0.3s;
+}
+.km-rail li span {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  margin-top: -5px;
+  font-size: 9px;
+  line-height: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(8px);
+  transition:
+    opacity 0.4s,
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.km-rail li.is-active i {
+  background: var(--km-accent);
+  border-color: var(--km-accent);
+  transform: scale(1.55);
+}
+.km-rail li:hover span {
+  opacity: 1;
+  transform: none;
+}
+.km-rail__label {
+  position: absolute;
+  right: -1px;
+  bottom: calc(100% + 18px);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+@media (max-width: 1199px) {
+  .km-rail {
+    display: none;
+  }
+}
+
+/* ---------- 5. Cursor ---------- */
+.km-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.km-cursor.is-visible {
+  opacity: 1;
+}
+.km-cursor__ring,
+.km-cursor__dot,
+.km-cursor__label {
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+.km-cursor__ring {
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  mix-blend-mode: difference;
+  transition:
+    width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    margin 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s,
+    border-color 0.3s;
+}
+.km-cursor__dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: #fff;
+  mix-blend-mode: difference;
+}
+.km-cursor.is-hover .km-cursor__ring {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  background: #fff;
+}
+.km-cursor.is-down .km-cursor__ring {
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+}
+.km-cursor.is-text .km-cursor__ring {
+  width: 3px;
+  height: 30px;
+  margin: -15px 0 0 -1px;
+  border-radius: 2px;
+}
+.km-cursor__label {
+  margin: 26px 0 0 26px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  background: var(--lime, #c6f986);
+  color: var(--forest, #10291e);
+  font:
+    600 10px/1 DM,
+    Arial,
+    sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.3s,
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+.km-cursor.has-label .km-cursor__label {
+  opacity: 1;
+  transform: none;
+}
+.km-cursor.is-hidden .km-cursor__ring,
+.km-cursor.is-hidden .km-cursor__dot,
+.km-cursor.is-hidden .km-cursor__label {
+  opacity: 0;
+}
+
+/* ---------- 6. Buttons (GSAP drives transform, keep colour transitions) ---------- */
+html.km-on .button,
+html.km-on .header-cta {
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    box-shadow 0.4s;
+  will-change: transform;
+}
+html.km-on .button:hover {
+  transform: none;
+  box-shadow: 0 14px 40px -12px rgba(198, 249, 134, 0.45);
+}
+html.km-on .button > span,
+html.km-on .header-cta > span {
+  display: inline-block;
+}
+html.km-on .text-link,
+html.km-on .under-link {
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0
+    1px;
+  transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html.km-on .text-link:hover,
+html.km-on .under-link:hover {
+  background-size: 100% 1px;
+}
+
+/* ---------- 7. Headline helpers ---------- */
+.km-line {
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+.km-swash {
+  position: absolute;
+  pointer-events: none;
+  color: var(--lime, #c6f986);
+  overflow: visible;
+  z-index: 0;
+}
+.property-section .km-swash,
+.services-section .km-swash,
+.founder-section .km-swash,
+.brief-section .km-swash,
+.manifesto .km-swash {
+  color: #3c7d42;
+}
+.km-num {
+  font-variant-numeric: tabular-nums;
+}
+.km-char {
+  will-change: transform;
+}
+
+/* section seam */
+html.km-on .section-heading {
+  position: relative;
+}
+.km-seam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -46px;
+  height: 9px;
+  pointer-events: none;
+  color: currentColor;
+  opacity: 0.55;
+}
+.km-seam__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left;
+}
+.km-seam__dot {
+  position: absolute;
+  top: 0;
+  width: 9px;
+  height: 9px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: var(--lime, #c6f986);
+  box-shadow: 0 0 0 4px rgba(198, 249, 134, 0.2);
+}
+.property-section .km-seam__dot,
+.services-section .km-seam__dot {
+  background: var(--forest, #10291e);
+  box-shadow: 0 0 0 4px rgba(16, 41, 30, 0.12);
+}
+
+/* ---------- 8. Ticker ---------- */
+html.km-on .ticker > div.km-ticker {
+  animation: none;
+  will-change: transform;
+}
+
+/* ---------- 9. Films: viewfinder ---------- */
+html.km-on .video-frame {
+  position: relative;
+}
+.km-vf {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  color: var(--lime, #c6f986);
+}
+.km-vf__c {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  overflow: visible;
+}
+.km-vf__c--tl {
+  left: 10px;
+  top: 10px;
+}
+.km-vf__c--tr {
+  right: 10px;
+  top: 10px;
+  transform: rotate(90deg);
+}
+.km-vf__c--br {
+  right: 10px;
+  bottom: 54px;
+  transform: rotate(180deg);
+}
+.km-vf__c--bl {
+  left: 10px;
+  bottom: 54px;
+  transform: rotate(270deg);
+}
+.km-vf__rec {
+  position: absolute;
+  left: 44px;
+  top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font:
+    600 9px/1 DM,
+    Arial,
+    sans-serif;
+  letter-spacing: 0.14em;
+  color: #fff;
+}
+.km-vf__rec i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lime, #c6f986);
+  box-shadow: 0 0 10px var(--lime, #c6f986);
+}
+.km-vf__tc {
+  position: absolute;
+  right: 44px;
+  top: 16px;
+  font:
+    600 9px/1 ui-monospace,
+    monospace;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.8);
+}
+.km-vf.is-playing {
+  opacity: 0.55;
+}
+
+/* ---------- 10. PinYourSite: pins + route ---------- */
+.km-pins {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.km-pins__route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.km-pin {
+  position: absolute;
+  width: 22px;
+  height: 30px;
+  margin: -30px 0 0 -11px;
+}
+.km-pin svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+  position: relative;
+  z-index: 1;
+}
+.km-pin em {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--lime, #c6f986);
+}
+.km-pin small {
+  position: absolute;
+  left: 26px;
+  top: 2px;
+  white-space: nowrap;
+  font:
+    600 8px/1 DM,
+    Arial,
+    sans-serif;
+  letter-spacing: 0.12em;
+  padding: 5px 7px;
+  border-radius: 10px;
+  background: rgba(9, 27, 19, 0.85);
+  color: var(--lime, #c6f986);
+}
+html.km-on .feature-list li {
+  position: relative;
+}
+.km-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--forest, #10291e);
+  transform-origin: left;
+  opacity: 0.55;
+}
+
+/* ---------- 11. Avatar: scan overlay ---------- */
+.km-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  color: var(--lime, #c6f986);
+}
+.km-scan__box {
+  position: absolute;
+  left: 26%;
+  right: 26%;
+  top: 14%;
+  height: 40%;
+}
+.km-scan__c {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  overflow: visible;
+}
+.km-scan__c.km-vf__c--tl {
+  left: 0;
+  top: 0;
+}
+.km-scan__c.km-vf__c--tr {
+  right: 0;
+  top: 0;
+  transform: rotate(90deg);
+}
+.km-scan__c.km-vf__c--br {
+  right: 0;
+  bottom: 0;
+  transform: rotate(180deg);
+}
+.km-scan__c.km-vf__c--bl {
+  left: 0;
+  bottom: 0;
+  transform: rotate(270deg);
+}
+.km-scan__line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--lime, #c6f986),
+    transparent
+  );
+  box-shadow: 0 0 18px 4px rgba(198, 249, 134, 0.35);
+}
+.km-scan__voice {
+  position: absolute;
+  right: 18px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 20px;
+  background: rgba(9, 27, 19, 0.8);
+  font:
+    600 7px/1 DM,
+    Arial,
+    sans-serif;
+  letter-spacing: 0.14em;
+  color: var(--lime, #c6f986);
+}
+.km-scan__voice span {
+  margin-right: 8px;
+}
+.km-scan__voice b {
+  width: 2px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--lime, #c6f986);
+  transform-origin: center;
+}
+
+/* ---------- 12. Ghost flowers (vector backgrounds) ---------- */
+.km-rel {
+  position: relative;
+}
+html.km-on .manifesto,
+html.km-on .plans-section,
+html.km-on footer,
+html.km-on .brief-section {
+  position: relative;
+  overflow: hidden;
+}
+.km-ghost {
+  position: absolute;
+  pointer-events: none;
+  color: var(--lime, #c6f986);
+  overflow: visible;
+}
+.km-ghost path,
+.km-ghost circle {
+  stroke-width: 1.2;
+}
+.km-ghost--manifesto {
+  width: 46vmax;
+  right: -12vmax;
+  bottom: -22vmax;
+  color: #2f6b38;
+  opacity: 0.35;
+}
+.km-ghost--plans {
+  width: 60vmax;
+  left: -22vmax;
+  top: -10vmax;
+  opacity: 0.07;
+  z-index: 0;
+}
+.km-ghost--footer {
+  width: 52vmax;
+  right: -16vmax;
+  top: -18vmax;
+  opacity: 0.08;
+}
+.km-ghost .km-core-dot {
+  opacity: 0.5;
+}
+html.km-on .plans-section > *:not(.km-ghost),
+html.km-on footer > *:not(.km-ghost),
+html.km-on .brief-section > *:not(.km-flight):not(.km-plane) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- 13. Services: tab pill + floating vector preview ---------- */
+html.km-on .km-tabs {
+  position: relative;
+}
+.km-tab-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 30px;
+  background: var(--forest, #10291e);
+  z-index: 0;
+  pointer-events: none;
+}
+html.km-on .km-tabs button {
+  position: relative;
+  z-index: 1;
+  transition: color 0.4s;
+}
+html.km-on .km-tabs button.active {
+  background: transparent;
+}
+.km-svc {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 95;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+}
+.km-svc__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed var(--forest, #10291e);
+}
+.km-svc__icon {
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  background: var(--lime, #c6f986);
+  color: var(--forest, #10291e);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 24px 50px -16px rgba(16, 41, 30, 0.55);
+}
+.km-svc__icon svg {
+  width: 54px;
+  height: 54px;
+}
+.km-svc__label {
+  position: absolute;
+  top: 100%;
+  margin-top: 8px;
+  white-space: nowrap;
+  font:
+    600 9px/1 DM,
+    Arial,
+    sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--forest, #10291e);
+}
+html.km-on .service-row {
+  position: relative;
+  transition:
+    padding 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.3s;
+}
+html.km-on .service-row::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(198, 249, 134, 0.45);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
+  border-radius: 4px;
+}
+html.km-on #service-grid {
+  position: relative;
+  z-index: 0;
+}
+html.km-on .service-row:hover::before {
+  transform: scaleY(1);
+  transform-origin: top;
+}
+html.km-on .service-row .service-arrow {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html.km-on .service-row:hover .service-arrow {
+  transform: rotate(45deg);
+}
+
+/* ---------- 14. Plans: spotlight + animated featured border ---------- */
+html.km-on .km-spot {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+html.km-on .km-spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(198, 249, 134, 0.14),
+    transparent 45%
+  );
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+html.km-on .km-spot:hover::before {
+  opacity: 1;
+}
+@property --km-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+html.km-on .plan.featured {
+  position: relative;
+  isolation: isolate;
+}
+html.km-on .plan.featured::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--km-angle),
+    transparent 0 70%,
+    var(--lime, #c6f986) 85%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: km-spin 5s linear infinite;
+}
+@keyframes km-spin {
+  to {
+    --km-angle: 360deg;
+  }
+}
+html.km-on .plan .km-li {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html.km-on .plan:hover .km-li {
+  transform: translateX(4px);
+}
+
+/* ---------- 15. Process connector ---------- */
+.km-proc {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 1px;
+  pointer-events: none;
+}
+.km-proc__line {
+  position: absolute;
+  inset: 0;
+  background: var(--lime, #c6f986);
+  transform-origin: left;
+}
+.km-proc__dot {
+  position: absolute;
+  top: -6px;
+  width: 13px;
+  height: 13px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--lime, #c6f986);
+  box-shadow:
+    0 0 0 6px rgba(198, 249, 134, 0.18),
+    0 0 24px rgba(198, 249, 134, 0.6);
+}
+
+/* ---------- 16. Brief: flight path + form focus ---------- */
+.km-flight {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  color: var(--forest, #10291e);
+  opacity: 0.5;
+  overflow: visible;
+}
+.km-plane {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 46px;
+  height: 46px;
+  color: var(--forest, #10291e);
+  pointer-events: none;
+  z-index: 2;
+}
+html.km-on .brief-section label {
+  position: relative;
+}
+html.km-on .brief-section input,
+html.km-on .brief-section select,
+html.km-on .brief-section textarea {
+  background: linear-gradient(var(--forest, #10291e), var(--forest, #10291e))
+    no-repeat 0 100% / 0 2px;
+  transition: background-size 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html.km-on .brief-section input:focus,
+html.km-on .brief-section select:focus,
+html.km-on .brief-section textarea:focus {
+  background-size: 100% 2px;
+  outline: none;
+}
+html.km-on .brief-section h2 .km-arrow {
+  display: block;
+  width: fit-content;
+  margin-top: 20px;
+  font-size: 100px;
+  line-height: 1;
+}
+@media (max-width: 540px) {
+  html.km-on .brief-section h2 .km-arrow {
+    font-size: 70px;
+  }
+}
+
+/* ---------- 17. FAQ ---------- */
+html.km-on .km-details summary {
+  list-style: none;
+  position: relative;
+}
+html.km-on .km-details summary::-webkit-details-marker {
+  display: none;
+}
+html.km-on .km-details summary::after {
+  content: "+";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  color: var(--lime, #c6f986);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html.km-on .km-details[open] summary::after {
+  transform: translateY(-50%) rotate(135deg);
+}
+html.km-on .km-details > :not(summary) {
+  overflow: hidden;
+}
+
+/* ---------- 18. Footer ---------- */
+html.km-on .footer-word.km-mask {
+  overflow: hidden;
+}
+html.km-on .footer-word .char,
+html.km-on .footer-word > div {
+  display: inline-block;
+}
+
+/* ---------- 19. Service dialog entrance (CSS only) ---------- */
+html.km-on dialog[open] {
+  animation: km-dialog-in 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+html.km-on dialog[open]::backdrop {
+  animation: km-fade 0.5s ease;
+}
+html.km-on dialog[open] #dialog-content > * {
+  animation: km-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+html.km-on dialog[open] #dialog-content > *:nth-child(2) {
+  animation-delay: 0.05s;
+}
+html.km-on dialog[open] #dialog-content > *:nth-child(3) {
+  animation-delay: 0.1s;
+}
+html.km-on dialog[open] #dialog-content > *:nth-child(n + 4) {
+  animation-delay: 0.15s;
+}
+@keyframes km-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+    clip-path: inset(10% 0 0 0 round 14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0 round 14px);
+  }
+}
+@keyframes km-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes km-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- 20. Small screens & motion preferences ---------- */
+@media (max-width: 800px) {
+  .km-seam {
+    top: -30px;
+  }
+  .km-pin small {
+    display: none;
+  }
+  .km-vf__tc {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .km-pre,
+  .km-cursor,
+  .km-rail,
+  .km-svc {
+    display: none !important;
+  }
+  html.km-preload .hero {
+    visibility: visible;
+  }
+  html.km-preload body {
+    overflow: auto;
+  }
+}
+html.km-has-cursor body.motion-paused .km-cursor {
+  display: none;
+}
