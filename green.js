@@ -155,7 +155,7 @@ function openService(id) {
       ) +
       '" target="_blank" rel="noopener noreferrer">Discuss this project ↗</a>' +
       (id === "pinyoursite"
-        ? '<a class="button lime" href="https://pinyoursite-kapadiya.vercel.app" target="_blank" rel="noopener noreferrer">Explore the live demo ↗</a>'
+        ? '<a class="button lime" href="https://pinyoursite-kapadiya.vercel.app" target="_blank" rel="noopener noreferrer">Explore plots ↗</a> <a class="button lime" href="/apartments/index.html">Explore apartments ↗</a>'
         : "") +
       '<p class="dialog-foot">Scope, timeline and review terms are agreed before production. AI realism depends on the concept and references.</p>',
   );
@@ -316,3 +316,4 @@ document.querySelectorAll('.plan:not(.featured)').forEach(plan=>{
 });
 import "./signal-motion.js";
 import './journey.js';
+

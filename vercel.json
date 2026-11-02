@@ -1,7 +1,7 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite",
+  "framework": "vite", "rewrites": [{"source":"/apartments","destination":"/apartments/index.html"}],
   "headers": [
     {
       "source": "/(.*)",
@@ -30,3 +30,4 @@
     }
   ]
 }
+

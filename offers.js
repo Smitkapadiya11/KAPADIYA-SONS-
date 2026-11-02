@@ -12,8 +12,8 @@ export const offers = [
   {
     id: "architect",
     category: "property",
-    name: "Architect’s Cut",
-    price: 25999,
+    name: "PinYourSite Plots",
+    price: 50000,
     featured: true,
     label: "PINYOURSITE",
     items: [
@@ -21,6 +21,15 @@ export const offers = [
       "All your client’s required project information",
     ],
     note: "Turn a property into an experience.",
+  },
+  {
+    id: "apartments",
+    category: "property",
+    name: "PinYourSite Apartments",
+    price: 50000,
+    label: "APARTMENT EXPERIENCE",
+    items: ["Interactive wings, floors and apartment plans", "Availability, gallery, location, brochure and unit enquiries"],
+    note: "Guide a buyer from the elevation to an individual home.",
   },
   {
     id: "avatar-demo",
