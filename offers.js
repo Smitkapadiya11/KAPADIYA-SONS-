@@ -13,7 +13,7 @@ export const offers = [
     id: "architect",
     category: "property",
     name: "PinYourSite Plots",
-    price: 50000,
+    price: null,
     featured: true,
     label: "PINYOURSITE",
     items: [
@@ -26,7 +26,7 @@ export const offers = [
     id: "apartments",
     category: "property",
     name: "PinYourSite Apartments",
-    price: 50000,
+    price: null,
     label: "APARTMENT EXPERIENCE",
     items: ["Interactive wings, floors and apartment plans", "Availability, gallery, location, brochure and unit enquiries"],
     note: "Guide a buyer from the elevation to an individual home.",
@@ -113,10 +113,13 @@ export const pageTitle =
   "KAPADIYA & SONS — Creative intelligence. Real momentum.";
 export const description =
   "UGC AI ad films, human-clone avatar videos, PinYourSite property experiences, AI websites, apps, music videos and short films. Built by Kapadiya & Sons.";
+const priceLabel = (p) => p.category === "property" ? "Private quote" : money(p.price);
 export const booking = (p) =>
   "https://wa.me/917575807403?text=" +
   encodeURIComponent(
-    "Hi Smit! I’m interested in " +
+    p.category === "property"
+      ? `Hi Smit! I’m interested in ${p.name} for my development. Could we discuss pricing, features and launch timing for my project?`
+      : "Hi Smit! I’m interested in " +
       p.name +
       (p.price === null ? " (avatar demo)" : " at " + money(p.price)) +
       ". " +
@@ -127,7 +130,7 @@ export const servicePricing = (category) =>
   offers
     .filter((p) => p.category === category)
     .map(
-      (p) => p.name + ": " + money(p.price) + ". " + p.items.join(". ") + ".",
+      (p) => p.name + ": " + priceLabel(p) + ". " + p.items.join(". ") + ".",
     )
     .join(" ");
 export const offerSchema = () => ({
@@ -163,9 +166,9 @@ export const renderOffers = () =>
         "</h3><p>" +
         p.note +
         '</p><div class="plan-price">' +
-        money(p.price) +
+        priceLabel(p) +
         "<small>" +
-        (p.price === null ? "DEMO ENQUIRY" : "INR / PACKAGE") +
+        (p.category === "property" ? "PROJECT PRICING" : p.price === null ? "DEMO ENQUIRY" : "INR / PACKAGE") +
         "</small></div><ul>" +
         p.items.map((i) => "<li>" + i + "</li>").join("") +
         '</ul><a class="button ' +
@@ -173,7 +176,7 @@ export const renderOffers = () =>
         '" href="' +
         booking(p) +
         '" target="_blank" rel="noopener noreferrer">' +
-        (p.price === null ? "Request a demo" : "Discuss this cut") +
+        (p.category === "property" ? "Contact for pricing and more" : p.price === null ? "Request a demo" : "Discuss this cut") +
         ' <span aria-hidden="true">↗</span></a></article>',
     )
     .join("");

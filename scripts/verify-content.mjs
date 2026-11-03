@@ -3,7 +3,8 @@ import fs from "node:fs";
 import { offers, offerSchema, booking } from "../offers.js";
 const expected = {
   "lions-cut": 19999,
-  architect: 25999,
+  architect: null,
+  apartments: null,
   "avatar-demo": null,
   "cats-cut": 25999,
   monster: 49999,
@@ -15,7 +16,7 @@ assert.deepEqual(
   Object.fromEntries(offers.map((o) => [o.id, o.price])),
   expected,
 );
-assert.equal(offerSchema()["@graph"].length, 7);
+assert.equal(offerSchema()["@graph"].length, 6);
 for (const o of offers) {
   const u = new URL(booking(o));
   assert.equal(u.hostname, "wa.me");
@@ -30,7 +31,7 @@ assert.ok(
   ),
 );
 assert.ok(html.includes("https://pinyoursite-kapadiya.vercel.app"));
-assert.equal((html.match(/class="plan /g) || []).length, 8);
+assert.equal((html.match(/class="plan /g) || []).length, 9);
 for (const m of html.matchAll(
   /(?:src|poster|href)="(\/[^"#?]+)(?:[?#][^"]*)?"/g,
 )) {
@@ -68,5 +69,5 @@ assert.ok(
     .toString() === "%PDF-",
 );
 console.log(
-  "PASS: 8 exact packages; 7 structured prices; WhatsApp CTAs; no seasonal copy; all built assets; 3 compressed videos; 63 unique plots; 14 gallery images; brochure.",
+  "PASS: 9 packages; 6 structured prices; WhatsApp CTAs; no seasonal copy; all built assets; 3 compressed videos; 63 unique plots; 14 gallery images; brochure.",
 );

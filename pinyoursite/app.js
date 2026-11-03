@@ -557,7 +557,7 @@ function detailsPanel() {
         .join("") +
       '</div><div class="contact-list"><a href="https://www.kapadiya.tech" target="_blank" rel="noopener">Kapadiya & Sons ↗</a><a href="tel:+917575807403">+91 75758 07403 ↗</a><a href="mailto:smitkapadiya.work@gmail.com">smitkapadiya.work@gmail.com ↗</a></div>' +
       form("PinYourSite") +
-      "<h3>Project Experience By</h3><p>Kapadiya & Sons<br>PinYourSite Plots · ₹50,000<br>Complete 3D informational web view and project details.</p>",
+      `<h3>Project Experience By</h3><p>Kapadiya & Sons<br>PinYourSite Plots<br>Complete 3D informational web view and project details.</p><div class="contact-list"><a href="${wa("Hi Smit! Could we discuss pricing and features for PinYourSite Plots for my development?")}" target="_blank" rel="noopener">Contact for pricing and more ↗</a></div>`,
     "details",
   );
   wireForms(body);
