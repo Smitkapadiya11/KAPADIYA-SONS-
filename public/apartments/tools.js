@@ -3,7 +3,16 @@ export function projectTools(name, data, show, dialog) {
   const coords=data.latitude+','+data.longitude;
   const directions='https://www.google.com/maps/dir/?api=1&destination='+coords;
   if(name==='GPS'){
-    show('GPS','<div id="satellite"></div><div class="map-actions"><span id="tile-status"></span><a href="'+directions+'" target="_blank" rel="noopener">Directions ↗</a><button id="return-plan">Interactive Plan</button></div>');
+    show('GPS', `<div id="satellite" aria-label="Satellite map of PinYourSite Apartments"></div>
+      <div class="map-rail" role="group" aria-label="Map controls">
+        <button data-map-action="reset" title="Reset map view" aria-label="Reset map view">↺</button>
+        <button data-map-action="center" title="Centre on project" aria-label="Centre on project">⌖</button>
+        <button data-map-action="north" title="Face north" aria-label="Face north">♢</button>
+        <button data-map-action="plus" class="leaflet-control-zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+        <button data-map-action="minus" title="Zoom out" aria-label="Zoom out">−</button>
+      </div><span role="status" id="tile-status"></span><div class="map-actions">
+        <a href="${directions}" target="_blank" rel="noopener">➤ &nbsp;Directions</a>
+        <button id="return-plan">⊞ &nbsp;Interactive Plan</button></div>`);
     satellite(dialog,data);document.querySelector('#return-plan').onclick=()=>dialog.close();return;
   }
   if(name==='Nearby'){

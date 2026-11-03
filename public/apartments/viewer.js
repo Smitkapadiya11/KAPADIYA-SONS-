@@ -36,7 +36,7 @@ function render(){
  for(let f=22;f>=1;f--){const b=button(f,()=>{floor=f;unit='';render()},rail);b.classList.toggle('active',f==floor)}
  if(selected)button('Close ×',()=>{unit='';render()},$('#info'));
  }
- history.replaceState(null,'',location.pathname+(wing?'?wing='+wing+'&floor='+floor+(unit?'&unit='+encodeURIComponent(unit):''):''))
+ if (!modal.classList.contains('gps-view')) history.replaceState(null,'',location.pathname+(wing?'?wing='+wing+'&floor='+floor+(unit?'&unit='+encodeURIComponent(unit):''):''))
 }
 const params=new URLSearchParams(location.search);if(wings.includes(params.get('wing'))){wing=params.get('wing');const list=data.wings[wing].units;floor=list.some(u=>u.floor==params.get('floor'))?Number(params.get('floor')):1;unit=list.find(u=>u.floor==floor&&u.id===params.get('unit'))?.id||''}render();
 $('#plus').onclick=()=>setZoom(zoom+.5);$('#minus').onclick=()=>setZoom(zoom-.5);$('#compass').onclick=reset;$('#home').onclick=()=>{wing=unit='';reset();render()};
@@ -68,3 +68,5 @@ const separation=touches=>Math.hypot(touches[0].clientX-touches[1].clientX,touch
 viewport.addEventListener('touchstart',e=>{if(e.touches.length===2){drag=null;pinchDistance=separation(e.touches)}},{passive:true});
 viewport.addEventListener('touchmove',e=>{if(e.touches.length!==2||!pinchDistance)return;e.preventDefault();drag=null;const distance=separation(e.touches);setZoom(zoom*distance/pinchDistance);pinchDistance=distance},{passive:false});
 viewport.addEventListener('touchend',()=>{pinchDistance=0});
+
+if (params.get('map') === 'true') projectTools('GPS',data,show,modal);
