@@ -6,7 +6,8 @@ try {
   const page=await browser.newPage({viewport:{width,height:width===390?844:800},hasTouch:width===390});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(process.env.SITE_URL||'http://127.0.0.1:4352');
-  const open=page.getByRole('button',{name:'Sample House 3D View'});
+  await page.locator('#parcel-toggle').click();
+  const open=page.locator('#open-house');
   await open.click();
   await page.waitForSelector('#house-view.house-ready canvas');
   await page.waitForTimeout(350);

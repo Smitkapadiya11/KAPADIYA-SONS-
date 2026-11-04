@@ -303,7 +303,7 @@ svg.icon {
   background: #1c1d21e6;
   border: 1px solid #ffffff0d;
 }
-#legend-toggle {
+#legend-toggle,#parcel-toggle {
   padding: 10px 16px;
   display: flex;
   align-items: center;
@@ -1334,8 +1334,6 @@ p {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
-#open-house{display:flex;align-items:center;gap:9px;align-self:flex-end;border:1px solid #a5d9b0;border-radius:24px;padding:10px 16px;background:#e4f4d7;color:#143a2c;font:700 13px system-ui;box-shadow:0 3px 18px #13281844}
-#open-house span{font-size:18px;line-height:1}
 #house-view{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;max-height:none;margin:0;border:0;padding:0;border-radius:0;overflow:hidden;color:#233d30;background:radial-gradient(ellipse at 48% 40%,#f5f0e2,#e0ddce 69%,#c4c5b8)}
 .house-stage{position:absolute;inset:0}.house-stage canvas{display:block;width:100%;height:100%;touch-action:none}
 .house-heading{pointer-events:none;position:absolute;top:max(22px,env(safe-area-inset-top));left:clamp(18px,4vw,60px)}
@@ -1351,3 +1349,16 @@ p {
 .inside-villa .house-heading{background:#19251fe3;color:white;padding:11px 17px;border-radius:14px;max-width:calc(100% - 85px)}
 .inside-villa .house-heading h1{color:#fffaed}.inside-villa .house-heading small{color:#d3dabb}.inside-villa .house-heading p{display:none}
 .inside-villa #tour-hint{background:#233c30ed;color:white;padding:5px 9px;border-radius:14px}
+
+#villa-parcel{position:absolute;pointer-events:none;background:url(/villa-plot.webp) center / 100% 100% no-repeat}
+#villa-parcel canvas{width:100%;height:100%;display:block}
+#villa-survey text{font:700 4px system-ui;fill:#fff7d9;paint-order:stroke;stroke:#21302b;stroke-width:1.35px}
+#villa-survey path{stroke:#f3e7af;stroke-width:.72;fill:none}
+#parcel-info{padding:11px 14px;border:1px solid #444a4f;background:#1c2024f5;border-radius:15px;color:#f6f3ea;max-width:100%;align-self:flex-end}
+#parcel-info small,#parcel-info strong,#parcel-info>span{display:block}
+#parcel-info small{font:650 9px system-ui;letter-spacing:.13em;color:#b8c6ba}
+#parcel-info strong{font:650 15px system-ui;margin:3px 0}
+#parcel-info>span{font:12px system-ui;color:#d5dbd6}
+#parcel-info div{display:flex;gap:7px;margin-top:8px}
+#parcel-info button{background:#343d38;border:1px solid #58675d;color:white;padding:7px 11px;border-radius:18px;font:600 12px system-ui}
+@media(max-width:450px){.dock-top #parcel-toggle,.dock-top #legend-toggle{padding:8px 9px;font-size:9px;gap:5px}.dock-top{gap:4px}.dock-top .switch{width:27px}.dock-top [aria-pressed=true]>.switch:before{transform:translateX(11px)}}

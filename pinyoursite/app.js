@@ -879,3 +879,39 @@ house.addEventListener("close", () => {
   disposeHouse = undefined;
   q("#open-house").focus();
 });
+const parcelToggle=q("#parcel-toggle"), parcel=q("#villa-parcel"), survey=q("#villa-survey");
+const samplePlot=plots.find(p=>p.id===25);
+const edges=dimensions(samplePlot);
+const left=Math.min(...edges.map(e=>e.a.x)),top=Math.min(...edges.map(e=>e.a.y));
+const width=Math.max(...edges.map(e=>e.a.x))-left,height=Math.max(...edges.map(e=>e.a.y))-top;
+Object.assign(parcel.style,{left:left+"px",top:top+"px",width:width+"px",height:height+"px"});
+const short=edges.find(e=>e.a.y===e.b.y).length.toFixed(1);
+const long=edges.find(e=>e.a.x===e.b.x).length.toFixed(1);
+q("#parcel-size").textContent=`Approx. ${short} × ${long} ft · ${fmt(samplePlot.area)} ft²`;
+let parcelSession=0,parcelModel;
+parcelToggle.onclick=()=>{
+  const enabled=parcelToggle.getAttribute("aria-pressed")!=="true";
+  parcelToggle.setAttribute("aria-pressed",String(enabled));
+  parcel.hidden=q("#parcel-info").hidden=!enabled;
+  survey.innerHTML=enabled?`<g transform="translate(${left} ${top})">
+    <path d="M0 -2v-4m0 2h${width}m0 -2v4 M-2 0h-4m2 0v${height}m-2 0h4"/>
+    <text x="${width/2}" y="-6" text-anchor="middle">≈ ${short} ft</text>
+    <text transform="translate(-6 ${height/2}) rotate(-90)" text-anchor="middle">≈ ${long} ft</text>
+    <text x="${width/2}" y="${height+6}" text-anchor="middle">PLOT 25</text></g>`:"";
+  const session=++parcelSession;
+  const angle=q("#parcel-angle");angle.hidden=true;
+  if(!enabled){parcelModel?.dispose();parcelModel=null;parcel.replaceChildren();return}
+  import("./parcel-house.js").then(async m=>{
+    if(session!==parcelSession)return;
+    const layer=document.createElement("div");layer.style.height=parcel.style.height;layer.style.width=parcel.style.width;
+    const model=await m.drawParcel(layer);
+    if(session!==parcelSession){model.dispose();return}
+    parcel.replaceChildren(layer);parcelModel=model;angle.hidden=false;
+  }).catch(()=>{/* The baked Blender view remains visible on devices without WebGL. */});
+};
+q("#parcel-angle").onclick=()=>parcelModel?.rotate();
+q("#parcel-focus").onclick=()=>{
+  const start=innerWidth<600?90:80,end=innerHeight-(innerWidth<600?265:110);
+  const k=Math.min(6,Math.max(1,(end-start)/(height+19)),innerWidth*.56/width);
+  transition({k,x:innerWidth*.5-samplePlot.x*k,y:(start+end)*.5-samplePlot.y*k});
+};

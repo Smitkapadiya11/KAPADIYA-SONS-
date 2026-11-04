@@ -63,7 +63,9 @@
           />
           <g id="plots"></g>
           <g id="dimensions" pointer-events="none"></g>
+          <g id="villa-survey" pointer-events="none"></g>
         </svg>
+        <div id="villa-parcel" hidden aria-hidden="true"></div>
       </div>
     </main>
     <div id="hover-tip" hidden></div>
@@ -77,8 +79,13 @@
       </button>
     </div>
     <div class="dock">
-      <button id="open-house" aria-haspopup="dialog"><span aria-hidden="true">◇</span> Sample House 3D View</button>
+      <div id="parcel-info" hidden>
+        <small>ILLUSTRATIVE SITE PLAN</small><strong>Plot 25 · Courtyard Villa</strong>
+        <span id="parcel-size"></span>
+        <div><button id="parcel-focus">Inspect plot</button><button id="parcel-angle" hidden>Change angle</button><button id="open-house" aria-haspopup="dialog">Tour the villa ↗</button></div>
+      </div>
       <div class="dock-top">
+        <button id="parcel-toggle" aria-label="Sample House 3D View" aria-pressed="false" aria-controls="villa-parcel parcel-info">3D HOUSE <span class="switch"></span></button>
         <button id="legend-toggle" aria-pressed="false">
           STATUS LEGEND <span class="switch"></span></button
         ><button

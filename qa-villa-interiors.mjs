@@ -7,6 +7,7 @@ try {
     const errors=[];
     page.on("pageerror",e=>errors.push(e.message));
     await page.goto(process.env.SITE_URL||"http://127.0.0.1:4352");
+    await page.locator("#parcel-toggle").click();
     await page.locator("#open-house").click();
     await page.waitForSelector(".house-ready canvas");
     await page.screenshot({path:"../villa-exterior-"+width+".jpg"});
