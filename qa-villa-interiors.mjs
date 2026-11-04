@@ -62,5 +62,22 @@ try {
     await page.locator("#house-close").click();assert.deepEqual(errors,[]);
     await page.close();
   }
+  const lite=await browser.newPage({viewport:{width:390,height:844}});
+  await lite.addInitScript(()=>Object.defineProperty(navigator,"connection",{configurable:true,value:{saveData:true}}));
+  const requests=[];
+  lite.on("request",r=>{if(r.url().includes("/rooms/"))requests.push(new URL(r.url()).pathname)});
+  await lite.goto(process.env.SITE_URL||"http://127.0.0.1:4352");
+  await lite.locator("#parcel-toggle").click();await lite.locator("#open-house").click();
+  await lite.waitForSelector(".house-ready canvas");
+  await lite.locator("#tour-inside").click();
+  await lite.waitForSelector('[data-room="living"][aria-pressed="true"]');
+  assert.deepEqual(requests,["/rooms/compact/living.webp"]);
+  const sizes=await lite.evaluate(async()=>{
+    return Promise.all(["/rooms/living.webp","/rooms/compact/living.webp"].map(async url=>{
+      const image=new Image();image.src=url;await image.decode();return [image.naturalWidth,image.naturalHeight];
+    }));
+  });
+  assert.deepEqual(sizes,[[4096,2048],[2048,1024]]);
+  console.log("Verified native 4K room and data-saving 2K selection.");await lite.close();
 }finally{await browser.close()}
 

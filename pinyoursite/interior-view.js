@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 // Prelit panoramas preserve the Blender lighting in a single mobile draw call.
-export function createInterior(dialog, camera, controls, redraw) {
+export function createInterior(dialog, camera, controls, redraw, maxTextureSize) {
   const scene = new THREE.Scene();
   const material = new THREE.MeshBasicMaterial({toneMapped:false});
   const sphere = new THREE.Mesh(new THREE.SphereGeometry(8,48,24),material);
@@ -22,7 +22,8 @@ export function createInterior(dialog, camera, controls, redraw) {
     const id=++request;
     status.textContent="Opening "+rooms[name]+"…";
     try {
-      const texture=await textureLoader.loadAsync("/rooms/"+name+".webp");
+      const light=navigator.connection?.saveData || maxTextureSize<4096;
+      const texture=await textureLoader.loadAsync("/rooms/"+(light?"compact/":"")+name+".webp");
       if(disposed||id!==request){texture.dispose();return}
       texture.colorSpace=THREE.SRGBColorSpace;
       texture.generateMipmaps=false;texture.minFilter=THREE.LinearFilter;

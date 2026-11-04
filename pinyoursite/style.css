@@ -1371,3 +1371,5 @@ p {
 @media(max-width:520px){#measure-villa{top:auto;bottom:116px;right:12px}}
 
 .villa-facts{font:500 12px system-ui;color:#e1e6d9}.villa-facts[hidden]{display:none}
+.house-ready:not(.inside-villa) .house-heading{padding:10px 16px;background:#f7f2e5ed;border-radius:12px;max-width:calc(100% - 84px)}
+.house-ready:not(.inside-villa) #tour-hint{display:table;margin:7px auto 0;background:#f7f2e5ed;border-radius:14px;padding:4px 9px}

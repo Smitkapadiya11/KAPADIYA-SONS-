@@ -122,17 +122,21 @@ for x in (-5,-.52):box(x,-5.92,1.12,.36,.40,2.18,"limestone")
 box(-2.75,-5.92,2.25,4.86,.45,.30,"limestone")
 for k in range(26):box(-4.80+k*.16,-5.92,.94,.046,.064,1.68,"bronze")
 for y in (-3.0,-1,1,3.2,5):shrub(-5.15,y,.08,.98)
+frond_uv=[]
+palette["fronds"]="ffffff"
 for x,y,h in [(5.12,-3.30,5.35),(-5.16,3.7,5.95)]:
     start=Vector((x,y,.06));top=Vector((x+.29,y+.22,h))
     rod(start,top,.13,"earth",10)
     for j in range(12):
         a=j*math.tau/12;v=Vector((math.cos(a),math.sin(a),0));side=Vector((-v.y,v.x,0))
-        def mid(t):return top+v*(2.0*t)+Vector((0,0,.76*math.sin(t*math.pi)-.60*t))
-        for k in range(12):
-            t=k/12;rod(mid(t),mid((k+1)/12),.018,"palm",4)
-            for sign in (-1,1):
-                tip=mid(t)+side*sign*(.12+.28*math.sin(math.pi*t))+v*.34-Vector((0,0,.19))
-                mesh("leaf" if j%2 else "sage",[tuple(mid(t)),tuple(tip),tuple(mid((k+1)/12))],[(0,1,2)])
+        reach=2.15+.28*math.sin(j*1.8)
+        for k in range(8):
+            corners=[];uv=[]
+            for t,lateral in [(k/8,-1),((k+1)/8,-1),((k+1)/8,1),(k/8,1)]:
+                centre=top+v*(reach*t)+Vector((0,0,(.7+.25*math.sin(j))*math.sin(math.pi*t)-.94*t*t))
+                point=centre+side*lateral*.52+Vector((0,0,lateral*.16*math.sin(j*2.4)))
+                corners.append(tuple(point));uv.append((t,(lateral+1)/2))
+            mesh("fronds",corners,[(0,1,2,3)]);frond_uv.extend(uv)
 # Continue the fenestration around the elevations the gallery does not show.
 for z,back in [(1.60,4.9),(4.6,4.805),(7.12,3.85)]:
     for x in (-2.30,1.75):
@@ -168,6 +172,7 @@ for ob in bpy.context.scene.objects:
     colors=model.color_attributes.new(name="Contact shade",type="BYTE_COLOR",domain="CORNER")
     cache={}
     for face in model.polygons:
+        face_uv=[]
         n=face.normal
         tangent=n.cross(Vector((0,0,1)) if abs(n.z)<.85 else Vector((1,0,0))).normalized()
         bitangent=n.cross(tangent)
@@ -178,6 +183,8 @@ for ob in bpy.context.scene.objects:
             elif abs(n.x)>.65: coords=(v.y,v.z)
             else: coords=(v.x,v.z)
             uv.data[index].uv=(coords[0]/1.6,coords[1]/1.6)
+            if ob.name=="fronds":uv.data[index].uv=frond_uv[vi]
+            if ob.name=="glass":face_uv.append((index,coords))
             key=(vi,tuple(round(c,2) for c in n))
             if key not in cache:
                 hits=0
@@ -188,7 +195,37 @@ for ob in bpy.context.scene.objects:
                     if hit[0] is not None: hits+=1-hit[3]/1.25
                 cache[key]=1-.49*hits/8
             shade=cache[key];colors.data[index].color=(shade,shade,shade,1)
+        if face_uv:
+            for axis in range(2):
+                values=[coord[axis] for _,coord in face_uv];lo=min(values);span=max(values)-lo
+                for idx,coord in face_uv:uv.data[idx].uv[axis]=(coord[axis]-lo)/max(span,.00001)
 bpy.ops.export_scene.gltf(filepath=str(root/"public"/"sample-house.glb"),export_format="GLB",export_yup=True,export_vertex_color="ACTIVE")
+
+# Pack the same maps into the editable native scene. Keep them external in
+# the web build so the lightweight GLB does not duplicate browser downloads.
+for name,file,repeat,rough in [
+    ("lawn","doob-grass",2.25,.98),("stucco","lime-plaster",1,.91),
+    ("trim","lime-plaster",1,.91),("limestone","surat-stone",1,.78),
+    ("paving","kota-court",.82,.55),("clay","fired-clay",1.6,.84),
+    ("tile","fired-clay",1.6,.84),("oak","surat-teak",1,.46),
+    ("fronds","palm-frond",1,.85),("glass","window-linen",1,.27)]:
+    mat=bpy.data.materials[name];tree=mat.node_tree;shader=tree.nodes.get("Principled BSDF")
+    image=tree.nodes.new("ShaderNodeTexImage")
+    image.image=bpy.data.images.load(str(root/"public/finishes"/(file+".webp")),check_existing=True)
+    image.image.pack();image.extension="MIRROR"
+    uv=tree.nodes.new("ShaderNodeTexCoord");scale=tree.nodes.new("ShaderNodeVectorMath")
+    scale.operation="SCALE";scale.inputs["Scale"].default_value=repeat
+    tree.links.new(uv.outputs["UV"],scale.inputs[0]);tree.links.new(scale.outputs[0],image.inputs["Vector"])
+    tree.links.new(image.outputs["Color"],shader.inputs["Base Color"]);shader.inputs["Roughness"].default_value=rough
+    if name=="fronds":tree.links.new(image.outputs["Alpha"],shader.inputs["Alpha"])
+world=bpy.data.worlds.new("Surat garden daylight");bpy.context.scene.world=world;world.use_nodes=True
+env=world.node_tree.nodes.new("ShaderNodeTexEnvironment")
+env.image=bpy.data.images.load(str(root/"public/finishes/surat-garden.webp"));env.image.pack()
+world.node_tree.links.new(env.outputs[0],world.node_tree.nodes["Background"].inputs[0])
+world.node_tree.nodes["Background"].inputs[1].default_value=.65
+sun=bpy.data.lights.new("Late afternoon","SUN");sun.energy=3;sun.angle=.055;sun.color=(1,.88,.74)
+source_light=bpy.data.objects.new("Late afternoon",sun);bpy.context.scene.collection.objects.link(source_light)
+source_light.rotation_euler=Vector((15,11,-13)).to_track_quat("-Z","Y").to_euler()
 
 # Keep an editable native scene alongside the generator, outside the web payload.
 for screen in bpy.data.screens:

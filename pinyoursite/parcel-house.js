@@ -1,3 +1,4 @@
+import {applySurfaces} from "./villa-surfaces.js";
 import * as THREE from "three";
 import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 
@@ -44,21 +45,13 @@ export async function drawParcel(host) {
     const {scene:villa}=await new GLTFLoader().loadAsync("/sample-house.glb");
     villa.rotation.y=Math.PI;villa.position.set(-.45,.53,-3.4);
     scene.add(villa);
-    const stone=await new THREE.TextureLoader().loadAsync("/finishes/surat-stone.webp");
-    const grass=stone.clone();grass.repeat.set(6,18);grass.wrapS=grass.wrapT=THREE.RepeatWrapping;grass.colorSpace=THREE.SRGBColorSpace;grass.needsUpdate=true;
-    lawn.material.map=grass;forecourt.material.map=grass;
-    textures.push(grass);
-    textures.push(stone);stone.colorSpace=THREE.SRGBColorSpace;stone.wrapS=stone.wrapT=THREE.RepeatWrapping;
-    villa.traverse(o=>{
-      if(!o.isMesh)return;
-      o.castShadow=o.receiveShadow=true;
-      const m=o.material;
-      if(m.name==="limestone")m.color.set(0xf3e5cc);
-      if(m.name==="clay")m.color.set(0x9d493c);
-      if(m.name==="tile")m.color.set(0xc56c4c);
-      if(m.name==="glass"){m.color.set(0x38747a);m.roughness=.24}
-      if(["limestone","stucco","paving"].includes(m.name))m.map=stone;
-    });
+    const maps=await applySurfaces(villa,renderer,textures);
+    for(const [mesh,key,rx,ry] of [[lawn,"doob-grass",11,27],[forecourt,"kota-court",7,3]]){
+      if(!maps[key])continue;
+      const map=maps[key].clone();map.repeat.set(rx,ry);textures.push(map);
+      mesh.material.map=mesh.material.bumpMap=map;mesh.material.bumpScale=.018;mesh.material.color.set(0xf2eadb);
+    }
+    villa.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true}});
     function render(){
       const x=.22,y=-.72;
       camera.projectionMatrix.copy(baseProjection).multiply(new THREE.Matrix4().set(1,0,x,50*x,0,1,y,50*y,0,0,1,0,0,0,0,1));
