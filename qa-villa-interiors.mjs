@@ -15,7 +15,7 @@ try {
     for(const name of ["living","kitchen","bedroom","bath"]){
       if(name!=="living")await page.locator('[data-room="'+name+'"]').click();
       await page.waitForSelector('[data-room="'+name+'"][aria-pressed=true]');
-      await page.waitForSelector("#villa-lines g text");
+      await page.waitForSelector("#villa-lines g text:visible");
       assert.equal(await page.locator("#villa-lines g").count(),4);
       await page.waitForTimeout(150);
       await page.screenshot({path:"../villa-"+name+"-"+width+".jpg"});
@@ -63,3 +63,4 @@ try {
     await page.close();
   }
 }finally{await browser.close()}
+
