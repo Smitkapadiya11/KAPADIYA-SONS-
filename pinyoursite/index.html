@@ -77,6 +77,7 @@
       </button>
     </div>
     <div class="dock">
+      <button id="open-house" aria-haspopup="dialog"><span aria-hidden="true">◇</span> Sample House 3D View</button>
       <div class="dock-top">
         <button id="legend-toggle" aria-pressed="false">
           STATUS LEGEND <span class="switch"></span></button
@@ -209,6 +210,15 @@
         >
       </p>
     </section>
+    <dialog id="house-view" aria-labelledby="house-title">
+      <div class="house-stage"></div>
+      <header class="house-heading"><small>PINYOURSITE &nbsp; / &nbsp; DESIGN STUDY 01</small><h1 id="house-title">The Courtyard Villa</h1><p>Sample exterior inspired by the project gallery</p></header>
+      <button id="house-close" aria-label="Return to plot plan">×</button>
+      <p id="house-status" role="status"></p>
+      <div class="house-controls"><div role="group" aria-label="House camera views">
+        <button data-view="street">Street</button><button data-view="balcony">Balcony</button><button data-view="aerial">Aerial</button>
+      </div><p>Drag to orbit · Pinch or scroll to zoom</p></div>
+    </dialog>
     <div id="toast" role="status"></div>
     <script type="module" src="/app.js"></script>
   </body>

@@ -1334,3 +1334,13 @@ p {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
+#open-house{display:flex;align-items:center;gap:9px;align-self:flex-end;border:1px solid #a5d9b0;border-radius:24px;padding:10px 16px;background:#e4f4d7;color:#143a2c;font:700 13px system-ui;box-shadow:0 3px 18px #13281844}
+#open-house span{font-size:18px;line-height:1}
+#house-view{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;max-height:none;margin:0;border:0;padding:0;border-radius:0;overflow:hidden;color:#233d30;background:radial-gradient(ellipse at 48% 40%,#f5f0e2,#e0ddce 69%,#c4c5b8)}
+.house-stage{position:absolute;inset:0}.house-stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.house-heading{pointer-events:none;position:absolute;top:max(22px,env(safe-area-inset-top));left:clamp(18px,4vw,60px)}
+.house-heading small{font:700 10px system-ui;letter-spacing:.18em;color:#48664e}.house-heading h1{font:normal clamp(28px,4vw,53px) Georgia;margin:6px 0;color:#213c30}.house-heading p,.house-controls p{margin:0;font:13px system-ui;color:#465548}
+#house-close{position:absolute;right:18px;top:max(18px,env(safe-area-inset-top));border:0;border-radius:50%;width:46px;height:46px;background:#233c30;color:white;font-size:25px}
+.house-controls{position:absolute;bottom:max(20px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;display:none}.house-ready .house-controls{display:block}
+.house-controls div{display:inline-flex;background:#243b30;padding:5px;border-radius:28px}.house-controls button{min-height:42px;padding:0 18px;border:0;border-radius:22px;background:transparent;color:white;font:600 14px system-ui}.house-controls button[aria-pressed=true]{background:#d9eeac;color:#243b30}.house-controls p{margin-top:8px}
+#house-status:not(:empty){position:absolute;bottom:13%;width:100%;text-align:center;padding:12px;background:#eceadddd;color:#233d30}.house-fallback .house-stage{background:url(/gallery/12.webp) center / contain no-repeat}

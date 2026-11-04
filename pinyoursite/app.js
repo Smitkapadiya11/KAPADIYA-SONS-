@@ -808,6 +808,7 @@ panel.addEventListener("close", () => {
   returnFocus?.focus();
 });
 document.addEventListener("keydown", (e) => {
+  if (q("#house-view").open) return;
   if (q("#lightbox").open && ["ArrowLeft", "ArrowRight"].includes(e.key)) {
     e.preventDefault();
     openImage(imageIndex + (e.key === "ArrowRight" ? 1 : -1));
@@ -847,3 +848,34 @@ const initial = +(
   location.hash.replace("#plot-", "")
 );
 if (initial) openPlot(initial, false);
+
+const house = q("#house-view");
+let houseSession = 0;
+let disposeHouse;
+q("#open-house").onclick = async () => {
+  const session = ++houseSession;
+  house.showModal();
+  house.classList.remove("house-ready", "house-fallback");
+  const status = q("#house-status");
+  status.textContent = "Opening the 3D exterior…";
+  try {
+    const {startHouse} = await import("./house-view.js");
+    if (session !== houseSession) return;
+    const dispose = await startHouse(house);
+    if (session !== houseSession) { dispose(); return; }
+    disposeHouse = dispose;
+    house.classList.add("house-ready");
+    status.textContent = "";
+  } catch {
+    if (session !== houseSession) return;
+    house.classList.add("house-fallback");
+    status.textContent = "3D is unavailable here. Showing the gallery reference.";
+  }
+};
+q("#house-close").onclick = () => house.close();
+house.addEventListener("close", () => {
+  ++houseSession;
+  disposeHouse?.();
+  disposeHouse = undefined;
+  q("#open-house").focus();
+});
