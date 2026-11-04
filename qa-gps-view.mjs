@@ -9,7 +9,7 @@ for(const [width,height] of [[1534,871],[390,844]]){
  const bounds=()=>art.boundingBox();const first=await bounds();
  assert.ok(Math.abs(first.x+first.width/2-width/2)<2);
  assert.ok(Math.abs(first.y+first.height/2-height/2)<2);
- assert.ok(await p.locator('dialog').evaluate(d=>d.scrollHeight<=d.clientHeight));
+ assert.ok(await p.locator('dialog[open]').evaluate(d=>d.scrollHeight<=d.clientHeight));
  await p.screenshot({path:'../gps-'+width+'.jpg'});
  await p.getByRole('button',{name:'Zoom in',exact:true}).last().click();
  assert.ok((await bounds()).width>first.width*1.8);

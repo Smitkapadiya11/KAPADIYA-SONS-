@@ -9,6 +9,11 @@ function setZoom(n){zoom=Math.max(1,Math.min(6,n));if(zoom===1)x=y=0;move()}
 function button(text,fn,parent){const b=document.createElement('button');b.textContent=text;b.onclick=fn;parent.append(b);return b}
 function render(){
  const tower=data.wings[wing],units=tower?.units.filter(u=>u.floor==floor)||[],selected=units.find(u=>u.id===unit);
+ const stock=tower?units:Object.values(data.wings).flatMap(w=>w.units);
+ const counts={available:0,hold:0,sold:0};
+ stock.forEach(u=>counts[u.status.includes('hold')?'hold':u.status]++);
+ $('#status-key').setAttribute('aria-label',tower?'Current floor status':'Project status');
+ [...$('#status-key').children].forEach((el,i)=>{const key=['available','hold','sold'][i];el.textContent='● '+key[0].toUpperCase()+key.slice(1)+' '+counts[key]});
  const portrait=!wing&&matchMedia('(max-width:650px) and (orientation:portrait)').matches;
  const width=portrait?1080:1920,height=portrait?1920:1080;
  scene.setAttribute('viewBox',[0,0,width,height].join(' '));
@@ -28,7 +33,7 @@ function render(){
  document.body.classList.toggle('inside',Boolean(tower));
  document.querySelector('aside').hidden=!selected;
  const bar=$('#wingbar'),rail=$('#floors');bar.replaceChildren();rail.replaceChildren();
- $('#search').hidden=$('#legend').hidden=!tower;
+ $('#search').hidden=!tower;
  if(tower){
  button('← Elevation',()=>$('#home').click(),bar);
  wings.forEach(w=>button(w,()=>{wing=w;unit='';reset();render()},bar).classList.toggle('active',w===wing));
@@ -51,7 +56,7 @@ $('nav').onclick=e=>{
 $('#legend').onclick=()=>{
  const active=document.body.classList.toggle('legend-on');
  $('#legend').setAttribute('aria-pressed',String(active));
- $('#legend').textContent=active?'Available · Hold · Sold　●':'Status legend';
+ $('#status-key').hidden=!active;
 };
 $('#search').onclick=()=>{
  show('Find an apartment','<input type="search" placeholder="Wing or unit number" aria-label="Search units"><div id="results"></div>');
@@ -70,3 +75,31 @@ viewport.addEventListener('touchmove',e=>{if(e.touches.length!==2||!pinchDistanc
 viewport.addEventListener('touchend',()=>{pinchDistance=0});
 
 if (params.get('map') === 'true') projectTools('GPS',data,show,modal);
+
+const flatToggle=$('#toggle-flat'),flatCard=$('#flat-card'),flatTour=$('#flat-tour');
+flatToggle.onclick=()=>{
+ const active=flatToggle.getAttribute('aria-pressed')!=='true';
+ flatToggle.setAttribute('aria-pressed',String(active));flatCard.hidden=!active;
+};
+$('#inspect-flat').onclick=()=>{
+ wing='B';floor=1;unit='B-102';reset();render();
+ flatToggle.setAttribute('aria-pressed','false');flatCard.hidden=true;
+};
+let flatTicket=0,releaseFlat;
+$('#open-flat').onclick=async()=>{
+ const ticket=++flatTicket;const poster=flatTour.querySelector(".flat-stage img");
+ if(!poster.hasAttribute("src"))poster.src=poster.dataset.src;
+ flatTour.showModal();flatTour.classList.remove('interactive');
+ $('#flat-hint').textContent='Loading furnished model…';
+ try{
+   const {openFlat}=await import('/flat-web.js');
+   if(ticket!==flatTicket)return;
+   const clean=await openFlat(flatTour,()=>ticket===flatTicket);
+   if(ticket!==flatTicket){clean();return}
+   releaseFlat=clean;
+ }catch{
+   if(ticket===flatTicket)$('#flat-hint').textContent='Rendered overhead view · 3D could not load';
+ }
+};
+$('#close-flat').onclick=()=>flatTour.close();
+flatTour.addEventListener('close',()=>{++flatTicket;releaseFlat?.();releaseFlat=null;flatTour.classList.remove('interactive');$('#open-flat').focus()});

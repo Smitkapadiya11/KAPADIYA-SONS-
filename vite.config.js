@@ -10,8 +10,9 @@ import {
 } from "./offers.js";
 export default defineConfig({
   build: {
-    rollupOptions: {
-      output: { manualChunks: { spatial: ['three'] } },
+    rollupOptions: { preserveEntrySignatures: "exports-only",
+      input: {main:'index.html','flat-web':'flat-web.js'},
+      output: { entryFileNames: entry => entry.name==='flat-web' ? 'flat-web.js' : 'assets/[name]-[hash].js', manualChunks: { spatial: ['three'] } },
     },
   },
   plugins: [
@@ -30,3 +31,4 @@ export default defineConfig({
     },
   ],
 });
+
