@@ -9,7 +9,7 @@ export async function drawParcel(host) {
   const scene=new THREE.Scene();
   const textures=[];
   try {
-    renderer.setSize(352,Math.round(352*depth/width),false);
+    renderer.setSize(512,Math.round(512*depth/width),false);
     renderer.shadowMap.enabled=true;
     renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -44,7 +44,7 @@ export async function drawParcel(host) {
     const {scene:villa}=await new GLTFLoader().loadAsync("/sample-house.glb");
     villa.rotation.y=Math.PI;villa.position.set(-.45,.53,-3.4);
     scene.add(villa);
-    const stone=await new THREE.TextureLoader().loadAsync("/finishes/stone.webp");
+    const stone=await new THREE.TextureLoader().loadAsync("/finishes/surat-stone.webp");
     const grass=stone.clone();grass.repeat.set(6,18);grass.wrapS=grass.wrapT=THREE.RepeatWrapping;grass.colorSpace=THREE.SRGBColorSpace;grass.needsUpdate=true;
     lawn.material.map=grass;forecourt.material.map=grass;
     textures.push(grass);
@@ -53,21 +53,20 @@ export async function drawParcel(host) {
       if(!o.isMesh)return;
       o.castShadow=o.receiveShadow=true;
       const m=o.material;
+      if(m.name==="limestone")m.color.set(0xf3e5cc);
       if(m.name==="clay")m.color.set(0x9d493c);
       if(m.name==="tile")m.color.set(0xc56c4c);
       if(m.name==="glass"){m.color.set(0x38747a);m.roughness=.24}
       if(["limestone","stucco","paving"].includes(m.name))m.map=stone;
     });
-    const angles=[[.16,-.57],[-.19,-.42],[0,-.08]];
-    let angle=0;
     function render(){
-      const [x,y]=angles[angle];
+      const x=.22,y=-.72;
       camera.projectionMatrix.copy(baseProjection).multiply(new THREE.Matrix4().set(1,0,x,50*x,0,1,y,50*y,0,0,1,0,0,0,0,1));
       renderer.render(scene,camera);
     }
     host.replaceChildren(renderer.domElement);
     render();
-    return {rotate(){angle=(angle+1)%angles.length;render()},dispose};
+    return {dispose};
   } catch(error){dispose();throw error}
   function dispose(){
     textures.forEach(t=>t.dispose());

@@ -15,9 +15,14 @@ try {
     for(const name of ["living","kitchen","bedroom","bath"]){
       if(name!=="living")await page.locator('[data-room="'+name+'"]').click();
       await page.waitForSelector('[data-room="'+name+'"][aria-pressed=true]');
+      await page.waitForSelector("#villa-lines g text");
+      assert.equal(await page.locator("#villa-lines g").count(),4);
       await page.waitForTimeout(150);
       await page.screenshot({path:"../villa-"+name+"-"+width+".jpg"});
     }
+    const measureToggle=page.locator("#measure-villa");
+    await measureToggle.click();await page.waitForSelector("#villa-lines",{state:"hidden"});
+    await measureToggle.click();await page.waitForSelector("#villa-lines",{state:"visible"});
     if(width===390){
       const stage=page.locator(".house-stage");
       const before=await stage.screenshot();

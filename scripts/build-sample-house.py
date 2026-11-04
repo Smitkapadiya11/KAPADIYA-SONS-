@@ -87,6 +87,13 @@ box(0,.25,3.05,9.65,9.15,.28,"trim")
 box(0,1.03,4.55,9.3,7.55,2.85,"stucco")
 for x in (-2.62,1.19):window(x,-2.79,4.52,2.65,2.28)
 railing(-.86,-4.13,3.20,7.05)
+# A carved lozenge jaali occupies one balcony bay, leaving the glazing open.
+for col in range(5):
+    for row in range(3):
+        x=-4.04+col*.30; z=3.43+row*.31
+        corners=[(x,-4.16,z+.155),(x+.15,-4.16,z),(x,-4.16,z-.155),(x-.15,-4.16,z)]
+        for i in range(4):rod(corners[i],corners[(i+1)%4],.023,"limestone",6)
+box(-3.44,-4.16,4.235,1.56,.115,.08,"oak")
 box(-.9,-4.03,3.35,6.9,.36,.32,"earth")
 for k in range(22):shrub(-4.14+k*.30,-4.02,3.50,.40)
 # Tall limestone bay with paired arched windows.

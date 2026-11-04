@@ -52,7 +52,7 @@ export function createInterior(dialog, camera, controls, redraw) {
       current=null;material.map?.dispose();material.map=null;
     }
     dialog.classList.remove("inside-villa");exteriorBar.hidden=false;roomBar.hidden=true;enter.setAttribute("aria-expanded","false");
-    title.textContent="The Courtyard Villa";status.textContent="";hint.textContent="Drag to orbit · Pinch or scroll to zoom";
+    title.textContent="The Surat Courtyard Villa";status.textContent="";hint.textContent="Drag to orbit · Pinch or scroll to zoom";
     redraw();
   }
   const canvas=controls.domElement;
@@ -93,6 +93,7 @@ export function createInterior(dialog, camera, controls, redraw) {
   exit.onclick=()=>{leave();enter.focus()};
   roomBar.onclick=e=>{const button=e.target.closest("[data-room]");if(button)visit(button.dataset.room)};
   return {
+    get room(){return current},
     get scene(){return current?scene:null},
     dispose(){
       disposed=true;

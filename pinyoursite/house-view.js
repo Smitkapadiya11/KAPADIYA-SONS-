@@ -4,6 +4,8 @@ import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
 
 import {createInterior} from "./interior-view.js";
 
+import {villaDimensions} from "./villa-dimensions.js";
+
 export async function startHouse(dialog) {
   const stage = dialog.querySelector(".house-stage");
   const scene = new THREE.Scene();
@@ -51,6 +53,7 @@ export async function startHouse(dialog) {
   };
   let active="street", flight=null, frame=0, disposed=false;
   let interior;
+  const dimensions=villaDimensions(dialog,camera,draw);
   let lastFrame=0, slowFrames=0;
   const finishes=[];
   const buttons=[...dialog.querySelectorAll("[data-view]")];
@@ -90,6 +93,7 @@ export async function startHouse(dialog) {
     }
     lastFrame=now;
     renderer.render(interior?.scene || scene,camera);
+    dimensions.update(interior?.room || "exterior",stage.clientWidth,stage.clientHeight);
     if(flight) draw();
   }
   controls.addEventListener("change",draw);
@@ -103,7 +107,7 @@ export async function startHouse(dialog) {
   }
   const observer=new ResizeObserver(resize);
   function dispose(){
-    disposed=true;cancelAnimationFrame(frame);observer.disconnect();interior?.dispose();controls.dispose();
+    disposed=true;cancelAnimationFrame(frame);observer.disconnect();dimensions.dispose();interior?.dispose();controls.dispose();
     reflection?.dispose();finishes.forEach(texture=>texture.dispose());
     scene.traverse(o=>{o.geometry?.dispose();if(o.material) o.material.dispose()});
     sun.shadow.map?.dispose();renderer.dispose();renderer.forceContextLoss();canvas.remove();
@@ -121,12 +125,12 @@ export async function startHouse(dialog) {
       return c;
     });
     reflection=new THREE.CubeTexture(sides);reflection.colorSpace=THREE.SRGBColorSpace;reflection.needsUpdate=true;
-    for(const [name,materials] of [["stone",["stucco","limestone","paving","basalt"]],["timber",["oak"]]]){
+    for(const [name,materials] of [["surat-stone",["limestone","stucco"]],["kota",["paving","basalt"]],["surat-teak",["oak"]]]){
       const texture=await new THREE.TextureLoader().loadAsync("/finishes/"+name+".webp");
       texture.colorSpace=THREE.SRGBColorSpace;texture.wrapS=texture.wrapT=THREE.RepeatWrapping;
       texture.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
       finishes.push(texture);
-      model.traverse(o=>{if(o.isMesh && materials.includes(o.material.name))o.material.map=texture});
+      model.traverse(o=>{if(o.isMesh && materials.includes(o.material.name)){o.material.map=texture;o.material.color.set(0xf4ecdf)}});
     }
     model.traverse(o=>{
       if(!o.isMesh)return;

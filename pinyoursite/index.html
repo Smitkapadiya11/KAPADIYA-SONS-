@@ -80,9 +80,9 @@
     </div>
     <div class="dock">
       <div id="parcel-info" hidden>
-        <small>ILLUSTRATIVE SITE PLAN</small><strong>Plot 25 · Courtyard Villa</strong>
+        <small>ILLUSTRATIVE SITE PLAN</small><strong>Plot 25 · Surat Courtyard Villa</strong>
         <span id="parcel-size"></span>
-        <div><button id="parcel-focus">Inspect plot</button><button id="parcel-angle" hidden>Change angle</button><button id="open-house" aria-haspopup="dialog">Tour the villa ↗</button></div>
+        <div><button id="parcel-focus">Inspect plot</button><button id="open-house" aria-haspopup="dialog">See sample plot ↗</button></div>
       </div>
       <div class="dock-top">
         <button id="parcel-toggle" aria-label="Sample House 3D View" aria-pressed="false" aria-controls="villa-parcel parcel-info">3D HOUSE <span class="switch"></span></button>
@@ -219,7 +219,8 @@
     </section>
     <dialog id="house-view" aria-labelledby="house-title">
       <div class="house-stage"></div>
-      <header class="house-heading"><small>PINYOURSITE &nbsp; / &nbsp; DESIGN STUDY 01</small><h1 id="house-title">The Courtyard Villa</h1><p>Gallery-inspired exterior and furnished interiors</p></header>
+      <svg id="villa-lines" aria-hidden="true"></svg><button id="measure-villa" aria-pressed="true">Demo dimensions</button>
+      <header class="house-heading"><small>PINYOURSITE &nbsp; / &nbsp; DESIGN STUDY 01</small><h1 id="house-title">The Surat Courtyard Villa</h1><p>Teak, sandstone and Ajrakh · Surat design study</p><span class="villa-facts" hidden>Demo room · approx. 6.84 × 6.85 m</span></header>
       <button id="house-close" aria-label="Return to plot plan">×</button>
       <p id="house-status" role="status"></p>
       <div class="house-controls"><div role="group" aria-label="House camera views">

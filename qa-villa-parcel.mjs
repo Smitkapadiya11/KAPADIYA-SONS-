@@ -9,20 +9,16 @@ try{
   const before=await transform();
   await page.locator('#parcel-toggle').click();
   assert.equal(await transform(),before);assert.ok(!await page.locator('#house-view').isVisible());
-  await page.waitForSelector('#villa-parcel canvas');
+  assert.equal(await page.locator('#parcel-info button:visible').count(),2);
   await page.locator('#parcel-focus').click();await page.waitForTimeout(1250);
   const bounds=await page.locator('#villa-parcel').boundingBox(),plot=await page.locator('[data-plot="25"] polygon').evaluate(el=>{
     const b=el.getBBox(),m=el.getScreenCTM(),p=new DOMPoint(b.x,b.y).matrixTransform(m);
     return {x:p.x,y:p.y,width:b.width*m.a,height:b.height*m.d};
   });
   for(const k of ['x','y','width','height'])assert.ok(Math.abs(bounds[k]-plot[k])<1);
-  const crop=page.locator('#villa-parcel');
-  const first=await crop.screenshot();
-  await page.screenshot({path:'../plot25-'+width+'.jpg'});
-  await page.locator('#parcel-angle').click();assert.ok(!first.equals(await crop.screenshot()));
   await page.locator('#parcel-toggle').click();assert.equal(await page.locator('#villa-parcel canvas').count(),0);
   await page.close();
  }
 }finally{await browser.close()}
-console.log('In-place toggle, plot registration, camera angles and removal passed on both sizes.');
+console.log('In-place toggle, plot registration, two-action card and removal passed on both sizes.');
 
