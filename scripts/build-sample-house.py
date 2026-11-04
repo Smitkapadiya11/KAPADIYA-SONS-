@@ -147,7 +147,41 @@ for mat,(points,faces) in geometry.items():
     shader.inputs["Base Color"].default_value=material.diffuse_color
     shader.inputs["Roughness"].default_value=.27 if mat=="glass" else .79
     m.materials.append(material)
-bpy.ops.export_scene.gltf(filepath=str(root/"public"/"sample-house.glb"),export_format="GLB",export_yup=True)
+# Bake contact occlusion into glTF vertex colours. The mobile renderer can
+# reuse this lighting at every orbit angle, including under the eaves.
+from mathutils.bvhtree import BVHTree
+vertices, polygons = [], []
+for points,faces in geometry.values():
+    start=len(vertices); vertices.extend(points)
+    polygons.extend(tuple(start+j for j in f) for f in faces)
+tree=BVHTree.FromPolygons(vertices,polygons)
+for ob in bpy.context.scene.objects:
+    model=ob.data
+    uv=model.uv_layers.new(name="Finish")
+    colors=model.color_attributes.new(name="Contact shade",type="BYTE_COLOR",domain="CORNER")
+    cache={}
+    for face in model.polygons:
+        n=face.normal
+        tangent=n.cross(Vector((0,0,1)) if abs(n.z)<.85 else Vector((1,0,0))).normalized()
+        bitangent=n.cross(tangent)
+        for index in face.loop_indices:
+            vi=model.loops[index].vertex_index
+            v=model.vertices[vi].co
+            if abs(n.z)>.65: coords=(v.x,v.y)
+            elif abs(n.x)>.65: coords=(v.y,v.z)
+            else: coords=(v.x,v.z)
+            uv.data[index].uv=(coords[0]/1.6,coords[1]/1.6)
+            key=(vi,tuple(round(c,2) for c in n))
+            if key not in cache:
+                hits=0
+                for j in range(8):
+                    a=j*2.4;h=(j+.5)/8
+                    ray=(n*h+(tangent*math.cos(a)+bitangent*math.sin(a))*math.sqrt(1-h*h)).normalized()
+                    hit=tree.ray_cast(v+n*.027+ray*.012,ray,1.25)
+                    if hit[0] is not None: hits+=1-hit[3]/1.25
+                cache[key]=1-.49*hits/8
+            shade=cache[key];colors.data[index].color=(shade,shade,shade,1)
+bpy.ops.export_scene.gltf(filepath=str(root/"public"/"sample-house.glb"),export_format="GLB",export_yup=True,export_vertex_color="ACTIVE")
 
 # Keep an editable native scene alongside the generator, outside the web payload.
 for screen in bpy.data.screens:

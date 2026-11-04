@@ -212,12 +212,15 @@
     </section>
     <dialog id="house-view" aria-labelledby="house-title">
       <div class="house-stage"></div>
-      <header class="house-heading"><small>PINYOURSITE &nbsp; / &nbsp; DESIGN STUDY 01</small><h1 id="house-title">The Courtyard Villa</h1><p>Sample exterior inspired by the project gallery</p></header>
+      <header class="house-heading"><small>PINYOURSITE &nbsp; / &nbsp; DESIGN STUDY 01</small><h1 id="house-title">The Courtyard Villa</h1><p>Gallery-inspired exterior and furnished interiors</p></header>
       <button id="house-close" aria-label="Return to plot plan">×</button>
       <p id="house-status" role="status"></p>
       <div class="house-controls"><div role="group" aria-label="House camera views">
         <button data-view="street">Street</button><button data-view="balcony">Balcony</button><button data-view="aerial">Aerial</button>
-      </div><p>Drag to orbit · Pinch or scroll to zoom</p></div>
+        <button id="tour-inside" aria-expanded="false">Go inside ↗</button>
+      </div><div class="room-controls" role="group" aria-label="Interior rooms" hidden>
+        <button data-room="living">Living</button><button data-room="kitchen">Kitchen</button><button data-room="bedroom">Bedroom</button><button data-room="bath">Bath</button><button id="tour-outside">Outside ↗</button>
+      </div><p id="tour-hint">Drag to orbit · Pinch or scroll to zoom</p></div>
     </dialog>
     <div id="toast" role="status"></div>
     <script type="module" src="/app.js"></script>

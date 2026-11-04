@@ -1344,3 +1344,10 @@ p {
 .house-controls{position:absolute;bottom:max(20px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;display:none}.house-ready .house-controls{display:block}
 .house-controls div{display:inline-flex;background:#243b30;padding:5px;border-radius:28px}.house-controls button{min-height:42px;padding:0 18px;border:0;border-radius:22px;background:transparent;color:white;font:600 14px system-ui}.house-controls button[aria-pressed=true]{background:#d9eeac;color:#243b30}.house-controls p{margin-top:8px}
 #house-status:not(:empty){position:absolute;bottom:13%;width:100%;text-align:center;padding:12px;background:#eceadddd;color:#233d30}.house-fallback .house-stage{background:url(/gallery/12.webp) center / contain no-repeat}
+.house-controls [hidden]{display:none!important}
+.house-controls button:focus-visible{outline:2px solid #f4df8c;outline-offset:-3px}
+@media(max-width:520px){.house-controls{max-width:calc(100% - 12px)}.house-controls button{padding:0 10px;font-size:13px}.house-controls p{font-size:11px}}
+@media(max-width:345px){.house-controls button{padding:0 7px}}
+.inside-villa .house-heading{background:#19251fe3;color:white;padding:11px 17px;border-radius:14px;max-width:calc(100% - 85px)}
+.inside-villa .house-heading h1{color:#fffaed}.inside-villa .house-heading small{color:#d3dabb}.inside-villa .house-heading p{display:none}
+.inside-villa #tour-hint{background:#233c30ed;color:white;padding:5px 9px;border-radius:14px}
