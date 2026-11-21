@@ -11,7 +11,7 @@ function load(tag, attrs) {
   });
 }
 let ready;
-const leaflet = () =>
+export const leaflet = () =>
   (ready ||= Promise.all([load("link", { rel: "stylesheet", href: MAP + "leaflet.css" }), load("script", { src: MAP + "leaflet.js" })])
     .then(() => load("script", { src: MAP + "leaflet-rotate.js" })));
 
@@ -20,7 +20,12 @@ export async function satellite(dialog, data) {
   const L = window.L;
   const center = [data.latitude, data.longitude];
   const projectAngle = 49;
-  const initialZoom = () => (innerWidth < 700 ? 17.9 : 18.5);
+  // Fit the rotated 355 m site plan inside the screen, like a framed overview.
+  const initialZoom = () => {
+    const el = dialog.querySelector("#satellite"), fit = Math.min(el.clientWidth, el.clientHeight - 140) * 0.78;
+    const metresPerPixel = 355 / Math.max(240, fit);
+    return Math.min(18.5, Math.max(15, Math.log2((156543.033928 * Math.cos((center[0] * Math.PI) / 180)) / metresPerPixel)));
+  };
   const map = L.map(dialog.querySelector("#satellite"), {
     rotate: true, bearing: -projectAngle, rotateControl: false, zoomControl: false,
     zoomSnap: 0.1, minZoom: 12, maxZoom: 21, zoomAnimation: false,

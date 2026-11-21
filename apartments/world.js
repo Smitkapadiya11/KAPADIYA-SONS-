@@ -501,7 +501,9 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
       project(unitLabel, t.x + (sx * plate.w) / 4, PODIUM + (u.unit.floor - 1) * FLOOR + 3.4, t.z + (sz * plate.d) / 4);
     } else unitLabel.hidden = true;
   }
+  let paused = false;
   function frame(now) {
+    if (paused) { raf = 0; return; }
     raf = requestAnimationFrame(frame);
     const flying = stepFlight(now);
     if (modeTween) {
@@ -639,5 +641,11 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
       modeTween = { from: modeState.t, to: next === "dusk" ? 1 : 0, start: performance.now() };
     },
     get balconyActive() { return Boolean(balcony); },
+    // Full-screen overlays (map, flat tour) get the GPU to themselves.
+    pause(on) {
+      paused = on;
+      canvas.style.visibility = on ? "hidden" : "";
+      if (!on && !raf) { needsRender = true; raf = requestAnimationFrame(frame); }
+    },
   };
 }

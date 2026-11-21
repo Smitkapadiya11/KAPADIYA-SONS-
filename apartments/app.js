@@ -211,6 +211,7 @@ async function openFlat() {
   if (!poster.hasAttribute("src")) poster.src = poster.dataset.src;
   translate(tour);
   tour.showModal();
+  world?.pause(true);
   tour.classList.remove("interactive");
   q("#flat-hint").textContent = t("flat.loading");
   try {
@@ -225,6 +226,7 @@ async function openFlat() {
 }
 q("#close-flat").onclick = () => tour.close();
 tour.addEventListener("close", () => {
+  world?.pause(false);
   ++tourTicket;
   releaseTour?.();
   releaseTour = null;
@@ -321,18 +323,25 @@ async function gpsPanel() {
   if (panel.open) panel.close();
   translate(gps);
   gps.showModal();
+  world?.pause(true);
+  q("#gps").classList.add("loading");
   const u = new URL(location.href);
   u.searchParams.set("map", "true");
   history.replaceState(null, "", u);
   try {
     const { satellite } = await import("./satellite.js");
     closeMap = await satellite(gps, data);
+    q("#gps").classList.remove("loading");
   } catch {
+    q("#gps").classList.remove("loading");
     q("#tile-status").textContent = t("gps.tiles");
   }
 }
 q("#gps-back").onclick = () => gps.close();
+q("#gps-close").onclick = () => gps.close();
 gps.addEventListener("close", () => {
+  world?.pause(false);
+  q("#gps").classList.remove("loading");
   closeMap?.();
   closeMap = null;
   const u = new URL(location.href);
@@ -418,6 +427,8 @@ async function boot() {
     else world.intro();
     render();
     setTimeout(() => q("#hint").classList.add("gone"), 7000);
+    // Warm the map scripts after the 3D world is up so GPS opens instantly.
+    setTimeout(() => import("./satellite.js").then((m) => m.leaflet()).catch(() => {}), 2500);
   } catch (error) {
     console.error(error);
     q("p", loader).textContent = t("loading.fail");
