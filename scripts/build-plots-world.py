@@ -344,6 +344,30 @@ def home_d():
     return g.build()
 
 
+def car():
+    """A compact hatchback, nose towards -Y (Three.js +Z). Paint is tinted per instance."""
+    material('carpaint', 'ffffff', .3, .5)
+    material('tyre', '1b1c1e', .9)
+    material('carglass', '1c2830', .05, .6)
+    material('lamp', 'fff1d0', .3, emit='ffd9a0')
+    material('chrome', 'c9ccd0', .2, 1.)
+    g = Group('car')
+    body = [(-.86, -2.05), (.86, -2.05), (.9, 1.95), (-.9, 1.95)]
+    g.prism('carpaint', body, .32, .86, bottom=True)
+    extrude_x(g, 'carpaint', [(-1.0, .86), (1.85, .86), (1.7, 1.38), (.75, 1.5), (-.35, 1.5), (-1.15, .98)], -.78, .78)
+    extrude_x(g, 'carglass', [(-.95, .93), (1.72, .93), (1.6, 1.33), (.74, 1.44), (-.3, 1.44), (-1.04, 1.0)], -.795, .795)
+    g.box('carpaint', 0, .3, .88, 1.5, .1, .55)
+    for x in (-.82, .82):
+        for y in (-1.3, 1.35):
+            g.box('tyre', x, y, .02, .24, .66, .62)
+            g.box('chrome', x + (.13 if x > 0 else -.13), y, .2, .02, .32, .26)
+    for x in (-.6, .6):
+        g.box('lamp', x, -2.06, .62, .38, .04, .12)
+    g.box('chrome', 0, -2.08, .38, 1.5, .06, .1)
+    g.box('tyre', 0, 0, .3, 1.7, 3.9, .06)
+    return g.build()
+
+
 reset()
 palette()
 build_site()
@@ -351,7 +375,7 @@ export(out / 'site.glb')
 
 reset()
 home_palette()
-for fn in (home_a, home_b, home_c, home_d):
+for fn in (home_a, home_b, home_c, home_d, car):
     fn()
 props()
 export(out / 'kit.glb')

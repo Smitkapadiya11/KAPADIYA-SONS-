@@ -1,19 +1,19 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { qualityTier, createSky, loadSurfaces, applySurface, SURFACES, createPipeline } from "./realism.js";
 import { dimensions } from "./geometry.js";
 import { plotLayout, toWorld } from "./layout.js";
 
 const STATUS = { available: 0x2ec27e, hold: 0xf5a524, sold: 0xe5484d };
 const MODES = {
   day: {
-    top: 0x6f9fd6, horizon: 0xeee6d6, sun: 0xfff0d8, sunI: 3.1, sunPos: [-70, 120, 60],
-    hemiSky: 0xd6e6ff, hemiGround: 0x6d5b40, hemiI: 1.05, glass: 0, lamp: 0.25, exposure: 1, env: 0.45,
+    elevation: 32, azimuth: 225, turbidity: 4, rayleigh: 1.2, brightness: 0.3, fog: 0xcfd8de, sun: 0xffe9cc, sunI: 2.7,
+    hemiSky: 0xcfdcf0, hemiGround: 0x5a4a35, hemiI: 0.7, glass: 0, lamp: 0.25, exposure: 0.98, env: 0.55,
   },
   dusk: {
-    top: 0x111733, horizon: 0xe2875a, sun: 0xff9c5c, sunI: 0.85, sunPos: [110, 30, -40],
-    hemiSky: 0x48558a, hemiGround: 0x1f1915, hemiI: 0.42, glass: 1.15, lamp: 4, exposure: 0.95, env: 0.12,
+    elevation: 5, azimuth: 290, turbidity: 8, rayleigh: 2.4, brightness: 0.55, fog: 0x8a6a5c, sun: 0xffa060, sunI: 1.4,
+    hemiSky: 0x6c7cb8, hemiGround: 0x2a221c, hemiI: 1.0, glass: 1.4, lamp: 4, exposure: 1.2, env: 0.45,
   },
 };
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -96,7 +96,10 @@ function fillPositions(points, y) {
 export async function createWorld({ host, labels, plots, onPick, onHover, onProgress }) {
   const mobile = matchMedia("(max-width: 760px), (pointer: coarse)").matches;
   const lowMemory = (navigator.deviceMemory || 8) < 4;
-  const renderer = new THREE.WebGLRenderer({ antialias: !mobile || devicePixelRatio < 2, powerPreference: "high-performance" });
+  let tier = qualityTier(mobile);
+  let pipeline = null;
+  // Post-processing does its own anti-aliasing (SMAA), so MSAA is only for the low tier.
+  const renderer = new THREE.WebGLRenderer({ antialias: tier === "low", powerPreference: "high-performance", stencil: false });
   const maxRatio = Math.min(devicePixelRatio, mobile ? 1.6 : 1.75);
   let ratio = maxRatio;
   renderer.setPixelRatio(ratio);
@@ -118,8 +121,8 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
   controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
 
   // Lighting and atmosphere.
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  const sky = createSky(renderer);
+  scene.add(sky.mesh);
   const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
   const sun = new THREE.DirectionalLight(0xffffff, 3);
   sun.castShadow = true;
@@ -128,16 +131,6 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
   sun.shadow.bias = -0.0004;
   sun.shadow.normalBias = 0.05;
   scene.add(hemi, sun, sun.target);
-  const skyUniforms = { top: { value: new THREE.Color() }, horizon: { value: new THREE.Color() } };
-  const sky = new THREE.Mesh(
-    new THREE.SphereGeometry(1500, 32, 16),
-    new THREE.ShaderMaterial({
-      side: THREE.BackSide, depthWrite: false, fog: false, uniforms: skyUniforms,
-      vertexShader: "varying vec3 v; void main(){ v=normalize(position); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }",
-      fragmentShader: "uniform vec3 top;\nuniform vec3 horizon;\nvarying vec3 v;\nvoid main(){\nfloat h=smoothstep(-.02,.55,v.y);\ngl_FragColor=vec4(mix(horizon,top,h),1.);\n#include <colorspace_fragment>\n}",
-    }),
-  );
-  scene.add(sky);
   scene.fog = new THREE.Fog(0xffffff, 260, 1100);
 
   const grass = noiseTexture([104, 132, 70], 34);
@@ -146,6 +139,7 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
     new THREE.PlaneGeometry(3000, 3000),
     new THREE.MeshStandardMaterial({ map: grass, roughness: 1 }),
   );
+  ground.userData.uvScale = 3000;
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.05;
   ground.receiveShadow = true;
@@ -171,12 +165,13 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
     if (m.name === "lawn") { m.map = lawn; m.color.set(0xffffff); }
     if (m.name === "earth") { m.map = earth; m.color.set(0xffffff); }
     if (m.name === "glass") {
-      Object.assign(m, { roughness: 0.06, metalness: 0.35, emissiveMap: windows, envMapIntensity: 1.6 });
-      m.color.set(0x5d7682);
+      Object.assign(m, { roughness: 0.12, metalness: 0.2, emissiveMap: windows, envMapIntensity: 0.9 });
+      m.color.set(0x24323a);
       m.emissive = new THREE.Color(0xffffff);
       glassMaterials.add(m);
     }
     if (m.name === "lamp") { m.emissive = new THREE.Color(0xffd29a); lampMaterials.add(m); }
+    if (m.name === "carpaint") { m.metalness = 0.15; m.roughness = 0.35; }
     if (m.name === "rail" || m.name === "net") { m.transparent = true; m.depthWrite = false; }
     m.side = m.transparent ? THREE.DoubleSide : THREE.FrontSide;
     if (m.name === "frond") m.side = THREE.DoubleSide;
@@ -216,7 +211,12 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
   // Trees and street lights from the Blender scatter.
   const groves = {};
   for (const [kind, x, z, s, r] of scatter.trees) (groves[kind] ||= []).push(m4(x, 0, z, r, s));
-  for (const kind in groves) instance("tree-" + kind, groves[kind], !mobile || kind !== "cone");
+  // Natural variation: every tree gets its own shade of green.
+  const shade = new THREE.Color();
+  for (const kind in groves)
+    for (const im of instance("tree-" + kind, groves[kind], tier !== "low" || kind !== "cone"))
+      if (/leaf|frond/.test(im.material.name))
+        for (let i = 0; i < im.count; i++) im.setColorAt(i, shade.setHSL(0.24 + Math.sin(i * 12.9) * 0.04, 0.35 + Math.sin(i * 7.1) * 0.12, 0.42 + Math.sin(i * 3.7) * 0.1));
   instance("lamp", scatter.lamps.map(([x, z, side]) => m4(x, 0.05, z, side > 0 ? 0 : Math.PI, 1)), false);
 
   // Plots: parcels, status rings and one home per plot.
@@ -238,7 +238,7 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
   const parcelGeometry = new THREE.BufferGeometry();
   parcelGeometry.setAttribute("position", new THREE.Float32BufferAttribute(parcelPos, 3));
   parcelGeometry.setAttribute("color", new THREE.Float32BufferAttribute(parcelColor, 3));
-  parcelGeometry.setAttribute("uv", new THREE.Float32BufferAttribute(parcelPos.filter((_, i) => i % 3 !== 1).map((v) => v * 0.35), 2));
+  parcelGeometry.setAttribute("uv", new THREE.Float32BufferAttribute(parcelPos.filter((_, i) => i % 3 !== 1), 2));
   parcelGeometry.computeVertexNormals();
   const parcels = new THREE.Mesh(parcelGeometry, new THREE.MeshStandardMaterial({ map: lawn, vertexColors: true, roughness: 0.95 }));
   parcels.receiveShadow = true;
@@ -269,6 +269,19 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
   }
   const homes = [];
   for (const d in homeIds) for (const im of instance("home-" + d, homeMatrices[d])) { im.userData.ids = homeIds[d]; homes.push(im); }
+
+  // Parked cars in the driveways of sold and builder-held plots, in varied paint.
+  const carMatrices = [], local = new THREE.Matrix4();
+  for (const p of plots) {
+    if (p.status === "available") continue;
+    const L = layouts.get(p.id), sz = THREE.MathUtils.clamp((L.depth * 0.92) / 13.25, 0.72, 1.35);
+    const rot = Math.atan2(L.front.x, L.front.z), off = 1.375 * sz;
+    const base = m4(L.centre.x - L.front.x * off, 0.07, L.centre.z - L.front.z * off, rot, 1);
+    carMatrices.push(base.multiply(local.makeTranslation(1.05, 0, 5.2 * sz)));
+  }
+  const paints = [0xd9d9d4, 0xb8bcc0, 0x1d1f22, 0x7a1f24, 0x1f3550, 0xc8b79a, 0x5c6266];
+  const cars = instance("car", carMatrices);
+  for (const im of cars) if (im.material.name === "carpaint") for (let i = 0; i < im.count; i++) im.setColorAt(i, new THREE.Color(paints[(i * 5) % paints.length]));
 
   // Selection and hover overlays.
   const overlay = new THREE.Group();
@@ -310,25 +323,29 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
   const modeState = { t: 0 };
 
   function applyMode(t) {
-    const a = MODES.day, b = MODES.dusk, mix = (x, y) => new THREE.Color(x).lerp(new THREE.Color(y), t);
-    skyUniforms.top.value.copy(mix(a.top, b.top));
-    skyUniforms.horizon.value.copy(mix(a.horizon, b.horizon));
-    scene.fog.color.copy(skyUniforms.horizon.value);
+    const a = MODES.day, b = MODES.dusk, mix = (x, y) => new THREE.Color(x).lerp(new THREE.Color(y), t), lerp = THREE.MathUtils.lerp;
+    sky.set({
+      elevation: lerp(a.elevation, b.elevation, t), azimuth: lerp(a.azimuth, b.azimuth, t),
+      turbidity: lerp(a.turbidity, b.turbidity, t), rayleigh: lerp(a.rayleigh, b.rayleigh, t), brightness: lerp(a.brightness, b.brightness, t),
+    });
+    scene.fog.color.copy(mix(a.fog, b.fog));
     sun.color.copy(mix(a.sun, b.sun));
-    sun.intensity = THREE.MathUtils.lerp(a.sunI, b.sunI, t);
+    sun.intensity = lerp(a.sunI, b.sunI, t);
+    sun.position.copy(sky.sun).multiplyScalar(170);
     hemi.color.copy(mix(a.hemiSky, b.hemiSky));
     hemi.groundColor.copy(mix(a.hemiGround, b.hemiGround));
-    hemi.intensity = THREE.MathUtils.lerp(a.hemiI, b.hemiI, t);
-    renderer.toneMappingExposure = THREE.MathUtils.lerp(a.exposure, b.exposure, t);
-    scene.environmentIntensity = THREE.MathUtils.lerp(a.env, b.env, t);
-    glassMaterials.forEach((m) => (m.emissiveIntensity = THREE.MathUtils.lerp(a.glass, b.glass, t)));
-    lampMaterials.forEach((m) => (m.emissiveIntensity = THREE.MathUtils.lerp(a.lamp, b.lamp, t)));
-    const p = new THREE.Vector3(...a.sunPos).lerp(new THREE.Vector3(...b.sunPos), t);
-    sun.position.copy(p);
+    hemi.intensity = lerp(a.hemiI, b.hemiI, t);
+    renderer.toneMappingExposure = lerp(a.exposure, b.exposure, t);
+    scene.environmentIntensity = lerp(a.env, b.env, t);
+    glassMaterials.forEach((m) => (m.emissiveIntensity = lerp(a.glass, b.glass, t)));
+    lampMaterials.forEach((m) => (m.emissiveIntensity = lerp(a.lamp, b.lamp, t)));
+    // Glow belongs to lamps and lit windows; keep sunlit white paint and plaster crisp.
+    if (pipeline) pipeline.bloom.luminanceMaterial.threshold = lerp(1.6, 0.8, t);
     renderer.shadowMap.needsUpdate = true;
     needsRender = true;
   }
   applyMode(0);
+  scene.environment = sky.environment();
 
   // Camera framing.
   const estate = { x: -6, z: -1 };
@@ -490,7 +507,7 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
       const t = Math.min(1, (now - modeTween.start) / 900);
       modeState.t = THREE.MathUtils.lerp(modeTween.from, modeTween.to, ease(t));
       applyMode(modeState.t);
-      if (t === 1) modeTween = null;
+      if (t === 1) { modeTween = null; scene.environment = sky.environment(); }
     }
     const moved = controls.update();
     const pulse = selected != null;
@@ -501,10 +518,14 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
     const dt = now - last;
     last = now;
     slow = dt > 24 && dt < 120 ? slow + 1 : 0;
-    if (slow > 14 && ratio > 1) { ratio = Math.max(1, ratio - 0.25); renderer.setPixelRatio(ratio); slow = 0; }
+    if (slow > 14) {
+      slow = 0;
+      if (ratio > 1) { ratio = Math.max(1, ratio - 0.25); renderer.setPixelRatio(ratio); pipeline?.setSize(width, height); }
+      else if (tier !== "low") downgrade();
+    }
     clearTimeout(sharpen);
-    if (ratio < maxRatio) sharpen = setTimeout(() => { ratio = maxRatio; renderer.setPixelRatio(ratio); needsRender = true; }, 900);
-    renderer.render(scene, camera);
+    if (ratio < maxRatio) sharpen = setTimeout(() => { ratio = maxRatio; renderer.setPixelRatio(ratio); pipeline?.setSize(width, height); needsRender = true; }, 900);
+    pipeline ? pipeline.render() : renderer.render(scene, camera);
     updateLabels();
   }
   function resize() {
@@ -516,6 +537,7 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
     camera.fov = camera.aspect < 0.8 ? 50 : 40;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    pipeline?.setSize(width, height);
     needsRender = true;
   }
   const observer = new ResizeObserver(resize);
@@ -524,6 +546,31 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
   place({ ...homeView(), distance: 420, polar: 0.12, azimuth: -1.1 });
   renderer.shadowMap.needsUpdate = true;
   renderer.compile(scene, camera);
+
+  // Post effects, then stream the PBR textures in after the first frame.
+  pipeline = createPipeline(renderer, scene, camera, tier);
+  applyMode(modeState.t);
+  if (!pipeline) renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  const textured = new Set();
+  scene.traverse((o) => { if (o.isMesh && o.material?.isMeshStandardMaterial) textured.add(o); });
+  loadSurfaces(tier === "low" ? 2 : 8).then((sets) => {
+    for (const o of textured) {
+      const key = o === ground || o === parcels ? "grass" : SURFACES[o.material.name];
+      if (!key || o.material.userData.surfaced) continue;
+      applySurface(o.material, sets[key], o.userData.uvScale || 1);
+      // The photo grass is bright; tone it to a natural Gujarat lawn.
+      if (key === "grass") o.material.color.set(o === parcels ? 0xb4be9a : 0x9aa384);
+      if (key === "wood") o.material.color.set(0xe0a874);
+      o.material.userData.surfaced = true;
+    }
+    needsRender = true;
+  }).catch(() => {});
+  // Step quality down if this device cannot keep up.
+  function downgrade() {
+    if (tier === "high") { tier = "medium"; pipeline?.dispose(); pipeline = createPipeline(renderer, scene, camera, tier); pipeline?.setSize(width, height); applyMode(modeState.t); }
+    else if (tier === "medium") { tier = "low"; pipeline?.dispose(); pipeline = null; renderer.toneMapping = THREE.ACESFilmicToneMapping; }
+    needsRender = true;
+  }
   raf = requestAnimationFrame(frame);
 
   return {
@@ -541,6 +588,7 @@ export async function createWorld({ host, labels, plots, onPick, onHover, onProg
     setHomes(on) {
       homesVisible = on;
       homes.forEach((h) => (h.visible = on));
+      cars.forEach((c) => (c.visible = on));
       renderer.shadowMap.needsUpdate = true;
       needsRender = true;
     },
