@@ -1,0 +1,27 @@
+#house-view{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;max-height:none;margin:0;border:0;padding:0;border-radius:0;overflow:hidden;color:#233d30;background:radial-gradient(ellipse at 48% 40%,#f5f0e2,#e0ddce 69%,#c4c5b8)}
+.house-stage{position:absolute;inset:0}.house-stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.house-heading{pointer-events:none;position:absolute;top:max(22px,env(safe-area-inset-top));left:clamp(18px,4vw,60px)}
+.house-heading small{font:700 10px system-ui;letter-spacing:.18em;color:#48664e}.house-heading h1{font:normal clamp(28px,4vw,53px) Georgia;margin:6px 0;color:#213c30}.house-heading p,.house-controls p{margin:0;font:13px system-ui;color:#465548}
+#house-close{position:absolute;right:18px;top:max(18px,env(safe-area-inset-top));border:0;border-radius:50%;width:46px;height:46px;background:#233c30;color:white;font-size:25px}
+.house-controls{position:absolute;bottom:max(20px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap;display:none}.house-ready .house-controls{display:block}
+.house-controls div{display:inline-flex;background:#243b30;padding:5px;border-radius:28px}.house-controls button{min-height:42px;padding:0 18px;border:0;border-radius:22px;background:transparent;color:white;font:600 14px system-ui}.house-controls button[aria-pressed=true]{background:#d9eeac;color:#243b30}.house-controls p{margin-top:8px}
+#house-status:not(:empty){position:absolute;bottom:13%;width:100%;text-align:center;padding:12px;background:#eceadddd;color:#233d30}.house-fallback .house-stage{background:url(/gallery/12.webp) center / contain no-repeat}
+.house-controls [hidden]{display:none!important}
+.house-controls button:focus-visible{outline:2px solid #f4df8c;outline-offset:-3px}
+@media(max-width:520px){.house-controls{max-width:calc(100% - 12px)}.house-controls button{padding:0 10px;font-size:13px}.house-controls p{font-size:11px}}
+@media(max-width:345px){.house-controls button{padding:0 7px}}
+.inside-villa .house-heading{background:#19251fe3;color:white;padding:11px 17px;border-radius:14px;max-width:calc(100% - 85px)}
+.inside-villa .house-heading h1{color:#fffaed}.inside-villa .house-heading small{color:#d3dabb}.inside-villa .house-heading p{display:none}
+.inside-villa #tour-hint{background:#233c30ed;color:white;padding:5px 9px;border-radius:14px}
+#villa-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
+#villa-lines path{fill:none;stroke:#fcf2cc;stroke-width:1.4;filter:drop-shadow(0 1px 1px #272419)}
+#villa-lines text{text-anchor:middle;fill:#fff9e6;stroke:#25342be8;stroke-width:4px;stroke-linejoin:round;paint-order:stroke;font:600 12px system-ui}
+#measure-villa{display:none;position:absolute;right:18px;top:max(72px,calc(env(safe-area-inset-top) + 56px));border:1px solid #ffffff48;border-radius:20px;background:#233c30ed;color:#fff;padding:8px 12px;font:600 11px system-ui}
+.house-ready #measure-villa{display:block}#measure-villa[aria-pressed=false]{background:#505452}
+@media(max-width:520px){#measure-villa{top:auto;bottom:116px;right:12px}}
+.villa-facts{font:500 12px system-ui;color:#e1e6d9}.villa-facts[hidden]{display:none}
+.house-ready:not(.inside-villa) .house-heading{padding:10px 16px;background:#f7f2e5ed;border-radius:12px;max-width:calc(100% - 84px)}
+.house-ready:not(.inside-villa) #tour-hint{display:table;margin:7px auto 0;background:#f7f2e5ed;border-radius:14px;padding:4px 9px}
+/* Scripts other than Latin need their own faces; system-ui does not cover them everywhere. */
+#house-view :is(small,p,button,span,h1,text){font-family:var(--font, system-ui)}
+.house-heading h1{font-family:var(--display, Georgia)}

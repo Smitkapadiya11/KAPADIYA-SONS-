@@ -11,8 +11,8 @@ import {
 export default defineConfig({
   build: {
     rollupOptions: { preserveEntrySignatures: "exports-only",
-      input: {main:'index.html','flat-web':'flat-web.js'},
-      output: { entryFileNames: entry => entry.name==='flat-web' ? 'flat-web.js' : 'assets/[name]-[hash].js', manualChunks: { spatial: ['three'] } },
+      input: { main: 'index.html', apartments: 'apartments/index.html' },
+      output: { manualChunks: { spatial: ['three'] } },
     },
   },
   plugins: [

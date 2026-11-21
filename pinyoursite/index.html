@@ -2,233 +2,137 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1,viewport-fit=cover"
-    />
-    <meta name="theme-color" content="#101113" />
-    <title>PinYourSite by Kapadiya & Sons | Interactive Project Demo</title>
-    <meta
-      name="description"
-      content="Every plot, every dimension, every perspective. An interactive property demonstration by Kapadiya & Sons."
-    />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#0c1110" />
+    <title>PinYourSite by Kapadiya & Sons | 3D Plot Explorer</title>
+    <meta name="description" content="Every plot, every dimension, every perspective. Explore the estate in 3D, tap any plot and walk through a sample villa. In English, ગુજરાતી and हिन्दी." />
     <link rel="icon" href="/favicon.svg" />
-    <meta
-      property="og:image"
-      content="https://pinyoursite-kapadiya.vercel.app/gallery/01.webp"
-    />
+    <link rel="preload" href="/world/site.glb" as="fetch" crossorigin />
+    <link rel="preload" href="/world/kit.glb" as="fetch" crossorigin />
+    <meta property="og:title" content="PinYourSite · 3D Plot Explorer" />
+    <meta property="og:image" content="https://pinyoursite-kapadiya.vercel.app/gallery/01.webp" />
   </head>
   <body>
-    <a class="skip" href="#toolbar">Skip to project tools</a>
-    <header class="brand">
-      <a href="https://www.kapadiya.tech/#pinyoursite"
-        ><svg viewBox="0 0 36 42" aria-hidden="true">
-          <path
-            d="M18 2C-1 2-1 25 18 40C37 25 37 2 18 2Z"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-          />
-          <path
-            d="M11 22V13h14v9M18 13v16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-          /></svg
-        ><span>PinYourSite<small>BY KAPADIYA & SONS</small></span></a
-      ><span class="demo-label">DEMONSTRATION</span>
-    </header>
-    <button id="compass" aria-label="Reset map view">
-      <span class="north">N</span><span class="east">E</span
-      ><span class="south">S</span><span class="west">W</span><b>➤</b>
-    </button>
-    <main
-      id="map-viewport"
-      tabindex="0"
-      aria-label="Interactive masterplan. Drag to pan, scroll to zoom, select a plot for details."
-    >
-      <div id="map-transform">
-        <svg
-          id="plot-map"
-          width="1920"
-          height="1080"
-          viewBox="0 0 1920 1080"
-          aria-label="63 demonstration plots"
-        >
-          <image
-            id="map-image"
-            href="/masterplan.webp"
-            width="1920"
-            height="1080"
-          />
-          <g id="plots"></g>
-          <g id="dimensions" pointer-events="none"></g>
-          <g id="villa-survey" pointer-events="none"></g>
-        </svg>
-        <div id="villa-parcel" hidden aria-hidden="true"></div>
-      </div>
+    <a class="skip" href="#toolbar" data-i18n="skip">Skip to project tools</a>
+    <main id="stage" tabindex="-1" data-i18n-attr="aria-label:world.label">
+      <div id="labels" aria-hidden="false"></div>
     </main>
+
+    <div id="loader" role="status">
+      <div class="loader-mark">
+        <svg viewBox="0 0 36 42" aria-hidden="true"><path d="M18 2C-1 2-1 25 18 40C37 25 37 2 18 2Z" /><path d="M11 22V13h14v9M18 13v16" /></svg>
+      </div>
+      <strong>PinYourSite</strong>
+      <p data-i18n="loading">Building your neighbourhood in 3D…</p>
+      <div class="bar"><i id="progress"></i></div>
+    </div>
+
+    <header class="topbar">
+      <a class="brand" href="https://www.kapadiya.tech/#pinyoursite">
+        <svg viewBox="0 0 36 42" aria-hidden="true"><path d="M18 2C-1 2-1 25 18 40C37 25 37 2 18 2Z" /><path d="M11 22V13h14v9M18 13v16" /></svg>
+        <span>PinYourSite<small data-i18n="brand.by">BY KAPADIYA & SONS</small></span>
+      </a>
+      <span class="chip demo" data-i18n="demo">Demo project</span>
+      <span class="spacer"></span>
+      <div class="lang" id="lang"></div>
+      <button id="share" class="icon-btn" data-icon="share" data-i18n-attr="aria-label:share.project;title:share.project"></button>
+    </header>
+
+    <section class="rail" data-i18n-attr="aria-label:filter.label">
+      <div class="filters">
+        <button class="filter available" data-status="available" aria-pressed="true"><i></i><span data-i18n="status.available">Available</span><b></b></button>
+        <button class="filter hold" data-status="hold" aria-pressed="true"><i></i><span data-i18n="status.hold">Builder</span><b></b></button>
+        <button class="filter sold" data-status="sold" aria-pressed="true"><i></i><span data-i18n="status.sold">Sold</span><b></b></button>
+      </div>
+      <div class="switches">
+        <div class="segmented" role="group" data-i18n-attr="aria-label:mode.label">
+          <button data-mode="day" aria-pressed="true" data-i18n="mode.day">Day</button>
+          <button data-mode="dusk" aria-pressed="false" data-i18n="mode.dusk">Dusk</button>
+        </div>
+        <button id="homes" class="toggle" aria-pressed="true" data-i18n-attr="aria-label:homes.label"><span data-i18n="homes">Homes</span><i></i></button>
+        <button id="sample" class="chip-btn"><span class="spark"></span><span data-i18n="sample">Sample villa</span></button>
+      </div>
+    </section>
+
+    <button id="compass" class="icon-btn compass" data-i18n-attr="aria-label:reset;title:reset"><span>N</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 16 14H8Z" /></svg></button>
+    <p id="hint" data-i18n="hint">Drag to orbit · Pinch or scroll to zoom · Tap any plot</p>
     <div id="hover-tip" hidden></div>
-    <div class="legend" id="legend" hidden>
-      <button data-status="available" aria-pressed="true">
-        <i></i>AVAILABLE<span>✓</span></button
-      ><button data-status="hold" aria-pressed="true">
-        <i></i>BUILDER<span>✓</span></button
-      ><button data-status="sold" aria-pressed="true">
-        <i></i>SOLD<span>✓</span>
-      </button>
-    </div>
-    <div class="dock">
-      <div id="parcel-info" hidden>
-        <small>ILLUSTRATIVE SITE PLAN</small><strong>Plot 25 · Surat Courtyard Villa</strong>
-        <span id="parcel-size"></span>
-        <div><button id="parcel-focus">Inspect plot</button><button id="open-house" aria-haspopup="dialog">See sample plot ↗</button></div>
-      </div>
-      <div class="dock-top">
-        <button id="parcel-toggle" aria-label="Sample House 3D View" aria-pressed="false" aria-controls="villa-parcel parcel-info">3D HOUSE <span class="switch"></span></button>
-        <button id="legend-toggle" aria-pressed="false">
-          STATUS LEGEND <span class="switch"></span></button
-        ><button
-          id="home"
-          class="round"
-          aria-label="Home view"
-          data-icon="house"
-        ></button
-        ><button
-          id="share"
-          class="round"
-          aria-label="Share project"
-          data-icon="share"
-        ></button>
-      </div>
-      <nav id="toolbar" aria-label="Project tools">
-        <button data-panel="search"><i data-icon="search"></i>Search</button
-        ><button data-panel="details"><i data-icon="info"></i>Details</button
-        ><button data-panel="gallery"><i data-icon="image"></i>Gallery</button
-        ><button data-panel="nearby"><i data-icon="pin"></i>Nearby</button
-        ><button data-panel="gps"><i data-icon="navigation"></i>GPS</button
-        ><button data-panel="brochure"><i data-icon="file"></i>Brochure</button>
-      </nav>
-    </div>
-    <a
-      class="powered"
-      href="https://www.kapadiya.tech"
-      target="_blank"
-      rel="noopener"
-      >POWERED BY KAPADIYA & SONS</a
-    >
+
+    <aside id="plot-card" hidden aria-live="polite"></aside>
+
+    <nav id="toolbar" data-i18n-attr="aria-label:tools.label">
+      <button data-panel="search"><i data-icon="search"></i><span data-i18n="tool.search">Search</span></button>
+      <button data-panel="details"><i data-icon="info"></i><span data-i18n="tool.details">Details</span></button>
+      <button data-panel="gallery"><i data-icon="image"></i><span data-i18n="tool.gallery">Gallery</span></button>
+      <button data-panel="nearby"><i data-icon="pin"></i><span data-i18n="tool.nearby">Nearby</span></button>
+      <button data-panel="gps"><i data-icon="navigation"></i><span data-i18n="tool.gps">GPS</span></button>
+      <button data-panel="brochure"><i data-icon="file"></i><span data-i18n="tool.brochure">Brochure</span></button>
+    </nav>
+    <a class="powered" href="https://www.kapadiya.tech" target="_blank" rel="noopener" data-i18n="powered">POWERED BY KAPADIYA & SONS</a>
+
     <dialog id="panel" aria-labelledby="panel-title">
       <header>
         <h2 id="panel-title"></h2>
-        <button
-          id="close-panel"
-          class="round"
-          aria-label="Close panel"
-          data-icon="x"
-        ></button>
+        <button id="close-panel" class="icon-btn" data-icon="x" data-i18n-attr="aria-label:close"></button>
       </header>
       <div id="panel-body"></div>
     </dialog>
-    <aside id="plot-detail" aria-label="Selected plot details" hidden></aside>
-    <dialog id="lightbox" aria-label="Project gallery image">
+
+    <dialog id="lightbox" data-i18n-attr="aria-label:lightbox.label">
       <header>
         <span id="image-count"></span>
         <div>
-          <button
-            id="image-zoom"
-            class="round"
-            aria-label="Zoom image"
-            data-icon="search"
-          ></button
-          ><a
-            id="image-download"
-            class="round"
-            download
-            aria-label="Download image"
-            data-icon="download"
-          ></a
-          ><button
-            id="image-full"
-            class="round"
-            aria-label="Full screen"
-            data-icon="expand"
-          ></button
-          ><button
-            id="image-close"
-            class="round"
-            aria-label="Close image"
-            data-icon="x"
-          ></button>
+          <button id="image-zoom" class="icon-btn" data-icon="search" data-i18n-attr="aria-label:lightbox.zoom"></button>
+          <a id="image-download" class="icon-btn" download data-icon="download" data-i18n-attr="aria-label:lightbox.download"></a>
+          <button id="image-full" class="icon-btn" data-icon="expand" data-i18n-attr="aria-label:lightbox.full"></button>
+          <button id="image-close" class="icon-btn" data-icon="x" data-i18n-attr="aria-label:lightbox.close"></button>
         </div>
       </header>
-      <div class="lightbox-stage">
-        <img id="lightbox-image" alt="Project visualisation" />
-      </div>
-      <button id="image-prev" class="round" aria-label="Previous image">
-        ‹</button
-      ><button id="image-next" class="round" aria-label="Next image">›</button>
+      <div class="lightbox-stage"><img id="lightbox-image" alt="" /></div>
+      <button id="image-prev" class="icon-btn nav" data-i18n-attr="aria-label:lightbox.prev">‹</button>
+      <button id="image-next" class="icon-btn nav" data-i18n-attr="aria-label:lightbox.next">›</button>
       <div id="image-thumbs"></div>
     </dialog>
-    <section id="gps-view" aria-label="Satellite project location" hidden>
+
+    <section id="gps-view" data-i18n-attr="aria-label:gps.title" hidden>
       <div id="satellite-map"></div>
       <div class="gps-head">
-        <span>PinYourSite <small>DEMONSTRATION LOCATION</small></span
-        ><button
-          id="gps-close"
-          class="round"
-          aria-label="Close satellite map"
-          data-icon="x"
-        ></button>
+        <span>PinYourSite <small data-i18n="gps.sub">DEMONSTRATION LOCATION</small></span>
+        <button id="gps-close" class="icon-btn" data-icon="x" data-i18n-attr="aria-label:gps.close"></button>
       </div>
       <div class="gps-tools">
-        <button
-          id="gps-home"
-          class="round"
-          aria-label="Recenter project"
-          data-icon="house"
-        ></button
-        ><button id="gps-plus" class="round" aria-label="Zoom map in">+</button
-        ><button id="gps-minus" class="round" aria-label="Zoom map out">
-          −</button
-        ><button
-          id="gps-overlay"
-          class="round"
-          aria-label="Toggle project overlay"
-          aria-pressed="true"
-          data-icon="layers"
-        ></button
-        ><a
-          class="round"
-          href="https://www.google.com/maps/dir/?api=1&destination=21.25548,72.76072"
-          target="_blank"
-          rel="noopener"
-          aria-label="Get directions"
-          data-icon="navigation"
-        ></a>
+        <button id="gps-home" class="icon-btn" data-icon="house" data-i18n-attr="aria-label:gps.home"></button>
+        <button id="gps-plus" class="icon-btn" data-i18n-attr="aria-label:gps.in">+</button>
+        <button id="gps-minus" class="icon-btn" data-i18n-attr="aria-label:gps.out">−</button>
+        <button id="gps-overlay" class="icon-btn" aria-pressed="true" data-icon="layers" data-i18n-attr="aria-label:gps.overlay"></button>
+        <a class="icon-btn" href="https://www.google.com/maps/dir/?api=1&destination=21.25548,72.76072" target="_blank" rel="noopener" data-icon="navigation" data-i18n-attr="aria-label:gps.directions"></a>
       </div>
-      <button id="gps-explore">Explore the project ↗</button>
-      <p id="map-error" hidden>
-        Satellite tiles could not load.
-        <a
-          href="https://www.google.com/maps/search/?api=1&query=21.25548,72.76072"
-          target="_blank"
-          rel="noopener"
-          >Open Google Maps ↗</a
-        >
-      </p>
+      <button id="gps-explore" class="primary" data-i18n="gps.explore">Explore the project in 3D ↗</button>
+      <p id="map-error" hidden><span data-i18n="gps.error">Satellite tiles could not load.</span> <a href="https://www.google.com/maps/search/?api=1&query=21.25548,72.76072" target="_blank" rel="noopener" data-i18n="gps.google">Open Google Maps ↗</a></p>
     </section>
+
     <dialog id="house-view" aria-labelledby="house-title">
       <div class="house-stage"></div>
-      <svg id="villa-lines" aria-hidden="true"></svg><button id="measure-villa" aria-pressed="true">Demo dimensions</button>
-      <header class="house-heading"><small>PINYOURSITE &nbsp; / &nbsp; DESIGN STUDY 01</small><h1 id="house-title">The Surat Courtyard Villa</h1><p>Teak, sandstone and Ajrakh · Surat design study</p><span class="villa-facts" hidden>Demo room · approx. 6.84 × 6.85 m</span></header>
-      <button id="house-close" aria-label="Return to plot plan">×</button>
+      <svg id="villa-lines" aria-hidden="true"></svg>
+      <button id="measure-villa" aria-pressed="true" data-i18n="villa.measure">Demo dimensions</button>
+      <header class="house-heading">
+        <small data-i18n="villa.kicker">PINYOURSITE / DESIGN STUDY 01</small>
+        <h1 id="house-title" data-i18n="villa.title">The Surat Courtyard Villa</h1>
+        <p data-i18n="villa.sub">Teak, sandstone and Ajrakh · Surat design study</p>
+        <span class="villa-facts" hidden data-i18n="villa.facts">Demo room · approx. 6.84 × 6.85 m</span>
+      </header>
+      <button id="house-close" data-i18n-attr="aria-label:villa.back">×</button>
       <p id="house-status" role="status"></p>
-      <div class="house-controls"><div role="group" aria-label="House camera views">
-        <button data-view="street">Street</button><button data-view="balcony">Balcony</button><button data-view="aerial">Aerial</button>
-        <button id="tour-inside" aria-expanded="false">Go inside ↗</button>
-      </div><div class="room-controls" role="group" aria-label="Interior rooms" hidden>
-        <button data-room="living">Living</button><button data-room="kitchen">Kitchen</button><button data-room="bedroom">Bedroom</button><button data-room="bath">Bath</button><button id="tour-outside">Outside ↗</button>
-      </div><p id="tour-hint">Drag to orbit · Pinch or scroll to zoom</p></div>
+      <div class="house-controls">
+        <div role="group" aria-label="House camera views" data-views>
+          <button data-view="street" data-i18n="villa.street">Street</button><button data-view="balcony" data-i18n="villa.balcony">Balcony</button><button data-view="aerial" data-i18n="villa.aerial">Aerial</button>
+          <button id="tour-inside" aria-expanded="false" data-i18n="villa.inside">Go inside ↗</button>
+        </div>
+        <div class="room-controls" role="group" data-i18n-attr="aria-label:villa.rooms" hidden>
+          <button data-room="living" data-i18n="villa.living">Living</button><button data-room="kitchen" data-i18n="villa.kitchen">Kitchen</button><button data-room="bedroom" data-i18n="villa.bedroom">Bedroom</button><button data-room="bath" data-i18n="villa.bath">Bath</button><button id="tour-outside" data-i18n="villa.outside">Outside ↗</button>
+        </div>
+        <p id="tour-hint" data-i18n="villa.hint">Drag to orbit · Pinch or scroll to zoom</p>
+      </div>
     </dialog>
     <div id="toast" role="status"></div>
     <script type="module" src="/app.js"></script>

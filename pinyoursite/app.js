@@ -1,15 +1,17 @@
 import "./style.css";
+import "./villa.css";
 import plots from "./plots.json";
-import { dimensions, fitView, plotView } from "./geometry.js";
+import { dimensions } from "./geometry.js";
+import { plotLayout } from "./layout.js";
+import { t, lang, mountSwitch, onLang, translate } from "./i18n.js";
+
 const q = (s) => document.querySelector(s),
   qa = (s) => [...document.querySelectorAll(s)],
-  fmt = (n) =>
-    new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(n);
+  fmt = (n) => new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(n);
 const wa = (s) => "https://wa.me/917575807403?text=" + encodeURIComponent(s);
 const paths = {
   house: "M3 10 12 3l9 7v11h-6v-7H9v7H3Z",
-  share:
-    "M8 10 16 6M8 14l8 4M8 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0M22 5a3 3 0 1 0-6 0 3 3 0 0 0 6 0M22 19a3 3 0 1 0-6 0 3 3 0 0 0 6 0",
+  share: "M8 10 16 6M8 14l8 4M8 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0M22 5a3 3 0 1 0-6 0 3 3 0 0 0 6 0M22 19a3 3 0 1 0-6 0 3 3 0 0 0 6 0",
   search: "M21 21l-5-5M18 10a8 8 0 1 0-16 0 8 8 0 0 0 16 0",
   info: "M12 11v6M12 7h.01M22 12a10 10 0 1 0-20 0 10 10 0 0 0 20 0",
   image: "M3 3h18v18H3ZM3 17l6-6 4 4 3-3 5 5M9 7h.01",
@@ -21,330 +23,40 @@ const paths = {
   expand: "M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5",
   layers: "m12 3 10 6-10 6L2 9Zm-10 12 10 6 10-6M2 12l10 6 10-6",
   tree: "M12 2 5 10h3l-5 7h7v5h4v-5h7l-5-7h3Z",
+  orbit: "M21 12a9 4 0 1 1-18 0 9 4 0 0 1 18 0M12 3v18",
+  left: "m15 5-7 7 7 7",
+  right: "m9 5 7 7-7 7",
+  cube: "m12 2 9 5v10l-9 5-9-5V7Zm0 10 9-5M12 12v10M12 12 3 7",
 };
-const icon = (n) =>
-  '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="' +
-  (paths[n] || paths.pin) +
-  '"/></svg>';
-function icons(root = document) {
-  root
-    .querySelectorAll("[data-icon]")
-    .forEach((el) => (el.innerHTML = icon(el.dataset.icon)));
-}
+const icon = (n) => '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="' + (paths[n] || paths.pin) + '"/></svg>';
+const icons = (root = document) => root.querySelectorAll("[data-icon]").forEach((el) => (el.innerHTML = icon(el.dataset.icon)));
 icons();
-const view = q("#map-viewport"),
-  transform = q("#map-transform"),
-  panel = q("#panel"),
-  body = q("#panel-body"),
-  detail = q("#plot-detail");
-let selected = null,
-  state = fitView(innerWidth, innerHeight),
-  animation = 0,
-  panelType = null,
-  legend = false,
-  toastTimer,
-  returnFocus,
-  expanded = false;
-const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+mountSwitch(q("#lang"));
+
+const card = q("#plot-card"), panel = q("#panel"), body = q("#panel-body");
+const layouts = new Map(plots.map((p) => [p.id, plotLayout(p)]));
+const ordered = [...plots].sort((a, b) => a.id - b.id);
+let world = null, selected = null, expanded = false, orbiting = false, panelType = null, returnFocus, toastTimer;
+
 function toast(s) {
   clearTimeout(toastTimer);
   q("#toast").textContent = s;
   q("#toast").classList.add("visible");
-  toastTimer = setTimeout(() => q("#toast").classList.remove("visible"), 3500);
+  toastTimer = setTimeout(() => q("#toast").classList.remove("visible"), 3200);
 }
-function renderPlots() {
-  q("#plots").innerHTML = [
-    ...plots.filter((p) => p.id !== selected),
-    ...plots.filter((p) => p.id === selected),
-  ]
-    .map((p) => {
-      const active = p.id === selected;
-      return (
-        '<g class="plot ' +
-        p.status +
-        (active ? " selected" : "") +
-        '" data-plot="' +
-        p.id +
-        '" role="button" tabindex="0" aria-label="Plot ' +
-        p.id +
-        ", " +
-        p.status +
-        ", " +
-        fmt(p.area) +
-        ' square feet" aria-pressed="' +
-        active +
-        '"><polygon points="' +
-        p.points +
-        '"/><text x="' +
-        p.x +
-        '" y="' +
-        (p.y - (active ? 7 : 0)) +
-        '" text-anchor="middle" dominant-baseline="middle">' +
-        p.id +
-        "</text>" +
-        (active
-          ? '<text class="plot-area" x="' +
-            p.x +
-            '" y="' +
-            (p.y + 5) +
-            '" text-anchor="middle">' +
-            fmt(p.area) +
-            ' ft²</text><text class="plot-var" x="' +
-            p.x +
-            '" y="' +
-            (p.y + 14) +
-            '" text-anchor="middle">' +
-            fmt(p.area / 9) +
-            " Var</text>"
-          : "") +
-        "</g>"
-      );
-    })
-    .join("");
-  applyFilters();
+const statusLabel = (s) => t("status." + s);
+function counts() {
+  for (const s of ["available", "hold", "sold"]) q(`.filter.${s} b`).textContent = plots.filter((p) => p.status === s).length;
 }
-function apply() {
-  transform.style.transform =
-    "translate3d(" + state.x + "px," + state.y + "px,0) scale(" + state.k + ")";
-}
-function transition(target, animate = true) {
-  cancelAnimationFrame(animation);
-  if (!animate || reduced.matches) {
-    state = target;
-    apply();
-    return;
-  }
-  const start = { ...state },
-    time = performance.now();
-  function tick(t) {
-    const p = Math.min(1, (t - time) / 1100),
-      e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-    state = {
-      x: start.x + (target.x - start.x) * e,
-      y: start.y + (target.y - start.y) * e,
-      k: start.k + (target.k - start.k) * e,
-    };
-    apply();
-    if (p < 1) animation = requestAnimationFrame(tick);
-  }
-  animation = requestAnimationFrame(tick);
-}
-function reset(animate = true) {
-  selected = null;
-  expanded = false;
-  detail.hidden = true;
-  detail.replaceChildren();
-  detail.classList.remove("expanded");
-  document.body.classList.remove("plot-open");
-  q("#dimensions").innerHTML = "";
-  q("#legend").hidden = !legend;
-  history.replaceState(null, "", location.pathname);
-  renderPlots();
-  transition(fitView(innerWidth, innerHeight), animate);
-}
-function zoom(mult, x = innerWidth / 2, y = innerHeight / 2) {
-  cancelAnimationFrame(animation);
-  const k = Math.max(0.15, Math.min(12, state.k * mult)),
-    ratio = k / state.k;
-  state = { k, x: x - (x - state.x) * ratio, y: y - (y - state.y) * ratio };
-  apply();
-}
-view.addEventListener(
-  "wheel",
-  (e) => {
-    e.preventDefault();
-    zoom(Math.exp(-e.deltaY * 0.0015), e.clientX, e.clientY);
-  },
-  { passive: false },
-);
-const pointers = new Map();
-let drag = null,
-  pinch = null,
-  moved = false;
-view.addEventListener("pointerdown", (e) => {
-  if (e.button > 0) return;
-  cancelAnimationFrame(animation);
-  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  drag = { x: e.clientX, y: e.clientY, px: state.x, py: state.y };
-  moved = false;
-  q("#hover-tip").hidden = true;
-  view.setPointerCapture(e.pointerId);
-  if (pointers.size === 2) {
-    const [a, b] = [...pointers.values()];
-    pinch = {
-      distance: Math.hypot(a.x - b.x, a.y - b.y),
-      state: { ...state },
-      cx: (a.x + b.x) / 2,
-      cy: (a.y + b.y) / 2,
-    };
-  }
-});
-view.addEventListener("pointermove", (e) => {
-  if (pointers.has(e.pointerId)) {
-    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (pointers.size === 2 && pinch) {
-      const [a, b] = [...pointers.values()],
-        k = Math.max(
-          0.15,
-          Math.min(
-            12,
-            (pinch.state.k * Math.hypot(a.x - b.x, a.y - b.y)) / pinch.distance,
-          ),
-        ),
-        r = k / pinch.state.k;
-      state = {
-        k,
-        x: (a.x + b.x) / 2 - (pinch.cx - pinch.state.x) * r,
-        y: (a.y + b.y) / 2 - (pinch.cy - pinch.state.y) * r,
-      };
-      moved = true;
-      apply();
-    } else if (drag) {
-      const dx = e.clientX - drag.x,
-        dy = e.clientY - drag.y;
-      if (Math.abs(dx) + Math.abs(dy) > 5) moved = true;
-      state.x = drag.px + dx;
-      state.y = drag.py + dy;
-      apply();
-    }
-    return;
-  }
-  const el = e.target.closest("[data-plot]");
-  if (el && !selected && e.pointerType === "mouse") {
-    const p = plots.find((p) => p.id === +el.dataset.plot),
-      tip = q("#hover-tip");
-    tip.innerHTML =
-      "<strong>Plot " +
-      p.id +
-      "<span>" +
-      p.status +
-      "</span></strong><small>" +
-      fmt(p.area) +
-      " ft²</small>";
-    tip.style.left = Math.min(innerWidth - 185, e.clientX + 18) + "px";
-    tip.style.top = Math.max(10, e.clientY - 65) + "px";
-    tip.hidden = false;
-  } else q("#hover-tip").hidden = true;
-});
-view.addEventListener("pointerup", (e) => {
-  pointers.delete(e.pointerId);
-  if (view.hasPointerCapture(e.pointerId))
-    view.releasePointerCapture(e.pointerId);
-  if (!moved) {
-    const el = document
-      .elementFromPoint(e.clientX, e.clientY)
-      ?.closest("[data-plot]");
-    if (el) {
-      const id = +el.dataset.plot;
-      id === selected ? reset() : openPlot(id);
-    } else if (selected) reset();
-  }
-  drag = null;
-  pinch = null;
-  if (pointers.size) {
-    const a = [...pointers.values()][0];
-    drag = { x: a.x, y: a.y, px: state.x, py: state.y };
-  }
-});
-view.addEventListener("pointercancel", (e) => {
-  pointers.delete(e.pointerId);
-  drag = null;
-  pinch = null;
-});
-view.addEventListener("pointerleave", () => (q("#hover-tip").hidden = true));
-view.addEventListener("keydown", (e) => {
-  const p = e.target.closest("[data-plot]");
-  if (p && ["Enter", " "].includes(e.key)) {
-    e.preventDefault();
-    openPlot(+p.dataset.plot);
-    return;
-  }
-  if (
-    [
-      "+",
-      "=",
-      "-",
-      "Home",
-      "ArrowUp",
-      "ArrowDown",
-      "ArrowLeft",
-      "ArrowRight",
-    ].includes(e.key)
-  ) {
-    e.preventDefault();
-    cancelAnimationFrame(animation);
-    if (e.key === "+" || e.key === "=") zoom(1.2);
-    if (e.key === "-") zoom(0.8);
-    if (e.key === "Home") reset();
-    if (e.key === "ArrowUp") state.y -= 40;
-    if (e.key === "ArrowDown") state.y += 40;
-    if (e.key === "ArrowLeft") state.x -= 40;
-    if (e.key === "ArrowRight") state.x += 40;
-    apply();
-  }
-});
-q("#home").onclick = () => reset();
-q("#compass").onclick = () => reset();
-function applyFilters() {
-  qa("[data-status]").forEach((b) =>
-    qa(".plot." + b.dataset.status).forEach((g) =>
-      g.classList.toggle(
-        "filtered",
-        b.getAttribute("aria-pressed") === "false",
-      ),
-    ),
-  );
-}
-q("#legend-toggle").onclick = () => {
-  legend = !legend;
-  document.body.classList.toggle("status-on", legend);
-  q("#legend").hidden = !legend;
-  q("#legend-toggle").setAttribute("aria-pressed", legend);
-};
-qa("[data-status]").forEach(
-  (b) =>
-    (b.onclick = () => {
-      b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true");
-      applyFilters();
-    }),
-);
-const nearby = [
-  ["Vankala Canal Road", "0 Mins", "Highway"],
-  ["Sonsak Village Center", "3 Mins", "Other"],
-  ["Ambheta Branch Post Office", "5 Mins", "Other"],
-  ["Kim–Olpad Road", "8 Mins", "Highway"],
-  ["Olpad City Center / Market", "15 Mins", "Mall / Market"],
-  ["International Airport Road", "2 Mins", "Airport"],
-];
-function landmarks(limit = 6) {
-  return (
-    '<div class="landmarks">' +
-    nearby
-      .slice(0, limit)
-      .map(
-        ([name, time, cat]) =>
-          '<a class="landmark" href="https://www.google.com/maps/search/?api=1&query=' +
-          encodeURIComponent(name + " Surat Gujarat") +
-          '" target="_blank" rel="noopener"><i>' +
-          icon(cat === "Highway" ? "navigation" : "house") +
-          "</i><div><strong>" +
-          name +
-          "</strong><small><b>" +
-          time +
-          "</b> · " +
-          cat +
-          "</small></div></a>",
-      )
-      .join("") +
-    "</div>"
-  );
-}
-function form(topic) {
-  return (
-    '<section class="enquiry"><h3>Interested? Connect Now</h3><form data-enquiry="' +
-    topic +
-    '"><label class="sr-only" for="enquiry-name">Your name</label><input id="enquiry-name" name="name" placeholder="Your Name" required maxlength="80" autocomplete="name"><div class="phone-field"><select name="code" aria-label="Country calling code"><option>IN +91</option><option>US +1</option><option>UK +44</option><option>AE +971</option></select><input name="phone" aria-label="Phone number" placeholder="Phone Number" type="tel" required maxlength="20" autocomplete="tel"></div><button class="action green full" type="submit">Continue on WhatsApp ↗</button><p class="fine">Review and send your enquiry in WhatsApp. Demonstration only; no plot reservation or lead storage.</p></form></section>'
-  );
+counts();
+
+// Plot card.
+function enquiry(topic) {
+  return `<section class="enquiry"><h3>${t("enquiry.title")}</h3><form data-enquiry="${topic}">
+    <input name="name" placeholder="${t("enquiry.name")}" aria-label="${t("enquiry.name")}" required maxlength="80" autocomplete="name">
+    <div class="phone-field"><select name="code" aria-label="${t("enquiry.code")}"><option>IN +91</option><option>US +1</option><option>UK +44</option><option>AE +971</option></select>
+    <input name="phone" aria-label="${t("enquiry.phone")}" placeholder="${t("enquiry.phone")}" type="tel" required maxlength="20" autocomplete="tel"></div>
+    <button class="primary full" type="submit">${t("enquiry.send")}</button><p class="fine">${t("enquiry.fine")}</p></form></section>`;
 }
 function wireForms(root) {
   root.querySelectorAll("[data-enquiry]").forEach(
@@ -352,140 +64,162 @@ function wireForms(root) {
       (f.onsubmit = (e) => {
         e.preventDefault();
         const d = new FormData(f);
-        location.assign(
-          wa(
-            "Hi Kapadiya & Sons, I’m " +
-              d.get("name") +
-              " (" +
-              d.get("code") +
-              " " +
-              d.get("phone") +
-              "). I explored " +
-              f.dataset.enquiry +
-              " in the PinYourSite demo. I’d like to discuss an interactive viewer for my project.",
-          ),
-        );
+        location.assign(wa(`Hi Kapadiya & Sons, I’m ${d.get("name")} (${d.get("code")} ${d.get("phone")}). I explored ${f.dataset.enquiry} in the PinYourSite 3D demo (language: ${lang}). I’d like to discuss an interactive viewer for my project.`));
       }),
   );
 }
-function drawDimensions(p) {
-  q("#dimensions").innerHTML = dimensions(p)
-    .map(
-      (d) =>
-        '<g><path class="dimension-extension" d="M' +
-        d.a.x +
-        " " +
-        d.a.y +
-        "L" +
-        d.u.x +
-        " " +
-        d.u.y +
-        "M" +
-        d.b.x +
-        " " +
-        d.b.y +
-        "L" +
-        d.v.x +
-        " " +
-        d.v.y +
-        '"/><path class="dimension-line" d="M' +
-        d.u.x +
-        " " +
-        d.u.y +
-        "L" +
-        d.v.x +
-        " " +
-        d.v.y +
-        '"/><text class="dimension-label" x="' +
-        d.mx +
-        '" y="' +
-        d.my +
-        '" dominant-baseline="middle" text-anchor="middle" transform="rotate(' +
-        d.angle +
-        " " +
-        d.mx +
-        " " +
-        d.my +
-        ')">' +
-        d.length.toFixed(2) +
-        " ft</text></g>",
-    )
-    .join("");
+function renderCard() {
+  if (selected == null) {
+    card.hidden = true;
+    card.replaceChildren();
+    document.body.classList.remove("plot-open");
+    return;
+  }
+  const p = plots.find((x) => x.id === selected), L = layouts.get(selected), dims = dimensions(p);
+  const front = dims.reduce((a, b) => (Math.abs(b.length - L.width / 0.3048) < Math.abs(a.length - L.width / 0.3048) ? b : a));
+  const turn = (a, b) => { const d = (((a - b) % 180) + 180) % 180; return Math.min(d, 180 - d); };
+  const depth = dims.find((d) => d !== front && turn(d.angle, front.angle) > 45) || dims[1];
+  card.innerHTML = `
+    <div class="grab" aria-hidden="true"></div>
+    <header>
+      <div><small>${t("plot")}</small><h2>${selected}</h2></div>
+      <span class="status ${p.status}">${statusLabel(p.status)}</span>
+      <span class="spacer"></span>
+      <button class="icon-btn" data-act="prev" aria-label="${t("plot.prev")}">${icon("left")}</button>
+      <button class="icon-btn" data-act="next" aria-label="${t("plot.next")}">${icon("right")}</button>
+      <button class="icon-btn" data-act="close" aria-label="${t("close")}">${icon("x")}</button>
+    </header>
+    <div class="stats">
+      <div><span>${t("area")}</span><strong>${fmt(p.area)} ft²</strong><small>${fmt(p.area / 9)} ${t("var")}</small></div>
+      <div><span>${t("dims")}</span><strong>${front.length.toFixed(1)} × ${depth.length.toFixed(1)} ft</strong><small>${t("frontage")}: ${t(L.road)}</small></div>
+    </div>
+    <div class="design">
+      <i>${icon("cube")}</i>
+      <div><small>${t("design")}</small><strong>${t("design." + L.design)}</strong><span>${t("design." + L.design + ".sub")}</span></div>
+    </div>
+    <div class="actions">
+      <button class="primary" data-act="villa">${t("villa.open")}</button>
+      <button class="ghost" data-act="orbit" aria-pressed="${orbiting}">${icon("orbit")}<span>${t(orbiting ? "orbit.stop" : "orbit")}</span></button>
+      <button class="ghost" data-act="share" aria-label="${t("share")}">${icon("share")}</button>
+    </div>
+    <button class="more" data-act="expand" aria-expanded="${expanded}">${t("plot.details")}</button>
+    <div class="extra">
+      <p class="fine">${t("design.note")} ${t("plot.fine")}</p>
+      ${enquiry("Plot " + selected)}
+    </div>`;
+  card.hidden = false;
+  card.classList.toggle("expanded", expanded);
+  document.body.classList.add("plot-open");
+  wireForms(card);
 }
-function openPlot(id, updateUrl = true) {
-  const p = plots.find((p) => p.id === id);
-  if (!p) return;
-  panel.close();
+card.addEventListener("click", (e) => {
+  const act = e.target.closest("[data-act]")?.dataset.act;
+  if (!act) return;
+  const i = ordered.findIndex((p) => p.id === selected);
+  if (act === "close") selectPlot(null);
+  if (act === "prev") selectPlot(ordered[(i - 1 + ordered.length) % ordered.length].id);
+  if (act === "next") selectPlot(ordered[(i + 1) % ordered.length].id);
+  if (act === "villa") openHouse();
+  if (act === "share") share(selected);
+  if (act === "expand") { expanded = !expanded; renderCard(); }
+  if (act === "orbit") setOrbit(!orbiting);
+});
+let touchStart = null;
+card.addEventListener("touchstart", (e) => (touchStart = e.target.closest(".grab, header") ? e.touches[0].clientY : null), { passive: true });
+card.addEventListener("touchend", (e) => {
+  if (touchStart == null) return;
+  const dy = e.changedTouches[0].clientY - touchStart;
+  if (dy < -40 && !expanded) { expanded = true; renderCard(); }
+  else if (dy > 40) { if (expanded) { expanded = false; renderCard(); } else selectPlot(null); }
+  touchStart = null;
+});
+function setOrbit(on) {
+  orbiting = on;
+  world?.orbit(on, (state) => { orbiting = state; renderCard(); });
+  renderCard();
+}
+
+function selectPlot(id, { updateUrl = true } = {}) {
+  if (id != null && !plots.some((p) => p.id === id)) return;
   selected = id;
   expanded = false;
-  document.body.classList.add("plot-open");
-  q("#legend").hidden = true;
+  orbiting = false;
+  world?.orbit(false);
+  if (panel.open) panel.close();
   q("#hover-tip").hidden = true;
-  renderPlots();
-  drawDimensions(p);
-  const dims = dimensions(p),
-    badge = '<span class="status ' + p.status + '">' + p.status + "</span>";
-  detail.innerHTML =
-    '<button class="round plot-close-mobile" data-close-plot aria-label="Close plot">' +
-    icon("x") +
-    '</button><div class="compact-plot"><div><strong>Plot ' +
-    id +
-    "</strong>" +
-    badge +
-    "<small>" +
-    fmt(p.area) +
-    ' ft²</small></div><button class="action" id="expand-plot">View Details ↗</button></div><header class="plot-header"><h2>Plot ' +
-    id +
-    "</h2>" +
-    badge +
-    '<span class="spacer"></span><button class="round" id="share-plot" aria-label="Share plot">' +
-    icon("share") +
-    '</button><button class="round" data-close-plot aria-label="Close plot">' +
-    icon("x") +
-    '</button></header><div class="plot-body"><div class="stats"><div class="stat"><span>Total Area</span><strong>' +
-    fmt(p.area) +
-    " ft²</strong><small>" +
-    fmt(p.area / 9) +
-    ' Var</small></div><div class="stat dim"><span>Dimensions</span><strong>' +
-    dims[0].length.toFixed(2) +
-    " ft × " +
-    dims[1].length.toFixed(2) +
-    " ft</strong></div></div>" +
-    landmarks(3) +
-    '<p class="fine">Illustrative dimensions calculated from the demo plan. Not a site survey or live availability.</p></div><div class="plot-enquiry">' +
-    form("Plot " + id) +
-    "</div>";
-  detail.hidden = false;
-  detail.classList.remove("expanded");
-  detail
-    .querySelectorAll("[data-close-plot]")
-    .forEach((b) => (b.onclick = () => reset()));
-  q("#expand-plot").onclick = () => {
-    expanded = true;
-    detail.classList.add("expanded");
-  };
-  q("#share-plot").onclick = () => share(id);
-  wireForms(detail);
-  transition(plotView(p, innerWidth, innerHeight));
-  if (updateUrl)
-    history.pushState({ plot: id }, "", location.pathname + "?plot=" + id);
+  if (id == null) world?.home();
+  else world?.select(id);
+  renderCard();
+  if (updateUrl) {
+    const url = new URL(location.href);
+    url.hash = "";
+    id == null ? url.searchParams.delete("plot") : url.searchParams.set("plot", id);
+    history.replaceState(null, "", url);
+  }
+}
+
+// Status filters, lighting and homes.
+qa(".filter").forEach(
+  (b) =>
+    (b.onclick = () => {
+      const on = b.getAttribute("aria-pressed") !== "true";
+      b.setAttribute("aria-pressed", on);
+      world?.setFilter(b.dataset.status, on);
+    }),
+);
+qa("[data-mode]").forEach(
+  (b) =>
+    (b.onclick = () => {
+      qa("[data-mode]").forEach((x) => x.setAttribute("aria-pressed", x === b));
+      document.body.dataset.mode = b.dataset.mode;
+      world?.setMode(b.dataset.mode);
+    }),
+);
+q("#homes").onclick = () => {
+  const on = q("#homes").getAttribute("aria-pressed") !== "true";
+  q("#homes").setAttribute("aria-pressed", on);
+  world?.setHomes(on);
+};
+q("#sample").onclick = () => selectPlot(25);
+q("#compass").onclick = () => selectPlot(null);
+
+// Panels.
+const nearby = [
+  ["place.0", 0, "Highway"],
+  ["place.1", 3, "Other"],
+  ["place.2", 5, "Other"],
+  ["place.3", 8, "Highway"],
+  ["place.4", 15, "Mall / Market"],
+  ["place.5", 2, "Airport"],
+];
+const english = ["Vankala Canal Road", "Sonsak Village Center", "Ambheta Branch Post Office", "Kim–Olpad Road", "Olpad City Center / Market", "International Airport Road"];
+function landmarks(limit = 6) {
+  return (
+    '<div class="landmarks">' +
+    nearby
+      .slice(0, limit)
+      .map(
+        ([key, mins, cat], i) =>
+          `<a class="landmark" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(english[i] + " Surat Gujarat")}" target="_blank" rel="noopener"><i>${icon(cat === "Highway" ? "navigation" : "house")}</i><div><strong>${t(key)}</strong><small><b>${t("mins", { n: mins })}</b> · ${t("cat." + cat)}</small></div></a>`,
+      )
+      .join("") +
+    "</div>"
+  );
 }
 function openPanel(title, content, type) {
-  returnFocus = document.activeElement;
+  if (!panel.open) returnFocus = document.activeElement;
   panelType = type;
   q("#panel-title").textContent = title;
   body.innerHTML = content;
   panel.className = type === "gallery" ? "gallery-panel" : "";
   if (!panel.open) panel.showModal();
   body.scrollTop = 0;
-  qa("[data-panel]").forEach((b) =>
-    b.classList.toggle("active", b.dataset.panel === type),
-  );
+  qa("[data-panel]").forEach((b) => b.classList.toggle("active", b.dataset.panel === type));
 }
 function searchPanel() {
   openPanel(
-    "Plot Search",
-    '<input id="plot-search" type="search" inputmode="numeric" aria-label="Search plot number" placeholder="Type plot number (e.g. 102)..."><div class="size-label">FILTER BY SIZE</div><div class="size-filters"><button class="active" data-size="all">All Plots</button><button data-size="small">&lt; 100 yd²</button><button data-size="medium">100–200 yd²</button><button data-size="large">200+ yd²</button></div><div id="search-results"></div>',
+    t("search.title"),
+    `<input id="plot-search" type="search" inputmode="numeric" aria-label="${t("search.label")}" placeholder="${t("search.placeholder")}"><div class="size-label">${t("search.size")}</div><div class="size-filters"><button class="active" data-size="all">${t("search.all")}</button><button data-size="small">&lt; 100 yd²</button><button data-size="medium">100–200 yd²</button><button data-size="large">200+ yd²</button></div><div id="search-results"></div>`,
     "search",
   );
   let size = "all";
@@ -501,22 +235,9 @@ function searchPanel() {
       );
     q("#search-results").innerHTML = found.length
       ? found
-          .map(
-            (p) =>
-              '<button class="search-result" data-result="' +
-              p.id +
-              '"><strong># ' +
-              p.id +
-              "</strong><small>" +
-              fmt(p.area) +
-              ' ft²</small><span class="status ' +
-              p.status +
-              '">' +
-              p.status +
-              "</span></button>",
-          )
+          .map((p) => `<button class="search-result" data-result="${p.id}"><strong># ${p.id}</strong><small>${fmt(p.area)} ft²</small><span class="status ${p.status}">${statusLabel(p.status)}</span></button>`)
           .join("")
-      : "<p>No matching plots. Try another number or size.</p>";
+      : `<p>${t("search.none")}</p>`;
   };
   q("#plot-search").oninput = render;
   qa("[data-size]").forEach(
@@ -529,179 +250,90 @@ function searchPanel() {
   );
   q("#search-results").onclick = (e) => {
     const b = e.target.closest("[data-result]");
-    if (b) openPlot(+b.dataset.result);
+    if (b) selectPlot(+b.dataset.result);
   };
   render();
 }
 function detailsPanel() {
   openPanel(
-    "Project Overview",
-    '<div class="demo-info">PINYOURSITE BY KAPADIYA & SONS · DEMONSTRATION</div><h3>About the Project</h3><p>A complete neighbourhood, ready to explore. This demonstration brings plot information, project visuals and location context into one interactive experience.</p><h3>Site Location</h3><p>Vankala / Jahangirpura, Surat, Gujarat<br>Reference location for this demonstration.</p><div class="stats"><div class="stat"><span>Total Plot Area</span><strong>' +
-      fmt(plots.reduce((s, p) => s + p.area, 0) / 9) +
-      '</strong><small>Square yards</small></div><div class="stat"><span>Total Plots</span><strong>63</strong><small>Demonstration plots</small></div></div><h3>Amenities</h3><div class="amenities">' +
-      [
-        "Landscaped garden",
-        "Children’s play area",
-        "Gazebo seating",
-        "Box cricket",
-        "Jogging track",
-        "Entrance gate",
-        "Security cabin",
-        "Street lighting",
-        "Internal roads",
-        "Drainage",
-        "Underground power",
-        "CCTV",
-      ]
-        .map((x) => "<span>" + icon("tree") + x + "</span>")
-        .join("") +
-      '</div><div class="contact-list"><a href="https://www.kapadiya.tech" target="_blank" rel="noopener">Kapadiya & Sons ↗</a><a href="tel:+917575807403">+91 75758 07403 ↗</a><a href="mailto:smitkapadiya.work@gmail.com">smitkapadiya.work@gmail.com ↗</a></div>' +
-      form("PinYourSite") +
-      `<h3>Project Experience By</h3><p>Kapadiya & Sons<br>PinYourSite Plots<br>Complete 3D informational web view and project details.</p><div class="contact-list"><a href="${wa("Hi Smit! Could we discuss pricing and features for PinYourSite Plots for my development?")}" target="_blank" rel="noopener">Contact for pricing and more ↗</a></div>`,
+    t("details.title"),
+    `<div class="demo-info">${t("details.tag")}</div><h3>${t("details.about")}</h3><p>${t("details.aboutText")}</p><h3>${t("details.location")}</h3><p>${t("details.place")}<br>${t("details.ref")}</p>
+    <div class="stats"><div><span>${t("details.totalArea")}</span><strong>${fmt(plots.reduce((s, p) => s + p.area, 0) / 9)}</strong><small>${t("details.sqyd")}</small></div><div><span>${t("details.totalPlots")}</span><strong>63</strong><small>${t("details.demoPlots")}</small></div></div>
+    <h3>${t("details.amenities")}</h3><div class="amenities">${Array.from({ length: 12 }, (_, i) => "<span>" + icon("tree") + t("amenity." + i) + "</span>").join("")}</div>
+    <div class="contact-list"><a href="https://www.kapadiya.tech" target="_blank" rel="noopener">Kapadiya & Sons ↗</a><a href="tel:+917575807403">+91 75758 07403 ↗</a><a href="mailto:smitkapadiya.work@gmail.com">smitkapadiya.work@gmail.com ↗</a></div>
+    ${enquiry("PinYourSite")}
+    <h3>${t("details.by")}</h3><p>${t("details.byText")}</p><div class="contact-list"><a href="${wa("Hi Smit! Could we discuss pricing and features for PinYourSite Plots for my development?")}" target="_blank" rel="noopener">${t("details.pricing")}</a></div>`,
     "details",
   );
   wireForms(body);
 }
 function nearbyPanel() {
-  openPanel(
-    "Nearby Landmarks",
-    '<p class="demo-info">Reference project landmarks and illustrative travel times. Open a place for current routes.</p>' +
-      landmarks(),
-    "nearby",
-  );
+  openPanel(t("nearby.title"), `<p class="demo-info">${t("nearby.intro")}</p>${landmarks()}`, "nearby");
 }
 function brochurePanel() {
   openPanel(
-    "Project Catalogue",
-    '<div class="catalogue">' +
-      icon("file") +
-      '<h3>PinYourSite</h3><p>Your project. Every detail.<br>By Kapadiya & Sons.</p><small>DEMONSTRATION CATALOGUE · PDF</small></div><a class="action full" href="/pinyoursite-demo.pdf" download>' +
-      icon("download") +
-      'Download Brochure</a><p>Explore the viewer, its features and Architect’s Cut.</p><a class="action green full" href="' +
-      wa(
-        "Hi Kapadiya & Sons! I’d like to know more about PinYourSite and Architect’s Cut.",
-      ) +
-      '" target="_blank" rel="noopener">Enquire on WhatsApp ↗</a>',
+    t("brochure.title"),
+    `<div class="catalogue">${icon("file")}<h3>PinYourSite</h3><p>${t("brochure.tag")}</p><small>${t("brochure.kind")}</small></div><a class="primary full" href="/pinyoursite-demo.pdf" download>${icon("download")}${t("brochure.download")}</a><p>${t("brochure.text")}</p><a class="ghost full" href="${wa("Hi Kapadiya & Sons! I’d like to know more about PinYourSite and Architect’s Cut.")}" target="_blank" rel="noopener">${t("brochure.enquire")}</a>`,
     "brochure",
   );
 }
-const names = [
-  "The complete neighbourhood",
-  "An aerial perspective",
-  "The arrival",
-  "Poolside living",
-  "The streetscape",
-  "Garden moments",
-  "A place to pause",
-  "Inside the neighbourhood",
-  "Contemporary living",
-  "At your doorstep",
-  "Homes with character",
-  "The evening view",
-  "A welcoming entrance",
-  "A connected community",
-];
 const imagePath = (i) => "/gallery/" + String(i + 1).padStart(2, "0") + ".webp";
+const imageName = (i) => t("g." + i);
+const IMAGES = 14;
 let imageIndex = 0;
 function galleryPanel() {
   openPanel(
-    "Project Gallery",
+    t("gallery.title"),
     '<div class="gallery-grid">' +
-      names
-        .map(
-          (n, i) =>
-            '<button data-gallery="' +
-            i +
-            '" aria-label="View ' +
-            n +
-            '"><img src="' +
-            imagePath(i) +
-            '" loading="lazy" alt="' +
-            n +
-            ' — reference project visual"><span>' +
-            String(i + 1).padStart(2, "0") +
-            " / " +
-            n +
-            "</span></button>",
-        )
-        .join("") +
-      '</div><p class="fine">Reference project visualisations. Demonstration imagery, not completed Kapadiya developments.</p>',
+      Array.from(
+        { length: IMAGES },
+        (_, i) =>
+          `<button data-gallery="${i}" aria-label="${t("gallery.view", { n: imageName(i) })}"><img src="${imagePath(i)}" loading="lazy" alt="${t("gallery.alt", { n: imageName(i) })}"><span>${String(i + 1).padStart(2, "0")} / ${imageName(i)}</span></button>`,
+      ).join("") +
+      `</div><p class="fine">${t("gallery.fine")}</p>`,
     "gallery",
   );
-  qa("[data-gallery]").forEach(
-    (b) => (b.onclick = () => openImage(+b.dataset.gallery)),
-  );
+  qa("[data-gallery]").forEach((b) => (b.onclick = () => openImage(+b.dataset.gallery)));
 }
 function openImage(index) {
-  imageIndex = (index + names.length) % names.length;
+  imageIndex = (index + IMAGES) % IMAGES;
   q("#lightbox-image").src = imagePath(imageIndex);
-  q("#lightbox-image").alt = names[imageIndex] + " — reference project visual";
+  q("#lightbox-image").alt = t("gallery.alt", { n: imageName(imageIndex) });
   q("#image-download").href = imagePath(imageIndex);
-  q("#image-count").textContent =
-    imageIndex + 1 + " / " + names.length + " — " + names[imageIndex];
+  q("#image-count").textContent = imageIndex + 1 + " / " + IMAGES + " — " + imageName(imageIndex);
   q(".lightbox-stage").classList.remove("zoomed");
-  q("#image-thumbs").innerHTML = names
-    .map(
-      (n, i) =>
-        '<button data-thumb="' +
-        i +
-        '" aria-label="View ' +
-        n +
-        '" aria-pressed="' +
-        (i === imageIndex) +
-        '"><img src="' +
-        imagePath(i) +
-        '" alt=""></button>',
-    )
-    .join("");
-  qa("[data-thumb]").forEach(
-    (b) => (b.onclick = () => openImage(+b.dataset.thumb)),
-  );
+  q("#image-thumbs").innerHTML = Array.from(
+    { length: IMAGES },
+    (_, i) => `<button data-thumb="${i}" aria-label="${t("gallery.view", { n: imageName(i) })}" aria-pressed="${i === imageIndex}"><img src="${imagePath(i)}" alt=""></button>`,
+  ).join("");
+  qa("[data-thumb]").forEach((b) => (b.onclick = () => openImage(+b.dataset.thumb)));
   if (!q("#lightbox").open) q("#lightbox").showModal();
 }
 q("#image-close").onclick = () => q("#lightbox").close();
 q("#image-next").onclick = () => openImage(imageIndex + 1);
 q("#image-prev").onclick = () => openImage(imageIndex - 1);
-q("#image-zoom").onclick = () =>
-  q(".lightbox-stage").classList.toggle("zoomed");
+q("#image-zoom").onclick = () => q(".lightbox-stage").classList.toggle("zoomed");
 q("#image-full").onclick = async () => {
   try {
-    document.fullscreenElement
-      ? await document.exitFullscreen()
-      : await q("#lightbox").requestFullscreen();
+    document.fullscreenElement ? await document.exitFullscreen() : await q("#lightbox").requestFullscreen();
   } catch {
-    toast("Fullscreen is unavailable in this browser.");
+    toast(t("fullscreen.fail"));
   }
 };
-let map,
-  overlay,
-  overlayVisible = true;
+
+let map, overlay, overlayVisible = true;
 async function gpsPanel() {
   panel.close();
   q("#gps-view").hidden = false;
-  if (map) {
-    map.invalidateSize();
-    return;
-  }
+  if (map) { map.invalidateSize(); return; }
   try {
-    const L = await import("leaflet");
+    const mod = await import("leaflet"), L = mod.default || mod;
     await import("leaflet/dist/leaflet.css");
     const center = [21.25548, 72.76072];
-    map = L.map("satellite-map", {
-      zoomControl: false,
-      minZoom: 12,
-      maxZoom: 22,
-      zoomSnap: 0.1,
-      zoomDelta: 0.5,
-    }).setView(center, innerWidth < 1024 ? 18.2 : 19.2);
-    const tiles = L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      {
-        maxNativeZoom: 19,
-        maxZoom: 22,
-        attribution: "Imagery © Esri, Maxar, Earthstar Geographics",
-      },
-    ).addTo(map);
+    map = L.map("satellite-map", { zoomControl: false, minZoom: 12, maxZoom: 22, zoomSnap: 0.1, zoomDelta: 0.5 }).setView(center, innerWidth < 1024 ? 18.2 : 19.2);
+    const tiles = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+      maxNativeZoom: 19, maxZoom: 22, attribution: "Imagery © Esri, Maxar, Earthstar Geographics",
+    }).addTo(map);
     tiles.on("tileerror", () => (q("#map-error").hidden = false));
     tiles.on("load", () => (q("#map-error").hidden = true));
     overlay = document.createElement("img");
@@ -710,32 +342,15 @@ async function gpsPanel() {
     overlay.style.position = "absolute";
     map.getPanes().overlayPane.append(overlay);
     function position() {
-      const c = map.latLngToLayerPoint(center),
-        n = map.latLngToLayerPoint([center[0] + 0.001, center[1]]),
-        pixels = Math.abs(c.y - n.y) / 110.54,
-        w = 190 * pixels,
-        h = w * (overlay.naturalHeight / overlay.naturalWidth || 0.5625);
-      overlay.style.width = w + "px";
-      overlay.style.height = h + "px";
-      overlay.style.left = c.x - w / 2 + "px";
-      overlay.style.top = c.y - h / 2 + "px";
-      overlay.style.transform = "rotate(-101deg)";
+      const c = map.latLngToLayerPoint(center), n = map.latLngToLayerPoint([center[0] + 0.001, center[1]]);
+      const pixels = Math.abs(c.y - n.y) / 110.54, w = 190 * pixels, h = w * (overlay.naturalHeight / overlay.naturalWidth || 0.5625);
+      Object.assign(overlay.style, { width: w + "px", height: h + "px", left: c.x - w / 2 + "px", top: c.y - h / 2 + "px", transform: "rotate(-101deg)" });
     }
     overlay.onload = position;
     map.on("move zoom viewreset", position);
     position();
-    L.marker(center, {
-      icon: L.divIcon({
-        className: "gps-project-label",
-        html: "PinYourSite ↗",
-        iconSize: [105, 38],
-        iconAnchor: [52, 100],
-      }),
-    })
-      .addTo(map)
-      .on("click", closeGps);
-    q("#gps-home").onclick = () =>
-      map.flyTo(center, innerWidth < 1024 ? 18.2 : 19.2, { duration: 1 });
+    L.marker(center, { icon: L.divIcon({ className: "gps-project-label", html: "PinYourSite 3D ↗", iconSize: [120, 38], iconAnchor: [60, 100] }) }).addTo(map).on("click", closeGps);
+    q("#gps-home").onclick = () => map.flyTo(center, innerWidth < 1024 ? 18.2 : 19.2, { duration: 1 });
     q("#gps-plus").onclick = () => map.zoomIn();
     q("#gps-minus").onclick = () => map.zoomOut();
     q("#gps-overlay").onclick = () => {
@@ -753,59 +368,42 @@ function closeGps() {
 }
 q("#gps-close").onclick = closeGps;
 q("#gps-explore").onclick = closeGps;
+
 async function share(id) {
-  const url = location.origin + location.pathname + (id ? "?plot=" + id : "");
+  const url = new URL(location.origin + location.pathname);
+  if (id) url.searchParams.set("plot", id);
+  if (lang !== "en") url.searchParams.set("lang", lang);
   if (navigator.share) {
     try {
-      await navigator.share({
-        title: "PinYourSite by Kapadiya & Sons",
-        text: id
-          ? "Explore demonstration Plot " + id
-          : "Explore our property demonstration",
-        url,
-      });
+      await navigator.share({ title: "PinYourSite by Kapadiya & Sons", text: id ? t("share.text") + " · " + t("plot.n", { n: id }) : t("share.text"), url: url.href });
       return;
     } catch (e) {
       if (e.name === "AbortError") return;
     }
   }
   try {
-    await navigator.clipboard.writeText(url);
-    toast("Link copied.");
+    await navigator.clipboard.writeText(url.href);
+    toast(t("copied"));
   } catch {
-    openPanel(
-      "Share Project",
-      '<label for="share-url">Copy this link</label><input id="share-url" readonly value="' +
-        url +
-        '">',
-      "share",
-    );
+    openPanel(t("share.project"), `<label for="share-url">${t("share.copy")}</label><input id="share-url" readonly value="${url.href}">`, "share");
     q("#share-url").select();
   }
 }
-q("#share").onclick = () => share();
-const panels = {
-  search: searchPanel,
-  details: detailsPanel,
-  gallery: galleryPanel,
-  nearby: nearbyPanel,
-  gps: gpsPanel,
-  brochure: brochurePanel,
-};
-qa("[data-panel]").forEach(
-  (b) => (b.onclick = () => panels[b.dataset.panel]()),
-);
+q("#share").onclick = () => share(selected);
+
+const panels = { search: searchPanel, details: detailsPanel, gallery: galleryPanel, nearby: nearbyPanel, gps: gpsPanel, brochure: brochurePanel };
+qa("[data-panel]").forEach((b) => (b.onclick = () => panels[b.dataset.panel]()));
 q("#close-panel").onclick = () => panel.close();
 panel.addEventListener("click", (e) => {
   if (e.target === panel) {
     const r = panel.getBoundingClientRect();
-    if (e.clientX < r.left || e.clientY < r.top) panel.close();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) panel.close();
   }
 });
 panel.addEventListener("close", () => {
   panelType = null;
   qa("[data-panel]").forEach((b) => b.classList.remove("active"));
-  returnFocus?.focus();
+  returnFocus?.focus?.();
 });
 document.addEventListener("keydown", (e) => {
   if (q("#house-view").open) return;
@@ -814,52 +412,28 @@ document.addEventListener("keydown", (e) => {
     openImage(imageIndex + (e.key === "ArrowRight" ? 1 : -1));
   }
   if (e.key === "Escape" && !q("#gps-view").hidden) closeGps();
-  else if (
-    e.key === "Escape" &&
-    selected &&
-    !panel.open &&
-    !q("#lightbox").open
-  )
-    reset();
+  else if (e.key === "Escape" && selected != null && !panel.open && !q("#lightbox").open) selectPlot(null);
 });
-window.addEventListener("resize", () =>
-  transition(
-    selected
-      ? plotView(
-          plots.find((p) => p.id === selected),
-          innerWidth,
-          innerHeight,
-        )
-      : fitView(innerWidth, innerHeight),
-    false,
-  ),
-);
-window.addEventListener("popstate", () => {
-  const id = +(
-    new URLSearchParams(location.search).get("plot") ||
-    location.hash.replace("#plot-", "")
-  );
-  id ? openPlot(id, false) : reset();
-});
-renderPlots();
-apply();
-const initial = +(
-  new URLSearchParams(location.search).get("plot") ||
-  location.hash.replace("#plot-", "")
-);
-if (initial) openPlot(initial, false);
 
+// Re-render dynamic text when the language changes.
+onLang(() => {
+  renderCard();
+  if (panel.open && panelType && panels[panelType] && panelType !== "gps" && panelType !== "share") panels[panelType]();
+  if (q("#lightbox").open) openImage(imageIndex);
+});
+
+// Sample villa tour.
 const house = q("#house-view");
-let houseSession = 0;
-let disposeHouse;
-q("#open-house").onclick = async () => {
+let houseSession = 0, disposeHouse;
+async function openHouse() {
   const session = ++houseSession;
   house.showModal();
-  house.classList.remove("house-ready", "house-fallback");
+  house.classList.remove("house-ready", "house-fallback", "inside-villa");
+  translate(house);
   const status = q("#house-status");
-  status.textContent = "Opening the 3D exterior…";
+  status.textContent = t("villa.opening");
   try {
-    const {startHouse} = await import("./house-view.js");
+    const { startHouse } = await import("./house-view.js");
     if (session !== houseSession) return;
     const dispose = await startHouse(house);
     if (session !== houseSession) { dispose(); return; }
@@ -869,38 +443,63 @@ q("#open-house").onclick = async () => {
   } catch {
     if (session !== houseSession) return;
     house.classList.add("house-fallback");
-    status.textContent = "3D is unavailable here. Showing the gallery reference.";
+    status.textContent = t("villa.fallback");
   }
-};
+}
 q("#house-close").onclick = () => house.close();
 house.addEventListener("close", () => {
   ++houseSession;
   disposeHouse?.();
   disposeHouse = undefined;
-  q("#open-house").focus();
+  card.querySelector("[data-act=villa]")?.focus();
 });
-const parcelToggle=q("#parcel-toggle"), parcel=q("#villa-parcel"), survey=q("#villa-survey");
-const samplePlot=plots.find(p=>p.id===25);
-const edges=dimensions(samplePlot);
-const left=Math.min(...edges.map(e=>e.a.x)),top=Math.min(...edges.map(e=>e.a.y));
-const width=Math.max(...edges.map(e=>e.a.x))-left,height=Math.max(...edges.map(e=>e.a.y))-top;
-Object.assign(parcel.style,{left:left+"px",top:top+"px",width:width+"px",height:height+"px"});
-const short=edges.find(e=>e.a.y===e.b.y).length.toFixed(1);
-const long=edges.find(e=>e.a.x===e.b.x).length.toFixed(1);
-q("#parcel-size").textContent=`Approx. ${short} × ${long} ft · ${fmt(samplePlot.area)} ft²`;
 
-parcelToggle.onclick=()=>{
-  const enabled=parcelToggle.getAttribute("aria-pressed")!=="true";
-  parcelToggle.setAttribute("aria-pressed",String(enabled));
-  parcel.hidden=q("#parcel-info").hidden=!enabled;
-  survey.innerHTML=enabled?`<g transform="translate(${left} ${top})">
-    <path d="M0 -2v-4m0 2h${width}m0 -2v4 M-2 0h-4m2 0v${height}m-2 0h4"/>
-    <text x="${width/2}" y="-6" text-anchor="middle">≈ ${short} ft</text>
-    <text transform="translate(-6 ${height/2}) rotate(-90)" text-anchor="middle">≈ ${long} ft</text>
-    <text x="${width/2}" y="${height+6}" text-anchor="middle">PLOT 25</text></g>`:"";
-};
-q("#parcel-focus").onclick=()=>{
-  const start=innerWidth<600?90:80,end=innerHeight-(innerWidth<600?265:110);
-  const k=Math.min(6,Math.max(1,(end-start)/(height+19)),innerWidth*.56/width);
-  transition({k,x:innerWidth*.5-samplePlot.x*k,y:(start+end)*.5-samplePlot.y*k});
-};
+// Hover tooltip (mouse only).
+function hover(id, x, y) {
+  const tip = q("#hover-tip");
+  if (id == null || id === selected) { tip.hidden = true; return; }
+  const p = plots.find((p) => p.id === id);
+  tip.innerHTML = `<strong>${t("plot.n", { n: id })}<span class="status ${p.status}">${statusLabel(p.status)}</span></strong><small>${fmt(p.area)} ft² · ${t("design." + layouts.get(id).design)}</small>`;
+  tip.style.left = Math.min(innerWidth - 210, x + 18) + "px";
+  tip.style.top = Math.max(70, y - 70) + "px";
+  tip.hidden = false;
+}
+
+// Boot the 3D world, falling back to the flat plan when WebGL is unavailable.
+const initial = () => +(new URLSearchParams(location.search).get("plot") || location.hash.replace("#plot-", "")) || null;
+async function boot() {
+  const loader = q("#loader");
+  try {
+    const { createWorld } = await import("./world.js");
+    world = await createWorld({
+      host: q("#stage"),
+      labels: q("#labels"),
+      plots,
+      onPick: (id) => (id == null ? selected != null && selectPlot(null) : selectPlot(id === selected ? null : id)),
+      onHover: hover,
+      onProgress: (f) => (q("#progress").style.width = Math.round(f * 100) + "%"),
+    });
+    q("#progress").style.width = "100%";
+    document.body.classList.add("ready");
+    loader.classList.add("done");
+    setTimeout(() => loader.remove(), 900);
+    const id = initial();
+    if (id) setTimeout(() => selectPlot(id, { updateUrl: false }), 200);
+    else world.intro();
+    setTimeout(() => q("#hint").classList.add("gone"), 6500);
+  } catch (error) {
+    console.error(error);
+    loader.querySelector("p").textContent = t("loading.fail");
+    loader.querySelector(".bar").remove();
+    const img = document.createElement("img");
+    img.src = "/masterplan.webp";
+    img.alt = "";
+    img.className = "fallback-plan";
+    q("#stage").prepend(img);
+    setTimeout(() => loader.classList.add("done"), 1600);
+    document.body.classList.add("ready", "flat");
+    const id = initial();
+    if (id) selectPlot(id, { updateUrl: false });
+  }
+}
+boot();

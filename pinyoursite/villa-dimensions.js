@@ -1,4 +1,5 @@
 import {Vector3} from "three";
+import {t} from "./i18n.js";
 
 // Survey endpoints in Blender metres, using the room-local coordinates of each bake.
 const marks={
@@ -31,7 +32,7 @@ export function villaDimensions(dialog,camera,redraw){
       rows=lines.map(([name,start,end])=>{
         const node=t=>document.createElementNS(svg.namespaceURI,t);
         const group=node("g"),path=node("path"),label=node("text");
-        label.textContent=name+" · "+new Vector3(...start).distanceTo(new Vector3(...end)).toFixed(2)+" m";
+        label.textContent=t("m."+name)+" · "+new Vector3(...start).distanceTo(new Vector3(...end)).toFixed(2)+" "+t("m.unit");
         group.append(path,label);svg.append(group);
         return {group,path,label,a:point(start,room!=="exterior"),b:point(end,room!=="exterior")};
       });

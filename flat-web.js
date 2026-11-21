@@ -8,7 +8,7 @@ const views={
   bedrooms:{target:[3.0,.22,-.12],direction:[.28,1,.32],span:8.8},
   kitchen:{target:[-.25,.55,-2.05],direction:[.28,.72,.86],span:4.5}
 };
-export async function openFlat(dialog,isCurrent){
+export async function openFlat(dialog,isCurrent,hint="Drag to orbit · Pinch or scroll to zoom"){
   const stage=dialog.querySelector(".flat-stage"),buttons=[...dialog.querySelectorAll("[data-flat-view]")];
   const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:"low-power"});
   renderer.setClearColor(0,0);renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));
@@ -61,7 +61,7 @@ export async function openFlat(dialog,isCurrent){
     stage.append(canvas);controls.addEventListener("change",draw);controls.addEventListener("start",()=>flight=null);
     for(const b of buttons)b.onclick=choose;
     renderer.shadowMap.needsUpdate=true;resize();observer.observe(stage);
-    dialog.classList.add("interactive");dialog.querySelector("#flat-hint").textContent="Drag to orbit · Pinch or scroll to zoom";
+    dialog.classList.add("interactive");dialog.querySelector("#flat-hint").textContent=hint;
     return clean;
   }catch(e){clean();throw e}
 }

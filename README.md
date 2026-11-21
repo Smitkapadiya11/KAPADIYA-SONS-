@@ -63,3 +63,19 @@ Portfolio and service images now use contain sizing to preserve the full artwork
 The spatial assembly also has a slow idle flow, staggered layer breathing and continuous scroll-weighted helix/petal morphs. Three.js is isolated in its own vendor chunk to prevent a minified identifier collision; generated JavaScript is syntax-checked before deployment.
 Director refinement: three procedural worlds (portal, architectural wireframe city, orbital constellation) transition in chapter order with faster pointer/scroll response. Services use a pinned vertical-scroll sequence with inert inactive cards, full artwork, and compact phone framing. Pause/reduced motion exposes a static service grid. Short windows also use the static grid. All package and service content is retained.
 Exhibition refinement: homepage now orders the opening work, PinYourSite, UGC studio and pricing before the remaining services. Non-flagship prices disclose full scope in native details panels. All three WebGL models remain visible as complete satellites connected by animated Bezier conduits; smaller viewports keep their centers inside the camera frame. Mobile service scenes and flagship prices use shorter framing.
+
+## 3D editions — November 2026
+
+Both property demos are now real-time 3D worlds built from Blender models and rendered with Three.js. Every visible string switches between English, ગુજરાતી and हिन्दी from the header (`?lang=gu|hi` links work too; the choice is remembered per browser).
+
+- **Plots** (`pinyoursite/`): the 63 plots from `plots.json` are extruded on a modelled estate (roads, gates, gardens, play area, compound wall). Each plot carries one of four contemporary home designs, instanced on the GPU and oriented to its road frontage. Tap a plot to fly in; the card shows area, dimensions, frontage and design, and opens the existing Surat villa tour. Day/dusk lighting, status filters and a homes on/off switch are included.
+- **Apartments** (`apartments/`, served at `/apartments/index.html`): three towers stacked from instanced floor modules. Each flat's glazing has its own tint and glow, so availability can colour the facade and windows light at night. Pick a floor to lift the floors above and reveal the real plan with clickable flats. Balcony view stands at the chosen flat's height looking the way its inventory record faces. The furnished B-102 glTF tour is unchanged.
+
+Rebuild the models with Blender 5.3:
+
+```sh
+blender --background --factory-startup --python scripts/build-plots-world.py
+blender --background --factory-startup --python scripts/build-apartments-world.py
+```
+
+These write `pinyoursite/public/world/` and `public/apartments/world/`. Rendering is on demand (no frames while idle), pixel ratio adapts during slow motion, and phones get a portrait-specific camera framing.

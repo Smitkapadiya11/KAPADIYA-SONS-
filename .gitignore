@@ -163,3 +163,5 @@ scripts/recon-reference.py
 scripts/prepare-property.py
 scripts/resize-plan.py
 scripts/update-demo-preview.py
+
+__pycache__/

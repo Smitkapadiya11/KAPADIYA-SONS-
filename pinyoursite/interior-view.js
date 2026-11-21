@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {t} from "./i18n.js";
 
 // Prelit panoramas preserve the Blender lighting in a single mobile draw call.
 export function createInterior(dialog, camera, controls, redraw, maxTextureSize) {
@@ -8,19 +9,19 @@ export function createInterior(dialog, camera, controls, redraw, maxTextureSize)
   sphere.geometry.scale(-1,1,1);
   sphere.rotation.y=-Math.PI/2;
   scene.add(sphere);
-  const exteriorBar=dialog.querySelector('[aria-label="House camera views"]');
+  const exteriorBar=dialog.querySelector("[data-views]");
   const roomBar=dialog.querySelector(".room-controls");
   const enter=dialog.querySelector("#tour-inside");
   const exit=dialog.querySelector("#tour-outside");
   const hint=dialog.querySelector("#tour-hint");
   const title=dialog.querySelector("#house-title");
   const status=dialog.querySelector("#house-status");
-  const rooms={living:"Living room",kitchen:"Kitchen & dining",bedroom:"Primary bedroom",bath:"Bath suite"};
+  const rooms=name=>t("room."+name);
   let current=null,request=0,disposed=false,returnView;
   const textureLoader=new THREE.TextureLoader();
   async function visit(name) {
     const id=++request;
-    status.textContent="Opening "+rooms[name]+"…";
+    status.textContent=t("villa.roomOpening",{n:rooms(name)});
     try {
       const light=navigator.connection?.saveData || maxTextureSize<4096;
       const texture=await textureLoader.loadAsync("/rooms/"+(light?"compact/":"")+name+".webp");
@@ -32,7 +33,7 @@ export function createInterior(dialog, camera, controls, redraw, maxTextureSize)
       current=name;dialog.classList.add("inside-villa");
       exteriorBar.hidden=true;roomBar.hidden=false;enter.setAttribute("aria-expanded","true");
       for(const b of roomBar.querySelectorAll("[data-room]")) b.setAttribute("aria-pressed",String(b.dataset.room===name));
-      title.textContent=rooms[name];status.textContent="";hint.textContent="Drag to look around · Choose a room to move";
+      title.textContent=rooms(name);status.textContent="";hint.textContent=t("villa.hintInside");
       controls.enableDamping=false;controls.update();
       controls.minDistance=.01;controls.maxDistance=.01;controls.minPolarAngle=.03;controls.maxPolarAngle=Math.PI-.03;
       controls.enableZoom=false;controls.rotateSpeed=-.5;
@@ -40,7 +41,7 @@ export function createInterior(dialog, camera, controls, redraw, maxTextureSize)
       controls.target.set(0,0,0);camera.position.set(0,0,.01);controls.update();
       redraw();canvas.focus({preventScroll:true});
     } catch {
-      if(!disposed && id===request)status.textContent="This room could not load. Select it again to retry.";
+      if(!disposed && id===request)status.textContent=t("villa.roomFail");
     }
   }
   function leave(){
@@ -53,7 +54,7 @@ export function createInterior(dialog, camera, controls, redraw, maxTextureSize)
       current=null;material.map?.dispose();material.map=null;
     }
     dialog.classList.remove("inside-villa");exteriorBar.hidden=false;roomBar.hidden=true;enter.setAttribute("aria-expanded","false");
-    title.textContent="The Surat Courtyard Villa";status.textContent="";hint.textContent="Drag to orbit · Pinch or scroll to zoom";
+    title.textContent=t("villa.title");status.textContent="";hint.textContent=t("villa.hint");
     redraw();
   }
   const canvas=controls.domElement;

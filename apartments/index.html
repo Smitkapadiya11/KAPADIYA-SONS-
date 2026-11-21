@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0e12" />
+    <title>PinYourSite Apartments | 3D Residence Explorer</title>
+    <meta name="description" content="Fly around three residential towers, slice open any floor and step onto a balcony. Every flat, its status and a furnished sample interior — in English, ગુજરાતી and हिन्दी." />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="preload" href="/apartments/world/towers.glb" as="fetch" crossorigin />
+    <link rel="preload" href="/apartments/world/site.glb" as="fetch" crossorigin />
+    <meta property="og:title" content="PinYourSite Apartments · 3D Residence Explorer" />
+    <meta property="og:image" content="https://www.kapadiya.tech/apartments/elevation.webp" />
+  </head>
+  <body data-mode="dusk">
+    <a class="skip" href="#toolbar" data-i18n="skip">Skip to project tools</a>
+    <main id="stage" tabindex="-1" data-i18n-attr="aria-label:world.label"><div id="labels"></div></main>
+
+    <div id="loader" role="status">
+      <div class="loader-mark"><b>K<span>&amp;</span>S</b></div>
+      <strong>PinYourSite <em>Apartments</em></strong>
+      <p data-i18n="loading">Raising three towers in 3D…</p>
+      <div class="bar"><i id="progress"></i></div>
+    </div>
+
+    <header class="topbar">
+      <a class="brand" href="/#pinyoursite"><b class="mark">K<span>&amp;</span>S</b><span>PinYourSite<small data-i18n="brand.sub">APARTMENTS · KAPADIYA & SONS</small></span></a>
+      <span class="chip demo" data-i18n="demo">Demo project</span>
+      <span class="spacer"></span>
+      <div class="lang" id="lang"></div>
+      <button id="share" class="icon-btn" data-icon="share" data-i18n-attr="aria-label:share.project;title:share.project"></button>
+    </header>
+
+    <section class="rail">
+      <div class="wings" id="wings" role="group" data-i18n-attr="aria-label:wings.label"></div>
+      <div class="switches">
+        <button id="legend" class="toggle" aria-pressed="false" data-i18n-attr="aria-label:legend.label"><span data-i18n="legend">Availability</span><i></i></button>
+        <div class="segmented" role="group" data-i18n-attr="aria-label:mode.label">
+          <button data-mode="day" aria-pressed="false" data-i18n="mode.day">Day</button>
+          <button data-mode="dusk" aria-pressed="true" data-i18n="mode.dusk">Night</button>
+        </div>
+        <button id="sample" class="chip-btn"><span class="spark"></span><span data-i18n="sample">Sample flat</span></button>
+      </div>
+      <div class="status-key" id="status-key" hidden></div>
+    </section>
+
+    <nav id="floors" data-i18n-attr="aria-label:floors.label" hidden></nav>
+    <button id="compass" class="icon-btn compass" data-i18n-attr="aria-label:reset;title:reset"><span>N</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 16 14H8Z" /></svg></button>
+    <p id="hint" data-i18n="hint.overview">Drag to orbit · Pinch to zoom · Tap a tower</p>
+    <div id="hover-tip" hidden></div>
+    <aside id="unit-card" hidden aria-live="polite"></aside>
+
+    <nav id="toolbar" data-i18n-attr="aria-label:tools.label">
+      <button data-panel="search"><i data-icon="search"></i><span data-i18n="tool.search">Search</span></button>
+      <button data-panel="details"><i data-icon="info"></i><span data-i18n="tool.details">Details</span></button>
+      <button data-panel="gallery"><i data-icon="image"></i><span data-i18n="tool.gallery">Gallery</span></button>
+      <button data-panel="nearby"><i data-icon="pin"></i><span data-i18n="tool.nearby">Nearby</span></button>
+      <button data-panel="gps"><i data-icon="navigation"></i><span data-i18n="tool.gps">GPS</span></button>
+      <a href="/apartments/brochure.pdf" download><i data-icon="file"></i><span data-i18n="tool.brochure">Brochure</span></a>
+    </nav>
+    <a class="powered" href="/" data-i18n="powered">POWERED BY KAPADIYA & SONS</a>
+
+    <dialog id="panel" aria-labelledby="panel-title">
+      <header><h2 id="panel-title"></h2><button id="close-panel" class="icon-btn" data-icon="x" data-i18n-attr="aria-label:close"></button></header>
+      <div id="panel-body"></div>
+    </dialog>
+
+    <dialog id="gps" data-i18n-attr="aria-label:gps.title">
+      <div id="satellite" data-i18n-attr="aria-label:gps.map"></div>
+      <div class="map-rail" role="group" data-i18n-attr="aria-label:gps.controls">
+        <button data-map-action="reset" data-i18n-attr="aria-label:gps.reset;title:gps.reset">↺</button>
+        <button data-map-action="center" data-i18n-attr="aria-label:gps.center;title:gps.center">⌖</button>
+        <button data-map-action="north" data-i18n-attr="aria-label:gps.north;title:gps.north">N</button>
+        <button data-map-action="plus" data-i18n-attr="aria-label:gps.in;title:gps.in">+</button>
+        <button data-map-action="minus" data-i18n-attr="aria-label:gps.out;title:gps.out">−</button>
+      </div>
+      <span role="status" id="tile-status"></span>
+      <div class="map-actions">
+        <a id="directions" target="_blank" rel="noopener"><span data-i18n="gps.directions">Directions</span> ↗</a>
+        <button id="gps-back" class="primary" data-i18n="gps.back">Back to 3D</button>
+      </div>
+    </dialog>
+
+    <dialog id="flat-tour" aria-labelledby="flat-title">
+      <div class="flat-stage"><img data-src="/apartments/flat/preview.webp" data-i18n-attr="alt:flat.alt" alt="" decoding="async" /></div>
+      <div class="flat-heading">
+        <small data-i18n="flat.kicker">PINYOURSITE / SAMPLE RESIDENCE</small>
+        <h2 id="flat-title" data-i18n="flat.title">The Vesu Flat</h2>
+        <p data-i18n="flat.sub">B-102 · Wing B · First floor · 2 BHK</p>
+      </div>
+      <button id="close-flat" data-i18n-attr="aria-label:flat.close">×</button>
+      <div class="flat-views">
+        <div role="group" data-i18n-attr="aria-label:flat.views">
+          <button data-flat-view="overhead" data-i18n="flat.overhead">Overhead</button><button data-flat-view="living" data-i18n="flat.living">Living</button><button data-flat-view="bedrooms" data-i18n="flat.bedrooms">Bedrooms</button><button data-flat-view="kitchen" data-i18n="flat.kitchen">Kitchen</button>
+        </div>
+        <p id="flat-hint" role="status" data-i18n="flat.loading">Loading furnished model…</p>
+      </div>
+    </dialog>
+    <div id="toast" role="status"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
