@@ -1,19 +1,19 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { qualityTier, createSky, loadSurfaces, applySurface, createPipeline } from "./realism.js";
 
 const ROOT = "/apartments/";
 const STATUS = { available: 0x2ec27e, hold: 0xf5a524, sold: 0xe5484d };
 export const statusGroup = (s) => (s === "available" || s === "sold" ? s : "hold");
 const MODES = {
   day: {
-    top: 0x6f9fd6, horizon: 0xeee6d6, sun: 0xfff0d8, sunI: 3.0, sunPos: [-90, 140, 80],
-    hemiSky: 0xd6e6ff, hemiGround: 0x6d5b40, hemiI: 1.0, night: 0, lamp: 0.25, water: 0, exposure: 1, env: 0.5,
+    elevation: 34, azimuth: 225, turbidity: 4, rayleigh: 1.2, brightness: 0.3, fog: 0xcfd8de, sun: 0xffe9cc, sunI: 2.7,
+    hemiSky: 0xcfdcf0, hemiGround: 0x5a4a35, hemiI: 0.7, night: 0, lamp: 0.25, water: 0, exposure: 0.98, env: 0.55,
   },
   dusk: {
-    top: 0x0c1226, horizon: 0xc8754c, sun: 0xff9a5a, sunI: 0.7, sunPos: [160, 36, -60],
-    hemiSky: 0x3d4a7c, hemiGround: 0x1b1612, hemiI: 0.38, night: 1, lamp: 4.5, water: 0.9, exposure: 0.95, env: 0.14,
+    elevation: 4, azimuth: 290, turbidity: 8, rayleigh: 2.4, brightness: 0.55, fog: 0x7a6258, sun: 0xffa060, sunI: 1.2,
+    hemiSky: 0x5d6ca8, hemiGround: 0x241d18, hemiI: 0.85, night: 1, lamp: 4.5, water: 0.9, exposure: 1.15, env: 0.4,
   },
 };
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -53,7 +53,10 @@ const windowTexture = () =>
 
 export async function createWorld({ host, labels, data, onPickWing, onPickUnit, onHover, onProgress }) {
   const mobile = matchMedia("(max-width: 760px), (pointer: coarse)").matches;
-  const renderer = new THREE.WebGLRenderer({ antialias: !mobile || devicePixelRatio < 2, powerPreference: "high-performance" });
+  let tier = qualityTier(mobile);
+  let pipeline = null;
+  // Post-processing does its own anti-aliasing (SMAA), so MSAA is only for the low tier.
+  const renderer = new THREE.WebGLRenderer({ antialias: tier === "low", powerPreference: "high-performance", stencil: false });
   const maxRatio = Math.min(devicePixelRatio, mobile ? 1.6 : 1.75);
   let ratio = maxRatio;
   renderer.setPixelRatio(ratio);
@@ -74,8 +77,6 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
   });
   controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
 
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   const hemi = new THREE.HemisphereLight();
   const sun = new THREE.DirectionalLight();
   sun.castShadow = true;
@@ -84,15 +85,8 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
   sun.shadow.bias = -0.0004;
   sun.shadow.normalBias = 0.06;
   scene.add(hemi, sun, sun.target);
-  const sky = { top: { value: new THREE.Color() }, horizon: { value: new THREE.Color() } };
-  scene.add(new THREE.Mesh(
-    new THREE.SphereGeometry(1800, 32, 16),
-    new THREE.ShaderMaterial({
-      side: THREE.BackSide, depthWrite: false, fog: false, uniforms: sky,
-      vertexShader: "varying vec3 v;\nvoid main(){ v=normalize(position); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }",
-      fragmentShader: "uniform vec3 top;\nuniform vec3 horizon;\nvarying vec3 v;\nvoid main(){\nfloat h=smoothstep(-.02,.6,v.y);\ngl_FragColor=vec4(mix(horizon,top,h),1.);\n#include <colorspace_fragment>\n}",
-    }),
-  ));
+  const sky = createSky(renderer);
+  scene.add(sky.mesh);
   scene.fog = new THREE.Fog(0xffffff, 320, 1400);
   const grass = noise([98, 128, 66], 32);
   grass.repeat.set(500, 500);
@@ -100,6 +94,7 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -0.06;
   ground.receiveShadow = true;
+  ground.userData.uvScale = 3600;
   scene.add(ground);
 
   // Blender assets.
@@ -168,11 +163,11 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
       if (!clear && Math.hypot(x, z) < 380) spots.push([x, z]);
     }
     const facade = windowTexture();
-    facade.repeat.set(7, 3);
-    const block = new THREE.MeshStandardMaterial({ color: 0xd9d2c6, roughness: 0.9, emissive: 0xffffff, emissiveMap: facade, emissiveIntensity: 0 });
+    facade.repeat.set(12, 5);
+    const block = new THREE.MeshStandardMaterial({ color: 0xbdb6ab, roughness: 0.95, emissive: 0xffffff, emissiveMap: facade, emissiveIntensity: 0 });
     block.onBeforeCompile = (shader) => {
       shader.uniforms.uNight = night;
-      shader.fragmentShader = "uniform float uNight;\n" + shader.fragmentShader.replace("#include <emissivemap_fragment>", "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= uNight * 0.32;");
+      shader.fragmentShader = "uniform float uNight;\n" + shader.fragmentShader.replace("#include <emissivemap_fragment>", "#include <emissivemap_fragment>\ntotalEmissiveRadiance *= uNight * 0.12;");
     };
     block.emissiveIntensity = 1;
     const town = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0), block, spots.length);
@@ -300,12 +295,14 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
 
   function applyMode(t) {
     const a = MODES.day, b = MODES.dusk, mix = (x, y) => new THREE.Color(x).lerp(new THREE.Color(y), t), lerp = THREE.MathUtils.lerp;
-    sky.top.value.copy(mix(a.top, b.top));
-    sky.horizon.value.copy(mix(a.horizon, b.horizon));
-    scene.fog.color.copy(sky.horizon.value);
+    sky.set({
+      elevation: lerp(a.elevation, b.elevation, t), azimuth: lerp(a.azimuth, b.azimuth, t),
+      turbidity: lerp(a.turbidity, b.turbidity, t), rayleigh: lerp(a.rayleigh, b.rayleigh, t), brightness: lerp(a.brightness, b.brightness, t),
+    });
+    scene.fog.color.copy(mix(a.fog, b.fog));
     sun.color.copy(mix(a.sun, b.sun));
     sun.intensity = lerp(a.sunI, b.sunI, t);
-    sun.position.copy(new THREE.Vector3(...a.sunPos).lerp(new THREE.Vector3(...b.sunPos), t));
+    sun.position.copy(sky.sun).multiplyScalar(240);
     hemi.color.copy(mix(a.hemiSky, b.hemiSky));
     hemi.groundColor.copy(mix(a.hemiGround, b.hemiGround));
     hemi.intensity = lerp(a.hemiI, b.hemiI, t);
@@ -314,10 +311,13 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
     night.value = lerp(a.night, b.night, t);
     lampMaterials.forEach((m) => (m.emissiveIntensity = lerp(a.lamp, b.lamp, t) * (m.userData.soft ? 0.35 : 1)));
     waterMaterials.forEach((m) => (m.emissiveIntensity = lerp(a.water, b.water, t)));
+    // Glow belongs to lamps and lit windows; keep sunlit facades crisp.
+    if (pipeline) pipeline.bloom.luminanceMaterial.threshold = lerp(1.6, 0.8, t);
     renderer.shadowMap.needsUpdate = true;
     needsRender = true;
   }
   applyMode(1);
+  scene.environment = sky.environment();
 
   // Floor plan reveal for the sliced floor.
   const planGroup = new THREE.Group();
@@ -510,7 +510,7 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
       const t = Math.min(1, (now - modeTween.start) / 900);
       modeState.t = THREE.MathUtils.lerp(modeTween.from, modeTween.to, ease(t));
       applyMode(modeState.t);
-      if (t === 1) modeTween = null;
+      if (t === 1) { modeTween = null; scene.environment = sky.environment(); }
     }
     let sliding = false;
     if (sliceAnim.t !== sliceAnim.target) {
@@ -527,10 +527,14 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
     const dt = now - last;
     last = now;
     slow = dt > 24 && dt < 120 ? slow + 1 : 0;
-    if (slow > 14 && ratio > 1) { ratio = Math.max(1, ratio - 0.25); renderer.setPixelRatio(ratio); slow = 0; }
+    if (slow > 14) {
+      slow = 0;
+      if (ratio > 1) { ratio = Math.max(1, ratio - 0.25); renderer.setPixelRatio(ratio); pipeline?.setSize(width, height); }
+      else if (tier !== "low") downgrade();
+    }
     clearTimeout(sharpen);
-    if (ratio < maxRatio) sharpen = setTimeout(() => { ratio = maxRatio; renderer.setPixelRatio(ratio); needsRender = true; }, 900);
-    renderer.render(scene, camera);
+    if (ratio < maxRatio) sharpen = setTimeout(() => { ratio = maxRatio; renderer.setPixelRatio(ratio); pipeline?.setSize(width, height); needsRender = true; }, 900);
+    pipeline ? pipeline.render() : renderer.render(scene, camera);
     updateLabels();
   }
   function resize() {
@@ -542,6 +546,7 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
     camera.fov = camera.aspect < 0.8 ? 52 : 40;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    pipeline?.setSize(width, height);
     needsRender = true;
   }
   const observer = new ResizeObserver(resize);
@@ -550,6 +555,35 @@ export async function createWorld({ host, labels, data, onPickWing, onPickUnit, 
   place({ ...views.overview(), distance: 620, polar: 0.35, azimuth: -0.4 });
   renderer.shadowMap.needsUpdate = true;
   renderer.compile(scene, camera);
+
+  // Post effects, then stream the PBR textures in after the first frame.
+  pipeline = createPipeline(renderer, scene, camera, tier);
+  applyMode(modeState.t);
+  if (!pipeline) renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  const SURFACES = {
+    lawn: "grass", asphalt: "asphalt", paving: "paving", deck: "wood", teak: "wood", stone: "concrete",
+    slab: "plaster", render: "plaster", wall: "plaster", rubber: "concrete",
+  };
+  const textured = new Set();
+  scene.traverse((o) => { if (o.isMesh && o.material?.isMeshStandardMaterial) textured.add(o); });
+  loadSurfaces(tier === "low" ? 2 : 8).then((sets) => {
+    for (const o of textured) {
+      const key = o === ground ? "grass" : SURFACES[o.material.name];
+      if (!key || o.material.userData.surfaced) continue;
+      applySurface(o.material, sets[key], o.userData.uvScale || 1);
+      if (key === "grass") o.material.color.set(o === ground ? 0x9aa384 : 0xb4be9a);
+      if (key === "wood") o.material.color.set(0xe0a874);
+      o.material.userData.surfaced = true;
+    }
+    renderer.shadowMap.needsUpdate = true;
+    needsRender = true;
+  }).catch(() => {});
+  // Step quality down if this device cannot keep up.
+  function downgrade() {
+    if (tier === "high") { tier = "medium"; pipeline?.dispose(); pipeline = createPipeline(renderer, scene, camera, tier); pipeline?.setSize(width, height); applyMode(modeState.t); }
+    else if (tier === "medium") { tier = "low"; pipeline?.dispose(); pipeline = null; renderer.toneMapping = THREE.ACESFilmicToneMapping; }
+    needsRender = true;
+  }
   raf = requestAnimationFrame(frame);
 
   function closeSlice(done) {
